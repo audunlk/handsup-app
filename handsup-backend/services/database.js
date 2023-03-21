@@ -119,30 +119,49 @@ async function getGroupsByUser(user_id) {
     return result.rows;
 }
 
-async function getPollsByUser(user_id) {
-    const result = await database.query(
-        `
-        SELECT polls.id, polls.title, polls.description, polls.respond_by, polls.user_id, users.username
-        FROM polls
-        JOIN users ON polls.user_id = users.id
-        WHERE polls.user_id = $1;
-        `,
-        [
-            user_id
-        ]
-    );
-    return result.rows;
-}
 
-// export async function getPollsByUser(user_id) {
-//     const response = await fetch(`${HANDSUP_API_URL}/polls-by-user/${user_id}`, {
-//         method: 'GET',
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//     });
-//     return response.json();
-// }
+//create poll
+async function createPoll(title, description, created_at, respond_by, question, group_id, answer_choices) {
+    const client = await database.connect();
+    try {
+        await client.query('BEGIN');
+        const result = await client.query(
+            `
+            INSERT INTO polls (title, description, created_at, respond_by, question, group_id)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING *;
+            `,
+            [title, description, created_at, respond_by, question, group_id]
+        );
+        const poll_id = result.rows[0].id;
+
+        const values = answer_choices.map((answer_choice) => {
+            return [answer_choice, poll_id];
+        }
+        );
+        const result2 = await client.query(
+            `
+            INSERT INTO answer_choices (text, poll_id)
+            VALUES ${values.map((value, index) => `($${index * 2 + 1}, $${index * 2 + 2})`).join(', ')}
+            RETURNING *;
+            `,
+            values.flat()
+        );
+        await client.query('COMMIT');
+        console.log(result2.rows);
+        return result2.rows;
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
+    }
+    }
+    
+
+
+
+
 
 
 
@@ -244,5 +263,5 @@ module.exports = {
     checkUserInGroup,
     getUserByEmail,
     getGroupsByUser,
-    getPollsByUser,
+    createPoll,
 };

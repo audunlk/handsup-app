@@ -107,15 +107,14 @@ app.get('/check-user-group/:user_id/:group_id', async (req, res) => {
 app.get('/groups-by-user/:user_id', async (req, res) => {
     const { user_id } = req.params;
     const groups = await database.getGroupsByUser(user_id);
-    res.json(groups);
-});
-
-
-
-app.get('/polls-by-user/:user_id', async (req, res) => {
-    const { user_id } = req.params;
-    const polls = await database.getPollsByUser(user_id);
-    res.json(polls);
+    res.json(groups); 
+});    
+  
+//create poll
+app.post("/create-poll", async (req, res) => {
+    const { title, description, created_at, respond_by, question, group_id, answer_choices } = req.body;
+    const poll = await database.createPoll(title, description, created_at, respond_by, question, group_id, answer_choices);
+    res.json(poll);
 });
 
 
@@ -188,3 +187,4 @@ app.listen(PORT, "192.168.0.106", () => {
 
 
     
+ 

@@ -1,9 +1,7 @@
 DROP TABLE IF EXISTS response_choice CASCADE;
 DROP TABLE IF EXISTS poll_response CASCADE;
-DROP TABLE IF EXISTS choice CASCADE;
-DROP TABLE IF EXISTS question CASCADE;
+DROP TABLE IF EXISTS anser_choices CASCADE;
 DROP TABLE IF EXISTS poll CASCADE;
-DROP TABLE IF EXISTS questionnaire CASCADE;
 DROP TABLE IF EXISTS user_group CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS groups CASCADE;
@@ -25,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
   timestamp TIMESTAMP DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS poll (
+CREATE TABLE IF NOT EXISTS polls (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   description TEXT,
@@ -36,28 +34,22 @@ CREATE TABLE IF NOT EXISTS poll (
   group_id INTEGER REFERENCES groups(id)
 );
 
-CREATE TABLE IF NOT EXISTS question (
+CREATE TABLE IF NOT EXISTS answer_choices (
   id SERIAL PRIMARY KEY,
   text VARCHAR(255) NOT NULL,
-  poll_id INTEGER REFERENCES poll(id)
-);
-
-CREATE TABLE IF NOT EXISTS choice (
-  id SERIAL PRIMARY KEY,
-  text VARCHAR(255) NOT NULL,
-  question_id INTEGER REFERENCES question(id)
+  poll_id INTEGER REFERENCES polls(id)
 );
 
 CREATE TABLE IF NOT EXISTS poll_response (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id),
-  poll_id INTEGER REFERENCES poll(id)
+  poll_id INTEGER REFERENCES polls(id)
 );
 
 CREATE TABLE IF NOT EXISTS response_choice (
   id SERIAL PRIMARY KEY,
   poll_response_id INTEGER REFERENCES poll_response(id),
-  choice_id INTEGER REFERENCES choice(id)
+  anwser_choice_id INTEGER REFERENCES answer_choices(id)
 );
 
 CREATE TABLE IF NOT EXISTS user_group (
@@ -66,42 +58,54 @@ CREATE TABLE IF NOT EXISTS user_group (
   group_id INTEGER REFERENCES groups(id),
   is_admin BOOLEAN DEFAULT FALSE
 );
--- Insert dummy data
-INSERT INTO groups (name, serialkey) VALUES
-  ('Group A', 'abc123'),
-  ('Group B', 'def456'),
-  ('Group C', 'ghi789');
+-- Dummy data for groups
+INSERT INTO groups (name, serialkey)
+VALUES 
+  ('Group A', 'ABC123'),
+  ('Group B', 'DEF456'),
+  ('Group C', 'GHI789');
 
--- Insert some example users
-INSERT INTO users (email, first_name, last_name, username, password, timestamp) VALUES
-  ('user1@example.com', 'John', 'Doe', 'jdoe', 'password123', '2023-03-20 12:34:56'),
-  ('user2@example.com', 'Jane', 'Smith', 'jsmith', 'password456', '2023-03-19 09:08:07'),
-  ('user3@example.com', 'Bob', 'Johnson', 'bjohnson', 'password789', NULL);
+-- Dummy data for users
+INSERT INTO users (email, first_name, last_name, username, password)
+VALUES 
+  ('user1@example.com', 'John', 'Doe', 'johndoe', 'password1'),
+  ('user2@example.com', 'Jane', 'Smith', 'janesmith', 'password2'),
+  ('user3@example.com', 'Bob', 'Johnson', 'bobjohnson', 'password3');
 
+-- Dummy data for poll
+INSERT INTO polls (title, description, respond_by, question, group_id)
+VALUES 
+  ('Poll 1', 'This is the first poll', '2023-03-31 23:59:59', 'Do you like pizza?', 1),
+  ('Poll 2', 'This is the second poll', '2023-04-01 23:59:59', 'What is your favorite color?', 2),
+  ('Poll 3', 'This is the third poll', '2023-04-02 23:59:59', 'Do you prefer cats or dogs?', 3);
 
--- Insert a polls referencing the questionnaire
-INSERT INTO poll (title, description, respond_by, question, group_id) VALUES
-  ('Example Poll', 'This is an example poll', '2023-03-20 12:34:56', 'Are you alive?', 1);
--- Insert a question referencing the poll
-INSERT INTO question (text, poll_id) VALUES ('Are you alive?', 1);
-
--- Insert some example choices for the question
-INSERT INTO choice (text, question_id) VALUES
+-- Dummy data for answer_choices
+INSERT INTO answer_choices (text, poll_id)
+VALUES 
   ('Yes', 1),
   ('No', 1),
-  ('Maybe', 1);
+  ('Red', 2),
+  ('Blue', 2),
+  ('Cats', 3),
+  ('Dogs', 3);
 
--- Insert a response to the poll from the first user
-INSERT INTO poll_response (user_id, poll_id) VALUES (1, 1);
-
--- Insert the user's choices for the response
-INSERT INTO response_choice (poll_response_id, choice_id) VALUES
+-- Dummy data for poll_response
+INSERT INTO poll_response (user_id, poll_id)
+VALUES 
   (1, 1),
-  (1, 3);
+  (2, 1),
+  (3, 2);
 
--- Add some example user groups
-INSERT INTO user_group (user_id, group_id, is_admin) VALUES
+-- Dummy data for response_choice
+INSERT INTO response_choice (poll_response_id, anwser_choice_id)
+VALUES 
+  (1, 1),
+  (2, 2),
+  (3, 3);
+
+-- Dummy data for user_group
+INSERT INTO user_group (user_id, group_id, is_admin)
+VALUES 
   (1, 1, true),
-  (1, 2, false),
-  (2, 2, true),
-  (2, 3, false);
+  (2, 1, false),
+  (3, 2, false);
