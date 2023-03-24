@@ -166,7 +166,7 @@ app.listen(PORT, "192.168.0.106", () => {
 //   text VARCHAR(255) NOT NULL,
 //   question_id INTEGER REFERENCES questions(id)
 // );
-
+  
 // CREATE TABLE IF NOT EXISTS polls (
 //   id SERIAL PRIMARY KEY,
 //   title VARCHAR(255) NOT NULL,

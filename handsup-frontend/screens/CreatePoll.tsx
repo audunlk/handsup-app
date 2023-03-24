@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { UserContext } from '../navigation/ScreenNav';
 import { createPoll } from '../services/pollSetup';
+import DateSelector from '../components/DateSelector';
 
 export default function CreatePoll({ navigation, route }) {
   const { user } = useContext(UserContext);
@@ -12,20 +13,21 @@ export default function CreatePoll({ navigation, route }) {
   const [poll, setPoll] = useState({
     description: '',
     created_at: new Date().toISOString(),
-    respond_by: new Date().toISOString(),
+    respond_by: new Date(),
     question: '',
     group_id: group.id,
     answer_choices: answers,
   });
 
+  
   useEffect(() => {
     console.log({group})
     console.log('group in create poll');
     console.log({poll})
   }, [ group])
 
+
   const handleCreatePoll = async () => {
-    // First, create the poll
     const pollData = {
       question: poll.question,
       description: poll.description,
@@ -38,7 +40,6 @@ export default function CreatePoll({ navigation, route }) {
     const pollResponse = await createPoll( question, description, created_at, respond_by,  group_id, answer_choices);
     const pollId = pollResponse.id;
 
-    // Finally, navigate to the poll view
     navigation.navigate('Home');
   };
 
@@ -57,18 +58,16 @@ export default function CreatePoll({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Text>Create Poll</Text>
+      
+      <View style={styles.question}>
       <TextInput
           placeholder="Question"
           onChangeText={(text) => setPoll({ ...poll, question: text })}
           value={poll.question}
         />
-      <View style={styles.question}>
-        <TextInput
-          placeholder="Description"
-          onChangeText={(text) => setPoll({ ...poll, description: text })}
-          value={poll.description}
+        <DateSelector 
+          date={poll.respond_by} setPoll={setPoll} poll={poll}
         />
-        
         <View>
           {answers.map((answer, index) => (
             <TextInput
