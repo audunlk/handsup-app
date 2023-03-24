@@ -31,8 +31,8 @@ export default function CreatePoll({ navigation, route }) {
     const pollData = {
       question: poll.question,
       description: poll.description,
-      created_at: poll.created_at,
-      respond_by: poll.respond_by,
+      created_at: new Date().toISOString(),
+      respond_by: new Date(poll.respond_by).toISOString(),
       group_id: poll.group_id,
       answer_choices: answers,
     };
