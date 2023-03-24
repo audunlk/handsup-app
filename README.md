@@ -1,4 +1,5 @@
 ## Polling App built with React Native
+## IN PROGRESS
 This mobile application offers the possibility for users to join teams by entering serial keys, and also to create teams that others can join.
 
 The app's main feature is the ability for group admins to send polls to the entire group and collect answers by the expiration date of the poll. The UI has been designed to be simple and user-friendly, with a singular purpose of collecting small amounts of data from a group. This sets it apart from other social media platforms that do not allow for effective timeframe management, potentially leaving users free to not respond.
