@@ -120,16 +120,6 @@ export async function getGroupsByUser(user_id) {
     return response.json();
 }
 
-export async function createPoll (title, description, created_at, respond_by, question, group_id, answer_choices) {
-    const response = await fetch(`${HANDSUP_API_URL}/create-poll`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title, description, created_at, respond_by, question, group_id, answer_choices }),
-    });
-    return response.json();
-}
 
 
 

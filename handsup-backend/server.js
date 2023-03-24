@@ -112,9 +112,18 @@ app.get('/groups-by-user/:user_id', async (req, res) => {
   
 //create poll
 app.post("/create-poll", async (req, res) => {
-    const { title, description, created_at, respond_by, question, group_id, answer_choices } = req.body;
-    const poll = await database.createPoll(title, description, created_at, respond_by, question, group_id, answer_choices);
+    const { question, description, created_at, respond_by,  group_id, answer_choices} = req.body;
+    const poll = await database.createPoll( question, description, created_at, respond_by,  group_id, answer_choices);
     res.json(poll);
+});
+
+
+
+//get polls by group
+app.get('/polls-by-group/:group_id', async (req, res) => {
+    const { group_id } = req.params;
+    const polls = await database.getPollsByGroup(group_id);
+    res.json(polls);
 });
 
 

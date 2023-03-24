@@ -4,8 +4,7 @@ import Header from '../components/Header'
 import { UserContext } from '../navigation/ScreenNav'
 import { getGroupsByUser } from '../services/accountSetup'
 import { LinearGradient } from 'expo-linear-gradient'
-
-
+import ListItem from '../components/ListItem'
 
 export default function Groups( {navigation}) {
     const { user } = useContext(UserContext)
@@ -38,16 +37,11 @@ export default function Groups( {navigation}) {
     const handleRenderGroups = () => {
         return groups.map((group) => {
             return (
-                <View key={group.id} >
-                    <TouchableOpacity onPress={
-                    () => {
-                        navigation.navigate('GroupInfo', {group: group})
-                    }
-                }>
-                    <Text>{group.name}</Text>
-                    <Text>{group.is_admin ? 'Leader' : 'Member'}</Text>
-                </TouchableOpacity>
-                </View>
+                <ListItem
+                key={group.id}
+                title={group.name}
+                onPress={() => navigation.navigate('GroupInfo', {group: group})}
+                />
             )
         })
     }
@@ -55,7 +49,6 @@ export default function Groups( {navigation}) {
     const handleCreateTeam = () => {
         navigation.navigate('CreateTeam')
       }
-    
       const handleJoinTeam = () => {
         navigation.navigate('JoinTeam', {user: user})
       }

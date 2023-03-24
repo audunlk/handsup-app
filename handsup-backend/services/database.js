@@ -121,17 +121,17 @@ async function getGroupsByUser(user_id) {
 
 
 //create poll
-async function createPoll(title, description, created_at, respond_by, question, group_id, answer_choices) {
+async function createPoll( question, description, created_at, respond_by,  group_id, answer_choices) {
     const client = await database.connect();
     try {
         await client.query('BEGIN');
         const result = await client.query(
             `
-            INSERT INTO polls (title, description, created_at, respond_by, question, group_id)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO polls (question, description, created_at, respond_by, group_id)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *;
             `,
-            [title, description, created_at, respond_by, question, group_id]
+            [question, description, created_at, respond_by, group_id]
         );
         const poll_id = result.rows[0].id;
 
@@ -157,6 +157,27 @@ async function createPoll(title, description, created_at, respond_by, question, 
         client.release();
     }
     }
+
+
+async function getPollsByGroup(group_id) {
+    try {
+        const result = await database.query(
+            `
+            SELECT polls.id, polls.description, polls.created_at, polls.respond_by, polls.question, polls.group_id, groups.name, groups.serialkey
+            FROM polls
+            JOIN groups ON polls.group_id = groups.id
+            WHERE polls.group_id = $1;
+            `,
+            [
+                group_id
+            ]
+        );
+        return result.rows;
+    } catch (error) {
+        throw error;
+    }
+}
+
     
 
 
@@ -264,4 +285,5 @@ module.exports = {
     getUserByEmail,
     getGroupsByUser,
     createPoll,
+    getPollsByGroup,
 };

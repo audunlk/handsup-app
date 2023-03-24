@@ -7,7 +7,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 export default function Header({navigation, title, showExit }) {
     const showExitButton = showExit ? true : false;
 
-
   return (
     <View style={styles.header} >
           <Text style={styles.title}>{title}</Text>

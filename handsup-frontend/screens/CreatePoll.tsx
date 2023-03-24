@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { UserContext } from '../navigation/ScreenNav';
-import { createPoll } from '../services/accountSetup';
+import { createPoll } from '../services/pollSetup';
 
 export default function CreatePoll({ navigation, route }) {
   const { user } = useContext(UserContext);
@@ -10,7 +10,6 @@ export default function CreatePoll({ navigation, route }) {
   const [answers, setAnswers] = useState([]);
 
   const [poll, setPoll] = useState({
-    title: '',
     description: '',
     created_at: new Date().toISOString(),
     respond_by: new Date().toISOString(),
@@ -28,16 +27,15 @@ export default function CreatePoll({ navigation, route }) {
   const handleCreatePoll = async () => {
     // First, create the poll
     const pollData = {
-      title: poll.title,
+      question: poll.question,
       description: poll.description,
       created_at: poll.created_at,
       respond_by: poll.respond_by,
-      question: poll.question,
       group_id: poll.group_id,
       answer_choices: answers,
     };
-    const { title, description, created_at, respond_by, question, group_id, answer_choices } = pollData;
-    const pollResponse = await createPoll(title, description, created_at, respond_by, question, group_id, answer_choices);
+    const { question, description, created_at, respond_by,  group_id, answer_choices } = pollData;
+    const pollResponse = await createPoll( question, description, created_at, respond_by,  group_id, answer_choices);
     const pollId = pollResponse.id;
 
     // Finally, navigate to the poll view
@@ -59,22 +57,18 @@ export default function CreatePoll({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Text>Create Poll</Text>
-      <View style={styles.question}>
-        <TextInput
-          placeholder="Title"
-          onChangeText={(text) => setPoll({ ...poll, title: text })}
-          value={poll.title}
+      <TextInput
+          placeholder="Question"
+          onChangeText={(text) => setPoll({ ...poll, question: text })}
+          value={poll.question}
         />
+      <View style={styles.question}>
         <TextInput
           placeholder="Description"
           onChangeText={(text) => setPoll({ ...poll, description: text })}
           value={poll.description}
         />
-        <TextInput
-          placeholder="Question"
-          onChangeText={(text) => setPoll({ ...poll, question: text })}
-          value={poll.question}
-        />
+        
         <View>
           {answers.map((answer, index) => (
             <TextInput

@@ -6,24 +6,34 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  Button,
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import Header from "../components/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons as IonIcons } from "@expo/vector-icons";
+import { getPollsByGroup } from "../services/pollSetup";
+import  ListItem  from "../components/ListItem";
+import MainBtn from "../components/MainBtn";
 
 export default function GroupInfo({ navigation, route }) {
   const { group } = route.params;
+  const [polls, setPolls] = useState([]);
 
   useEffect(() => {
     console.log(group);
     console.log("group in group info");
+    listPollsInGroup();
   }, []);
 
   const copyToClipboard = async () => {
     Clipboard.setStringAsync(group.serialkey);
     Alert.alert(`Copied to clipboard`);
+  };
+
+  const listPollsInGroup = async () => {
+    const listPolls = await getPollsByGroup(group.id);
+    console.log({ listPolls });
+    setPolls(listPolls);
   };
 
   return (
@@ -34,10 +44,10 @@ export default function GroupInfo({ navigation, route }) {
       >
         <Header navigation={navigation} title={group.name} showExit={false} />
         <View style={styles.body}>
-          <Text>{group.is_admin ? "Leader" : "Member"}</Text>
+          <Text style={styles.title}>{group.is_admin ? "Leader" : "Member"}</Text>
           {group.is_admin && (
             <View>
-                <Text>Invitation Key:</Text>
+                <Text style={styles.title}>Invitation Key:</Text>
                 <TouchableOpacity
                   style={styles.serialBox}
                   onPress={copyToClipboard}
@@ -55,10 +65,21 @@ export default function GroupInfo({ navigation, route }) {
                   />
                 </TouchableOpacity>
                 <View>
-                  <Button title="Create Poll" onPress={() => navigation.navigate("CreatePoll", { group })} />
+                  <MainBtn title="Add Poll" onPress={() => navigation.navigate("CreatePoll", { group })} />
                 </View>
             </View>
           )}
+          
+            <View>
+              <Text style={styles.title}>Active Polls</Text>
+              {polls.map((poll) => (
+                <ListItem
+                  key={poll.id}
+                  title={poll.question}
+                  onPress={() => navigation.navigate("Poll", { poll })}
+                />
+              ))}
+            </View>
         </View>
       </LinearGradient>
     </View>
@@ -68,7 +89,6 @@ export default function GroupInfo({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    
   },
   linearGradient: {
     flex: 1,
@@ -80,6 +100,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     alignContent: "center",
+    padding: 10,
   },
   serialBox: {
     flexDirection: "row",
@@ -89,10 +110,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "white",
     backgroundColor: "white",
-    width: '100%',
+    width: 300,
+    alignSelf: "center",
     padding: 10,
     borderRadius: 5,
-
+  },
+  title: {
+    fontSize: 15,
+    color: "white",
+    fontWeight: "bold",
+    marginVertical: 20,
   },
 
 });
