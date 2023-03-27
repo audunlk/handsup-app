@@ -16,6 +16,7 @@ import UserProfile from '../screens/UserProfile';
 import Groups from '../screens/Groups';
 import Loading from '../screens/Loading';
 import GroupInfo from '../screens/GroupInfo';
+import PollCard from '../components/PollCard';
 
 
 
@@ -70,9 +71,13 @@ export default function ScreenNav() {
                 component={Home}
                 options={{ headerShown: false }}
               />
-            <Stack.Screen name='CreatePoll' component={CreatePoll} />
-              
-              
+            <Stack.Screen name='CreatePoll' component={CreatePoll} 
+            options={{ headerShown: false }}
+            />
+            <Stack.Screen name='PollCard' component={PollCard}
+            options={{ headerShown: false }}
+
+             />
               <Stack.Screen
                 name='UserProfile'
                 component={UserProfile}

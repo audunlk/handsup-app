@@ -21,6 +21,16 @@ export async function getPollsByGroup(group_id) {
     return response.json();
 }
 
+export async function getAnswerChoices(poll_id) {
+    const response = await fetch(`${HANDSUP_API_URL}/answer-choices/${poll_id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.json();
+}
+
 
 
 

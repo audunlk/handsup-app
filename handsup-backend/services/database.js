@@ -178,6 +178,17 @@ async function getPollsByGroup(group_id) {
     }
 }
 
+async function getAnswerChoices(poll_id){
+    const result = await database.query(
+        `
+        SELECT * FROM answer_choices
+        WHERE poll_id = $1;
+        `,
+        [poll_id]
+    );
+    return result.rows;
+}
+
     
 
 
@@ -286,4 +297,5 @@ module.exports = {
     getGroupsByUser,
     createPoll,
     getPollsByGroup,
+    getAnswerChoices,
 };

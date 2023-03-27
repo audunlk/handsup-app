@@ -126,6 +126,14 @@ app.get('/polls-by-group/:group_id', async (req, res) => {
     res.json(polls);
 });
 
+//get answers by pollID
+app.get('/answer-choices/:poll_id', async (req, res) => {
+    const { poll_id } = req.params;
+    const answers = await database.getAnswerChoices(poll_id);
+    res.json(answers);
+});
+
+
 
  
 app.listen(PORT, "192.168.0.106", () => {

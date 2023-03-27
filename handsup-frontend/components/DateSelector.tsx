@@ -29,14 +29,18 @@ export default function DateSelector({ UTCdate, setPoll, poll }) {
     <View>
       <Button onPress={showDateTimePicker} title="Respond By" />
       {showPicker && (
-        <DateTimePicker
-          value={selectedDate}
-          mode="datetime"
-          display="default"
-          onChange={onChange}
-        />
+        <View>
+          <DateTimePicker
+            value={selectedDate}
+            mode="datetime"
+            display="spinner"
+            onChange={onChange}
+          />
+          <Button onPress={hideDateTimePicker} title="Add deadline" />
+        </View>
       )}
-      <Text>{selectedDate.toLocaleString()}</Text>
+        
+
     </View>
   );
 }

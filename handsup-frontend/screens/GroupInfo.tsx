@@ -76,7 +76,7 @@ export default function GroupInfo({ navigation, route }) {
                 <ListItem
                   key={poll.id}
                   title={poll.question}
-                  onPress={() => navigation.navigate("Poll", { poll })}
+                  onPress={() => navigation.navigate("PollCard", { poll: poll, group: group })}
                 />
               ))}
             </View>
