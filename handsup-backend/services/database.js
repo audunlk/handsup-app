@@ -2,7 +2,7 @@ const { Pool } = require("pg");
 
 const POSTGRES_URL = process.env.POSTGRES_URL || "postgresql://postgres:387456@localhost:5432/handsup";
 
-const database = new Pool({
+const database = new Pool({  
     connectionString: POSTGRES_URL,
 });
 // Database for a polling app called HandsUp

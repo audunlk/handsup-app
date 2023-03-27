@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, Button, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { localToUTC } from '../utils/dateConversion';
 
-export default function DateSelector({ date, setPoll, poll }) {
+
+export default function DateSelector({ UTCdate, setPoll, poll }) {
   const [showPicker, setShowPicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  
+  const UTCDate = localToUTC(selectedDate);
 
   const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
     setShowPicker(Platform.OS === 'ios');
-    setPoll({ ...poll, respond_by: currentDate });
+    setSelectedDate(selectedDate);
+    setPoll({ ...poll, respond_by: UTCDate.toISOString()});
   };
 
   const showDateTimePicker = () => {
@@ -24,13 +30,13 @@ export default function DateSelector({ date, setPoll, poll }) {
       <Button onPress={showDateTimePicker} title="Respond By" />
       {showPicker && (
         <DateTimePicker
-          value={date}
+          value={selectedDate}
           mode="datetime"
           display="default"
           onChange={onChange}
         />
       )}
-      <Text>{date.toLocaleString()}</Text>
+      <Text>{selectedDate.toLocaleString()}</Text>
     </View>
   );
 }
