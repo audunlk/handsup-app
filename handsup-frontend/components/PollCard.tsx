@@ -9,23 +9,38 @@ export default function PollCard( {route} ) {
   const [answers, setAnswers] = useState([]);
   const [creationDate, setCreationDate] = useState([]);
   const [respondBy, setRespondBy] = useState([]);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { poll } = route.params;
 
   const getAnswers = async (id: Number) => {
-    const answerChoices = await getAnswerChoices(id);
+    try{
+      const answerChoices = await getAnswerChoices(id);
     setAnswers(answerChoices);
     setCreationDate(ISOtoReadable(poll.created_at));
     setRespondBy(ISOtoReadable(poll.respond_by));
-    
+  } catch (error) {
+    setError(error.message);
+  }finally {
+    setIsLoading(false);
+  }
   }
 
 
   useEffect(() => {
+    setIsLoading(true);
     console.log({poll})
     getAnswers(poll.id);
     console.log({answers})
   }, [poll])
 
+  if(isLoading) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    )
+  }
 
   return (
     <View style={
@@ -48,6 +63,7 @@ export default function PollCard( {route} ) {
         <Text>{poll.group_id}</Text>
         {answers.map((answer, index) => {
           return (
+            
             <Text key={index}>{answer.text}</Text>
           )
         })
@@ -55,4 +71,5 @@ export default function PollCard( {route} ) {
     </View>
   )
 }
+
  

@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS poll_response (
 CREATE TABLE IF NOT EXISTS response_choice (
   id SERIAL PRIMARY KEY,
   poll_response_id INTEGER REFERENCES poll_response(id),
-  anwser_choice_id INTEGER REFERENCES answer_choices(id)
+  answer_choice_id INTEGER REFERENCES answer_choices(id)
 );
 
 CREATE TABLE IF NOT EXISTS user_group (
@@ -96,7 +96,7 @@ VALUES
   (3, 2);
 
 -- Dummy data for response_choice
-INSERT INTO response_choice (poll_response_id, anwser_choice_id)
+INSERT INTO response_choice (poll_response_id, answer_choice_id)
 VALUES 
   (1, 1),
   (2, 2),
