@@ -177,7 +177,7 @@ async function getPollsByGroup(group_id) {
         throw error;
     }
 }
-
+ 
 async function getAnswerChoices(poll_id){
     const result = await database.query(
         `
@@ -188,6 +188,24 @@ async function getAnswerChoices(poll_id){
     );
     return result.rows;
 }
+
+
+
+ 
+async function getPollsByGroups(group_ids) {
+    const result = await database.query(
+        `
+        SELECT polls.id, polls.description, polls.created_at, polls.respond_by, polls.question, polls.group_id, groups.name, groups.serialkey
+        FROM polls
+        JOIN groups ON polls.group_id = groups.id
+        WHERE polls.group_id IN (${group_ids});
+        `
+    );
+    console.log(result.rows);
+    return result.rows;
+}
+
+
 
     
 
@@ -298,4 +316,5 @@ module.exports = {
     createPoll,
     getPollsByGroup,
     getAnswerChoices,
+    getPollsByGroups
 };

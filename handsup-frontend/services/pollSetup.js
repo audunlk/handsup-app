@@ -31,6 +31,20 @@ export async function getAnswerChoices(poll_id) {
     return response.json();
 }
 
+//takes a group id array and returns an array of polls
+export async function getPollsByGroups(group_ids) {
+    const response = await fetch(`${HANDSUP_API_URL}/polls-by-groups/${
+        group_ids
+    }`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.json();
+
+}
+
 
 
 

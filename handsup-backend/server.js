@@ -135,6 +135,14 @@ app.get('/answer-choices/:poll_id', async (req, res) => {
 
 
 
+app.get('/polls-by-groups/:group_ids', async (req, res) => {
+    const { group_ids } = req.params;
+    console.log(group_ids)
+    const polls = await database.getPollsByGroups(group_ids);
+    res.json(polls);
+});
+
+
  
 app.listen(PORT, "192.168.0.106", () => {
     console.log(`Server is running on http://192.168.0.106:${PORT}`);

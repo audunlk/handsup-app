@@ -60,11 +60,15 @@ export default function ScreenNav() {
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
-      <NavigationContainer>
-        <Stack.Navigator>
+      <NavigationContainer 
+      
+      >
+        <Stack.Navigator
+        initialRouteName='Home'
+        >
           {isLoading ? (
             <Stack.Screen name='Loading' component={Loading} />
-          ) : user ? (
+          ) : ( 
             <>
             <Stack.Screen
                 name='Home'
@@ -76,7 +80,6 @@ export default function ScreenNav() {
             />
             <Stack.Screen name='PollCard' component={PollCard}
             options={{ headerShown: false }}
-
              />
               <Stack.Screen
                 name='UserProfile'
@@ -107,9 +110,7 @@ export default function ScreenNav() {
                 component={CreateTeam}
                 options={{ headerShown: false }}
               />
-            </>
-          ) : (
-            <>
+            
               <Stack.Screen
                 name='Login'
                 component={Login}

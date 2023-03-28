@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Animated, Easing } from "react-native";
 import { getLoginToken } from "../services/accountSetup";
 
-export default function Login({ navigation}) {
+export default function Login({ navigation }) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +16,6 @@ export default function Login({ navigation}) {
     const getToken = async () => {
       const token = await AsyncStorage.getItem("handsup-token");
       if (token) {
-        
         navigation.navigate("Home");
       }
       return
@@ -66,12 +65,17 @@ export default function Login({ navigation}) {
       <Text style={styles.text}>Login</Text>
       <TextInput 
       style={styles.input}
-      placeholder="Email" value={email} onChangeText={setEmail} />
+      placeholder="Email" value={email} onChangeText={setEmail} 
+      autoCapitalize="none"
+      autoComplete="email"
+      />
       <TextInput
       style={styles.input}      
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
+        autoCapitalize="none"
+        secureTextEntry={true}
       />
       <View
         style={styles.button}

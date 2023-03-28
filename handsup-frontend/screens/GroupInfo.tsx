@@ -12,7 +12,7 @@ import Header from "../components/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons as IonIcons } from "@expo/vector-icons";
 import { getPollsByGroup } from "../services/pollSetup";
-import  ListItem  from "../components/ListItem";
+import ListItem from "../components/ListItem";
 import MainBtn from "../components/MainBtn";
 
 export default function GroupInfo({ navigation, route }) {
@@ -44,42 +44,45 @@ export default function GroupInfo({ navigation, route }) {
       >
         <Header navigation={navigation} title={group.name} showExit={false} />
         <View style={styles.body}>
-          <Text style={styles.title}>{group.is_admin ? "Leader" : "Member"}</Text>
+          <Text style={styles.title}>
+            {group.is_admin ? "Leader" : "Member"}
+          </Text>
           {group.is_admin && (
             <View>
-                <Text style={styles.title}>Invitation Key:</Text>
-                <TouchableOpacity
-                  style={styles.serialBox}
-                  onPress={copyToClipboard}
-                >
-                  <TextInput
-                    value={group.serialkey}
-                    caretHidden={true}
-                    autoCorrect={false}
-                    editable={false}
-                  />
-                  <IonIcons
-                    name="copy-outline"
-                    size={24}
-                    color="black"
-                  />
-                </TouchableOpacity>
-                <View>
-                  <MainBtn title="Add Poll" onPress={() => navigation.navigate("CreatePoll", { group })} />
-                </View>
+              <Text style={styles.title}>Invitation Key:</Text>
+              <TouchableOpacity
+                style={styles.serialBox}
+                onPress={copyToClipboard}
+              >
+                <TextInput
+                  value={group.serialkey}
+                  caretHidden={true}
+                  autoCorrect={false}
+                  editable={false}
+                />
+                <IonIcons name="copy-outline" size={24} color="black" />
+              </TouchableOpacity>
+              <View>
+                <MainBtn
+                  title="Add Poll"
+                  onPress={() => navigation.navigate("CreatePoll", { group })}
+                />
+              </View>
             </View>
           )}
-          
-            <View>
-              <Text style={styles.title}>Active Polls</Text>
-              {polls.map((poll) => (
-                <ListItem
-                  key={poll.id}
-                  title={poll.question}
-                  onPress={() => navigation.navigate("PollCard", { poll: poll, group: group })}
-                />
-              ))}
-            </View>
+
+          <View>
+            <Text style={styles.title}>Active Polls</Text>
+            {polls.map((poll) => (
+              <ListItem
+                key={poll.id}
+                title={poll.question}
+                onPress={() =>
+                  navigation.navigate("PollCard", { poll: poll, group: group })
+                }
+              />
+            ))}
+          </View>
         </View>
       </LinearGradient>
     </View>
@@ -121,5 +124,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 20,
   },
-
 });
