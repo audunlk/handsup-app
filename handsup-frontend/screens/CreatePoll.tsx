@@ -8,6 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { UserContext } from "../navigation/ScreenNav";
+
 import { createPoll } from "../services/pollSetup";
 import DateSelector from "../components/DateSelector";
 import * as Notifications from "expo-notifications";
@@ -105,7 +106,7 @@ export default function CreatePoll({ navigation, route }) {
     console.log(answers);
   };
 
-  const handleAnswerTextChange = (index, text) => {
+  const handleAnswerTextChange = (index, text: string) => {
     const newAnswers = [...answers];
     newAnswers[index] = text;
     setAnswers(newAnswers);
@@ -115,14 +116,14 @@ export default function CreatePoll({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Text>Create Poll</Text>
-
-      <View style={styles.question}>
+    <View style={styles.body}>
+      <View>
         <TextInput
           placeholder="Question"
           onChangeText={(text) => setPoll({ ...poll, question: text })}
           value={poll.question}
         />
-        <DateSelector UTCdate={poll.respond_by} setPoll={setPoll} poll={poll} />
+        <DateSelector setPoll={setPoll} poll={poll} />
         <View>
           {answers.map((answer, index) => (
             <TextInput
@@ -137,7 +138,7 @@ export default function CreatePoll({ navigation, route }) {
         </View>
       </View>
       <Button title="Create Poll" onPress={handleCreatePoll} />
-      <View
+      {/* <View
         style={{
           flex: 1,
           alignItems: "center",
@@ -157,6 +158,7 @@ export default function CreatePoll({ navigation, route }) {
             await schedulePushNotification();
           }}
         />
+      </View> */}
       </View>
     </View>
   );
@@ -206,16 +208,15 @@ async function registerForPushNotificationsAsync() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
-  question: {
+  body: {
     flex: 1,
+    height: "70%",
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
+
   answer: {
     flex: 1,
     backgroundColor: "#fff",

@@ -1,47 +1,52 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import BottomNav from "../navigation/BottomNav";
 import { useContext } from "react";
 import { UserContext } from "../navigation/ScreenNav";
-import ListItem from "../components/ListItem";
 import { getGroupsByUser } from "../services/accountSetup";
 import { getPollsByGroups } from "../services/pollSetup";
-import AsyncStorage  from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setUser } from "../redux/actions/userActions";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
+import BottomNav from "../navigation/BottomNav";
+import MainBtn from "../components/MainBtn";
+import { RootState } from "../redux/store/types";
 
-export default function Home({ navigation, route }) {
-  const { user, setUser } = useContext(UserContext);
+export default function Home({ navigation }) {
+  const dispatch = useDispatch();
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [polls, setPolls] = useState([]);
-  const [groups, setGroups] = useState([]);
+  const [selectedTab, setSelectedTab] = useState("active");
 
   useEffect(() => {
     const getToken = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
         if (token) {
-          setUser(token);
+          dispatch(setUser(token));
         }
         navigation.navigate("Login");
       } catch (error) {
         console.log(error);
-      }
+      } 
     };
     getToken();
+  }, [dispatch, navigation]);
+
+  useEffect(() => {
     const getPolls = async () => {
       try {
+        const user = useSelector((state: RootState) => state.user);
         const groups = await getGroupsByUser(user.id);
         console.log(groups);
         const group_ids = groups.map((group) => group.id);
         const userPolls = await getPollsByGroups(group_ids);
-        setPolls(userPolls)
+        setPolls(userPolls);
       } catch (error) {
         console.log(error);
         setError(error);
@@ -50,8 +55,12 @@ export default function Home({ navigation, route }) {
       }
     };
     getPolls();
-  }, []);
+    console.log(polls);
+  }, [navigation]);
 
+  const now = new Date();
+  const activePolls = polls.filter((poll) => new Date(poll.respond_by) > now);
+  const expiredPolls = polls.filter((poll) => new Date(poll.respond_by) <= now);
 
   return (
     <View style={styles.container}>
@@ -60,7 +69,7 @@ export default function Home({ navigation, route }) {
         style={styles.linearGradient}
       >
         <View style={styles.header}>
-          <Text>Hi, {user.first_name}!✨</Text>
+          <Text>{user.first_name}</Text>
           <Ionicons
             name="ios-person"
             size={24}
@@ -68,24 +77,43 @@ export default function Home({ navigation, route }) {
             onPress={() => navigation.navigate("UserProfile", { user: user })}
           />
         </View>
-        {/* <View style={styles.tabs}>
-          <Text style={styles.tab}>Active Polls</Text>
-          <Text style={styles.tab}>Expired Polls</Text>
-        </View> */}
+        <View style={styles.tabs}>
+          <TouchableOpacity onPress={() => setSelectedTab("active")}>
+            <Text style={{ color: "white" }}>Active</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setSelectedTab("expired")}>
+            <Text style={{ color: "white" }}>Expired</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.body}>
-          {polls.length > 0 ? (
-            polls.map((poll) => (
-              <View key={poll.id}>
-                <Text>{poll.question}</Text>
-                <Text>{poll.created_at}</Text>
-                <Text>{poll.name}</Text>
-              </View>
-            ))
-          ): 
-          (
-            <Text>You have no polls yet</Text>
-          )}
-          <View style={styles.listContainer}></View>
+          <View style={styles.listContainer}>
+            {isLoading ? (
+              <Text>Loading...</Text>
+            ) : selectedTab === "active" ? (
+              activePolls.map((poll) => (
+                <View>
+                  <Text>{poll.name}</Text>
+                  <MainBtn
+                    key={poll.id}
+                    title={poll.question}
+                    onPress={() =>
+                      navigation.navigate("PollCard", { poll: poll })
+                    }
+                  />
+                </View>
+              ))
+            ) : (
+              expiredPolls.map((poll) => (
+                <MainBtn
+                  key={poll.id}
+                  title={poll.question}
+                  onPress={() =>
+                    navigation.navigate("PollCard", { poll: poll })
+                  }
+                />
+              ))
+            )}
+          </View>
         </View>
       </LinearGradient>
       <BottomNav navigation={navigation} />
@@ -106,9 +134,18 @@ const styles = StyleSheet.create({
   header: {
     justifyContent: "space-between",
     paddingHorizontal: 20,
+
     marginTop: 80,
     color: "white",
     flexDirection: "row",
+  },
+  tabs: {
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    marginTop: 20,
+    color: "white",
+    flexDirection: "row",
+    width: "100%",
   },
   body: {
     flex: 1,

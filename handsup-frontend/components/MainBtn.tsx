@@ -18,7 +18,6 @@ export default MainBtn;
         backgroundColor: "#1d9afd",
         padding: 10,
         borderRadius: 10,
-        width: 300,
         alignItems: "center",
         justifyContent: "center",
         alignSelf: "center",

@@ -4,31 +4,18 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { localToUTC } from '../utils/dateConversion';
 
 
-export default function DateSelector({ UTCdate, setPoll, poll }) {
-  const [showPicker, setShowPicker] = useState(false);
+export default function DateSelector({ setPoll, poll }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  
-  const UTCDate = localToUTC(selectedDate);
 
   const onChange = (event, selectedDate) => {
-    setShowPicker(Platform.OS === 'ios');
     setSelectedDate(selectedDate);
-    setPoll({ ...poll, respond_by: UTCDate.toISOString()});
+    const UTCdate = localToUTC(selectedDate)
+    console.log(UTCdate.toISOString())
+    setPoll({ ...poll, respond_by: UTCdate});
   };
-
-  const showDateTimePicker = () => {
-    setShowPicker(true);
-  };
-
-  const hideDateTimePicker = () => {
-    setShowPicker(false);
-  };
-
   return (
-    <View>
-      <Button onPress={showDateTimePicker} title="Respond By" />
-      {showPicker && (
+    <View>      
         <View>
           <DateTimePicker
             value={selectedDate}
@@ -36,10 +23,7 @@ export default function DateSelector({ UTCdate, setPoll, poll }) {
             display="spinner"
             onChange={onChange}
           />
-          <Button onPress={hideDateTimePicker} title="Add deadline" />
         </View>
-      )}
-        
 
     </View>
   );

@@ -2,6 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Animated, Easing } from "react-native";
 import { getLoginToken } from "../services/accountSetup";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+
 
 export default function Login({ navigation }) {
 
@@ -16,24 +19,15 @@ export default function Login({ navigation }) {
     const getToken = async () => {
       const token = await AsyncStorage.getItem("handsup-token");
       if (token) {
+        const user = jwtDecode(token);
+        dispatch(setUser(user));
         navigation.navigate("Home");
       }
       return
     };
     getToken();
-  }, [navigation]);
+  }, [dispatch, navigation]);
 
-  useEffect(() => {
-    Animated.timing(
-      fadeAnim,
-      {
-        toValue: 1,
-        duration: 500,
-        easing: Easing.ease,
-        useNativeDriver: true,
-      }
-    ).start();
-  }, []);
 
 
   const handleLogin = async () => {
@@ -61,7 +55,7 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+    <View style={[styles.container]}>
       <Text style={styles.text}>Login</Text>
       <TextInput 
       style={styles.input}
@@ -97,7 +91,7 @@ export default function Login({ navigation }) {
       </View>
       
       {error && <Text>{error}</Text>}
-    </Animated.View>
+    </View>
   );
 }
 

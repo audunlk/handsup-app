@@ -31,6 +31,16 @@ export async function getAnswerChoices(poll_id) {
     return response.json();
 }
 
+export async function deletePoll(poll_id) {
+    const response = await fetch(`${HANDSUP_API_URL}/delete-poll/${poll_id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.json();
+}
+
 //takes a group id array and returns an array of polls
 export async function getPollsByGroups(group_ids) {
     const response = await fetch(`${HANDSUP_API_URL}/polls-by-groups/${
@@ -43,6 +53,16 @@ export async function getPollsByGroups(group_ids) {
     });
     return response.json();
 
+}
+
+export async function getAdminsByGroup(group_id) {
+    const response = await fetch(`${HANDSUP_API_URL}/admins-by-group/${group_id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.json();
 }
 
 

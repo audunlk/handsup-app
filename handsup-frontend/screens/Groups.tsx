@@ -64,7 +64,7 @@ export default function Groups({ navigation }) {
         colors={["#3c41cf", "#1d9afd"]}
         style={styles.linearGradient}
       >
-        <Header navigation={navigation} title={"Groups"} showExit={true} />
+        <Header navigation={navigation} title={"Groups"} showExit={true} site={"Home"}/>
         <View style={styles.headerBtn}>
           <>
             <TouchableOpacity onPress={handleJoinTeam} style={styles.btn}>

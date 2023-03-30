@@ -61,7 +61,6 @@ export default function ScreenNav() {
   return (
     <UserContext.Provider value={{ user, setUser }}>
       <NavigationContainer 
-      
       >
         <Stack.Navigator
         initialRouteName='Home'

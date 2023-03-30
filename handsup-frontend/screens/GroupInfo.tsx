@@ -42,7 +42,7 @@ export default function GroupInfo({ navigation, route }) {
         colors={["#3c41cf", "#1d9afd"]}
         style={styles.linearGradient}
       >
-        <Header navigation={navigation} title={group.name} showExit={false} />
+        <Header navigation={navigation} title={group.name} showExit={false} site={"Groups"} />
         <View style={styles.body}>
           <Text style={styles.title}>
             {group.is_admin ? "Leader" : "Member"}

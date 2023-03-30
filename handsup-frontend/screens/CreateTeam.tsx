@@ -72,6 +72,7 @@ export default function JoinTeam({ navigation }) {
           navigation={navigation}
           title={"Create Group"}
           showExit={true}
+          site={"Groups"}
         />
 
         <View style={styles.body}>

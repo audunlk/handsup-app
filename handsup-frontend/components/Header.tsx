@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 
 
-export default function Header({navigation, title, showExit }) {
+export default function Header({navigation, title, showExit, site }) {
     const showExitButton = showExit ? true : false;
 
   return (
@@ -15,7 +15,7 @@ export default function Header({navigation, title, showExit }) {
             name="close"
             size={30}
             color="white"
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate(site)}
           />
             )}
     </View>
