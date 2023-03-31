@@ -23,32 +23,31 @@ CREATE TABLE IF NOT EXISTS users (
   timestamp TIMESTAMP DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS polls (
-  id SERIAL PRIMARY KEY,
-  question VARCHAR(255) NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  respond_by TIMESTAMP NOT NULL,
-  multiple_choice BOOLEAN DEFAULT FALSE,
-  group_id INTEGER REFERENCES groups(id)
-);
+  CREATE TABLE IF NOT EXISTS polls (
+    id SERIAL PRIMARY KEY,
+    question VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    respond_by TIMESTAMP NOT NULL,
+    multiple_choice BOOLEAN DEFAULT FALSE,
+    group_id INTEGER REFERENCES groups(id)
+  );
 
 CREATE TABLE IF NOT EXISTS answer_choices (
   id SERIAL PRIMARY KEY,
   text VARCHAR(255) NOT NULL,
-  poll_id INTEGER REFERENCES polls(id)
+  poll_id INTEGER REFERENCES polls(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS poll_response (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  poll_id INTEGER REFERENCES polls(id)
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  poll_id INTEGER REFERENCES polls(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS response_choice (
   id SERIAL PRIMARY KEY,
-  poll_response_id INTEGER REFERENCES poll_response(id),
-  answer_choice_id INTEGER REFERENCES answer_choices(id)
+  poll_response_id INTEGER REFERENCES poll_response(id) ON DELETE CASCADE,
+  answer_choice_id INTEGER REFERENCES answer_choices(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_group (
@@ -72,11 +71,11 @@ VALUES
   ('user3@example.com', 'Bob', 'Johnson', 'bobjohnson', 'password3');
 
 -- Dummy data for poll
-INSERT INTO polls (question, description, respond_by, group_id)
+INSERT INTO polls (question, respond_by, group_id)
 VALUES 
-  ('Do you like pizza?', 'This is the first poll', '2023-03-31 23:59:59',  1),
-  ('What is your favorite color?', 'This is the second poll', '2023-04-01 23:59:59', 2),
-  ('Do you prefer cats or dogs?', 'This is the third poll', '2023-04-02 23:59:59',  3);
+  ('Do you like pizza?',  '2023-03-31 23:59:59',  1),
+  ('What is your favorite color?',  '2023-04-01 23:59:59', 2),
+  ('Do you prefer cats or dogs?', '2023-04-02 23:59:59',  3);
 
 -- Dummy data for answer_choices
 INSERT INTO answer_choices (text, poll_id)
