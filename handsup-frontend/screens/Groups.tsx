@@ -11,9 +11,11 @@ import { UserContext } from "../navigation/ScreenNav";
 import { getGroupsByUser } from "../services/accountSetup";
 import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../components/ListItem";
+import { RootState } from "../redux/types/types";
+import { useSelector } from "react-redux";
 
 export default function Groups({ navigation }) {
-  const { user } = useContext(UserContext);
+  const user = useSelector((state: RootState) => state.user);
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState("");
 

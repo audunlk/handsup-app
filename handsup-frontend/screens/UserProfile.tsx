@@ -8,19 +8,31 @@ import {
   Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { updateUser } from "../services/accountSetup";
+import { getLoginToken, updateUser } from "../services/accountSetup";
 import { Ionicons } from "@expo/vector-icons";
 import { UserContext } from "../navigation/ScreenNav";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { clearUser } from "../redux/slices/userSlice";
+import { setUser } from "../redux/slices/userSlice";
+import { setToken } from "../redux/slices/tokenSlice";
+import { RootState, User } from "../redux/types/types";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsLoading } from "../redux/slices/loadingSlice";
+
+
+
 
 export default function UserProfile({ navigation }) {
-  const { user, setUser } = useContext(UserContext);
+  const user = useSelector((state: RootState) => state.user);
 
+  console.log(` user in UserProfile:`);
+  console.log({user})
+  const dispatch = useDispatch();
   const [isEditable, setIsEditable] = useState(false);
-  const [username, setUsername] = useState(user.username);
-  const [first_name, setfirst_name] = useState(user.first_name);
-  const [last_name, setlast_name] = useState(user.last_name);
-  const [email, setEmail] = useState(user.email);
+  const [username, setUsername] = useState("");
+  const [first_name, setfirst_name] = useState("");
+  const [last_name, setlast_name] = useState("");
+  const [password, setPassword] = useState(user.password);
+  const [email, setEmail] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -29,11 +41,13 @@ export default function UserProfile({ navigation }) {
     setfirst_name(user.first_name);
     setlast_name(user.last_name);
     setEmail(user.email);
+    setIsLoading(false)
   };
 
   useEffect(() => {
+    setIsLoading(true)
     resetInfo();
-  }, [user]);
+  }, []);
 
   const handleEdit = () => {
     setIsEditable(!isEditable);
@@ -60,12 +74,13 @@ export default function UserProfile({ navigation }) {
             last_name,
             username
           );
-          console.log(updatedUser);
-          setUser(updatedUser);
-          console.log("updated user in UserProfile");
+          const newToken = await getLoginToken(email, password);
+          dispatch(setToken(newToken));
+          dispatch(setUser(updatedUser));
         },
       },
     ]);
+
   };
 
   const handleLogout = async () => {
@@ -82,8 +97,7 @@ export default function UserProfile({ navigation }) {
         {
           text: "Log out",
           onPress: async () => {
-            await AsyncStorage.removeItem("handsup-token");
-            navigation.navigate("Login");
+            clearUser();
           },
         },
       ]

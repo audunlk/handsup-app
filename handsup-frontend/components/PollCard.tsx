@@ -4,7 +4,11 @@ import { getAnswerChoices, deletePoll, getAdminsByGroup } from "../services/poll
 import { ISOtoReadable } from "../utils/dateConversion";
 import IonIcons from "react-native-vector-icons/Ionicons";
 import Loading from "../screens/Loading";
-import { UserContext } from "../navigation/ScreenNav";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/types/types";
+import { User } from "../redux/types/types";
+
+
 
 export default function PollCard({ route, navigation }) {
   const [answers, setAnswers] = useState([]);
@@ -15,8 +19,7 @@ export default function PollCard({ route, navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const { poll } = route.params;
   // user from usecontext
-  const { user } = useContext(UserContext);
-
+  const user = useSelector((state: RootState) => state.user);
   const getAnswers = async (id: Number) => {
     try {
       const answerChoices = await getAnswerChoices(id);

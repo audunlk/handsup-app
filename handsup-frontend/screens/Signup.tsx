@@ -41,17 +41,6 @@ export default function Signup({ navigation }) {
     getToken();
   }, [navigation]);
 
-  useEffect(() => {
-    Animated.timing(
-      fadeAnim,
-      {
-        toValue: 1,
-        duration: 500,
-        easing: Easing.ease,
-        useNativeDriver: true,
-      }
-    ).start();
-  }, []);
 
   const handleSignup = async () => {
     setLoading(true);

@@ -1,9 +1,10 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getUser } from '../services/accountSetup';
-import jwtDecode from 'jwt-decode';
+import { useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
+import store from '../redux/store/store';
+
 
 //Screens
 import Login from '../screens/Login';
@@ -23,52 +24,19 @@ import PollCard from '../components/PollCard';
 const Stack = createStackNavigator();
 export const UserContext = createContext(null);
 
+
+
 export default function ScreenNav() {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
 
-  interface CurrentUser {
-    id: number,
-    email: string,
-    first_name: string,
-    last_name: string,
-    username: string,
-  }
-
-  useEffect(() => {
-    const decodeToken = async () =>{
-      try {
-      const token = await AsyncStorage.getItem('handsup-token').then((res) => res
-      );
-      if (token) {
-        const decodedToken: CurrentUser = await jwtDecode(token);
-        const user = await getUser(decodedToken.id);
-        setUser(user);
-      } else{
-        console.log('No token found')
-      }
-      setIsLoading(false);
-    } catch (error) {
-      setError(error.message);
-      setIsLoading(false);
-    }
-  }
-  decodeToken();
-}, []);
-
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <Provider store={store}>
       <NavigationContainer 
       >
         <Stack.Navigator
-        initialRouteName='Home'
+        initialRouteName='Login'
         >
-          {isLoading ? (
-            <Stack.Screen name='Loading' component={Loading} />
-          ) : ( 
-            <>
             <Stack.Screen
                 name='Home'
                 component={Home}
@@ -121,11 +89,10 @@ export default function ScreenNav() {
                 options={{ headerShown: false }}
               />
               
-            </>
-          )}
+        
         </Stack.Navigator>
 
       </NavigationContainer>
-    </UserContext.Provider>
+    </Provider>
   );
 }

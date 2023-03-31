@@ -1,96 +1,89 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Animated, Easing } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { getLoginToken } from "../services/accountSetup";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../redux/slices/userSlice";
+import { setIsLoading } from "../redux/slices/loadingSlice";
+import { RootState } from "../redux/types/types";
+import { User } from "../redux/types/types";
 
+interface LoginProps {
+  navigation: any;
+}
 
-export default function Login({ navigation }) {
-
+export default function Login({ navigation }: LoginProps) {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [fadeAnim] = useState(new Animated.Value(0));
+  const user = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
-    console.log('in login page')
+    console.log("in login page");
     const getToken = async () => {
-      const token = await AsyncStorage.getItem("handsup-token");
-      if (token) {
-        const user = jwtDecode(token);
-        dispatch(setUser(user));
-        navigation.navigate("Home");
+      try {
+        const token = await AsyncStorage.getItem("handsup-token");
+        
+        if (token) {
+          navigation.navigate("Home");
+        }
+      } catch (err) {
+        console.log("Error getting token from AsyncStorage:", err.message);
       }
-      return
     };
-    getToken();
-  }, [dispatch, navigation]);
-
-
+    getToken().catch((err) => {
+      console.log("Error in getToken:", err.message);
+    });
+  }, [dispatch, navigation, user]);
 
   const handleLogin = async () => {
-    setLoading(true);
-    setError("");
-    console.log("email", email);
-    console.log("password", password);
     try {
-      const { token, error } = await getLoginToken(email, password).then((res) => {
-        console.log(res);
-        return res;
-      });
+      const { token, error } = await getLoginToken(email, password);
       if (error) {
         setError(error);
-      }
-      if (!token) {
-        setError("Invalid credentials");
+        return;
       }
       await AsyncStorage.setItem("handsup-token", token);
+      if(token){
       navigation.navigate("Home");
-    } catch (error) {
-      setError(error.message);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
     }
-    setLoading(false);
   };
 
   return (
     <View style={[styles.container]}>
       <Text style={styles.text}>Login</Text>
-      <TextInput 
-      style={styles.input}
-      placeholder="Email" value={email} onChangeText={setEmail} 
-      autoCapitalize="none"
-      autoComplete="email"
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
       />
       <TextInput
-      style={styles.input}      
+        style={styles.input}
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         autoCapitalize="none"
         secureTextEntry={true}
       />
-      <View
-        style={styles.button}
-      >
-        <Button title="Login" onPress={handleLogin}
-        color="white"
-         />
+      <View style={styles.button}>
+        <Button title="Login" onPress={handleLogin} color="white" />
       </View>
       <View style={{ flex: 1, justifyContent: "flex-end" }}>
         <Text style={styles.footerText}>
           Don't have an account?
-          <Text
-            onPress={() => navigation.navigate("Signup")}
-            style={{ color: "black" }}
-          >
+          <Text onPress={() => navigation.navigate("Signup")} style={{ color: "black" }}>
             Sign Up
           </Text>
         </Text>
       </View>
-      
-      {error && <Text>{error}</Text>}
+      {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
 }
@@ -111,6 +104,14 @@ container: {
   alignItems: "center",
   justifyContent: "center",
   padding: 80,
+},
+error:{
+  color: "red",
+  fontSize: 20,
+  fontWeight: "bold",
+  textAlign: "center",
+  marginTop: 20,
+
 },
 input: {
   height: 40,
