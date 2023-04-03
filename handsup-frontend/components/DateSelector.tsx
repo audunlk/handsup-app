@@ -14,14 +14,18 @@ export default function DateSelector({ setPoll, poll }) {
     console.log(UTCdate.toISOString())
     setPoll({ ...poll, respond_by: UTCdate});
   };
+
+
+
   return (
     <View>      
         <View>
           <DateTimePicker
             value={selectedDate}
             mode="datetime"
-            display="spinner"
+            display="inline"
             onChange={onChange}
+            minimumDate={new Date()}
           />
         </View>
 

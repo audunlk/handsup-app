@@ -5,7 +5,7 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 const MainBtn = ({title = 'Button', onPress = () => null}) => {
     return (
       <TouchableOpacity style={styles.btn} onPress={onPress}>
-        <Text>{title}</Text>
+        <Text style={{color: "white"}}>{title}</Text>
       </TouchableOpacity>
     );
   };
@@ -15,13 +15,13 @@ export default MainBtn;
 
   const styles = StyleSheet.create({
     btn: {
-        backgroundColor: "#1d9afd",
         padding: 10,
         borderRadius: 10,
         alignItems: "center",
         justifyContent: "center",
         alignSelf: "center",
         marginVertical: 10,
+        color: "white",
       },
     });
 

@@ -7,13 +7,13 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
-import { UserContext } from "../navigation/ScreenNav";
-
 import { createPoll } from "../services/pollSetup";
 import DateSelector from "../components/DateSelector";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { Subscription } from "expo-notifications";
+import { User, RootState } from "../redux/types/types";
+import { useSelector } from "react-redux";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -28,8 +28,8 @@ export default function CreatePoll({ navigation, route }) {
   const [notification, setNotification] = useState(null);
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
+  const user: User = useSelector((state: RootState) => state.user);
 
-  const { user } = useContext(UserContext);
   const [group, setGroup] = useState(route.params.group);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");

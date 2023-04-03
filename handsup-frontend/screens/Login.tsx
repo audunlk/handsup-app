@@ -3,54 +3,34 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { getLoginToken } from "../services/accountSetup";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../redux/slices/userSlice";
 import { setIsLoading } from "../redux/slices/loadingSlice";
 import { RootState } from "../redux/types/types";
-import { User } from "../redux/types/types";
+import { setIsLoggedIn } from "../redux/slices/loggedInSlice";
 
-interface LoginProps {
-  navigation: any;
-}
 
-export default function Login({ navigation }: LoginProps) {
+export default function Login({ navigation }) {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const user = useSelector((state: RootState) => state.user);
+  
 
-  useEffect(() => {
-    console.log("in login page");
-    const getToken = async () => {
-      try {
-        const token = await AsyncStorage.getItem("handsup-token");
-        
-        if (token) {
-          navigation.navigate("Home");
-        }
-      } catch (err) {
-        console.log("Error getting token from AsyncStorage:", err.message);
-      }
-    };
-    getToken().catch((err) => {
-      console.log("Error in getToken:", err.message);
-    });
-  }, [dispatch, navigation, user]);
 
   const handleLogin = async () => {
     try {
+      dispatch(setIsLoading(true));
       const { token, error } = await getLoginToken(email, password);
       if (error) {
         setError(error);
         return;
       }
       await AsyncStorage.setItem("handsup-token", token);
-      if(token){
-      navigation.navigate("Home");
-      }
+      dispatch(setIsLoggedIn(true)); // Dispatch action to set isLoggedIn to true
     } catch (err) {
       setError(err.message);
-    } finally {
+    }finally{
+      dispatch(setIsLoading(false));
     }
   };
 

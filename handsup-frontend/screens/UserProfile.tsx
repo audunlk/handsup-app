@@ -1,31 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { getLoginToken, updateUser } from "../services/accountSetup";
 import { Ionicons } from "@expo/vector-icons";
-import { UserContext } from "../navigation/ScreenNav";
 import { clearUser } from "../redux/slices/userSlice";
 import { setUser } from "../redux/slices/userSlice";
 import { setToken } from "../redux/slices/tokenSlice";
 import { RootState, User } from "../redux/types/types";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoading } from "../redux/slices/loadingSlice";
-
-
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setIsLoggedIn } from "../redux/slices/loggedInSlice";
+import styles from "../styles/styles";
 
 export default function UserProfile({ navigation }) {
   const user = useSelector((state: RootState) => state.user);
 
-  console.log(` user in UserProfile:`);
-  console.log({user})
   const dispatch = useDispatch();
   const [isEditable, setIsEditable] = useState(false);
   const [username, setUsername] = useState("");
@@ -41,11 +31,11 @@ export default function UserProfile({ navigation }) {
     setfirst_name(user.first_name);
     setlast_name(user.last_name);
     setEmail(user.email);
-    setIsLoading(false)
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     resetInfo();
   }, []);
 
@@ -61,7 +51,9 @@ export default function UserProfile({ navigation }) {
     Alert.alert("Are you sure?", "You are about to update your profile.", [
       {
         text: "Cancel",
-        onPress: () => {setIsEditing(false), resetInfo()},
+        onPress: () => {
+          setIsEditing(false), resetInfo();
+        },
         style: "cancel",
       },
       {
@@ -75,12 +67,11 @@ export default function UserProfile({ navigation }) {
             username
           );
           const newToken = await getLoginToken(email, password);
-          dispatch(setToken(newToken));
+          AsyncStorage.setItem("handsup-token", newToken.token);
           dispatch(setUser(updatedUser));
         },
       },
     ]);
-
   };
 
   const handleLogout = async () => {
@@ -97,7 +88,9 @@ export default function UserProfile({ navigation }) {
         {
           text: "Log out",
           onPress: async () => {
-            clearUser();
+            AsyncStorage.clear();
+            dispatch(clearUser());
+            navigation.navigate("Login");
           },
         },
       ]
@@ -106,143 +99,80 @@ export default function UserProfile({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#3c41cf", "#1d9afd"]}
-        style={styles.linearGradient}
-      >
-        <View style={styles.header}>
-          <Text style={styles.title}>Your Profile</Text>
-          {/* X icon */}
-          <Ionicons
-            name="close"
-            size={30}
-            color="white"
-            onPress={() => navigation.goBack()}
+      <View style={styles.header}>
+        <Text style={styles.title}>Your Profile</Text>
+        {/* X icon */}
+        <Ionicons
+          name="close"
+          size={30}
+          color="white"
+          onPress={() => navigation.goBack()}
+        />
+      </View>
+      <View style={styles.listContainer}>
+        <Text style={[styles.mediumText, { alignSelf: "flex-start", marginLeft: '10%' }]}>
+          Username
+        </Text>
+        <TextInput
+          style={styles.input}
+          value={username}
+          editable={isEditable}
+          onChangeText={setUsername}
+        />
+        <Text style={[styles.mediumText, { alignSelf: "flex-start", marginLeft: '10%' }]}>
+          First Name
+        </Text>
+        <TextInput
+          style={styles.input}
+          value={first_name}
+          editable={isEditable}
+          onChangeText={setfirst_name}
+        />
+        <Text style={[styles.mediumText, { alignSelf: "flex-start", marginLeft: '10%' }]}>
+          Last Name
+        </Text>
+
+        <TextInput
+          style={styles.input}
+          value={last_name}
+          editable={isEditable}
+          onChangeText={setlast_name}
+        />
+        <Text style={[styles.mediumText, { alignSelf: "flex-start", marginLeft: '10%' }]}>
+          Email
+        </Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          editable={isEditable}
+          onChangeText={setEmail}
+        />
+        <View style={styles.btn}>
+          <Button
+            title={isEditable ? "Save" : "Edit"}
+            onPress={handleEdit}
+            color={"white"}
           />
         </View>
-        <View style={styles.body}>
-          <Text style={styles.inputText}>Username</Text>
-          <TextInput
-            style={styles.input}
-            value={username}
-            editable={isEditable}
-            onChangeText={setUsername}
+        <View
+          style={[
+            styles.btn,
+            {
+              position: "absolute",
+              bottom: 40,
+              backgroundColor: "black",
+              borderRadius: 10,
+            },
+          ]}
+        >
+          <Button
+            title="Log out"
+            onPress={handleLogout}
+            disabled={isLoggingOut}
+            color={"white"}
           />
-          <Text style={styles.inputText}>First Name</Text>
-          <TextInput
-            style={styles.input}
-            value={first_name}
-            editable={isEditable}
-            onChangeText={setfirst_name}
-          />
-          <Text style={styles.inputText}>Last Name</Text>
-
-          <TextInput
-            style={styles.input}
-            value={last_name}
-            editable={isEditable}
-            onChangeText={setlast_name}
-          />
-          <Text style={styles.inputText}>Email</Text>
-
-          <TextInput
-            style={styles.input}
-            value={email}
-            editable={isEditable}
-            onChangeText={setEmail}
-          />
-          <View style={styles.btn}>
-            <Button
-              title={isEditable ? "Save" : "Edit"}
-              onPress={handleEdit}
-              color={"white"}
-            />
-          </View>
-          <View
-            style={[
-              styles.btn,
-              {
-                position: "absolute",
-                bottom: 40,
-                backgroundColor: "black",
-                borderRadius: 10,
-              },
-            ]}
-          >
-            <Button
-              title="Log out"
-              onPress={handleLogout}
-              disabled={isLoggingOut}
-              color={"white"}
-            />
-          </View>
         </View>
-      </LinearGradient>
+      </View>
     </View>
   );
 }
-
-const shadow = {
-  shadowColor: "black",
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.26,
-  shadowRadius: 6,
-  elevation: 5,
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  linearGradient: {
-    flex: 1,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 5,
-  },
-  title: {
-    fontSize: 30,
-    color: "white",
-    fontWeight: "bold",
-    marginVertical: 20,
-  },
-  header: {
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    marginTop: 80,
-    color: "white",
-    flexDirection: "row",
-  },
-  body: {
-    flex: 1,
-    color: "white",
-    alignItems: "center",
-    flexDirection: "column",
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    borderColor: "white",
-    backgroundColor: "white",
-    padding: 10,
-    width: 300,
-    borderRadius: 5,
-    ...shadow,
-  },
-  inputText: {
-    fontSize: 12,
-    color: "white",
-  },
-
-  btn: {
-    backgroundColor: "#1d9afd",
-    padding: 10,
-    borderRadius: 10,
-    width: 200,
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 10,
-  },
-});

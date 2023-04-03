@@ -22,4 +22,5 @@ export type User = {
     isLoading: boolean;
     token: string | null;
     polls: Poll[];
+    isLoggedIn: boolean;
   };

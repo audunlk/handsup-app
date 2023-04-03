@@ -14,6 +14,7 @@ import { Ionicons as IonIcons } from "@expo/vector-icons";
 import { getPollsByGroup } from "../services/pollSetup";
 import ListItem from "../components/ListItem";
 import MainBtn from "../components/MainBtn";
+import styles from "../styles/styles";
 
 export default function GroupInfo({ navigation, route }) {
   const { group } = route.params;
@@ -38,18 +39,16 @@ export default function GroupInfo({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#3c41cf", "#1d9afd"]}
-        style={styles.linearGradient}
-      >
-        <Header navigation={navigation} title={group.name} showExit={false} site={"Groups"} />
+      
+        <Header navigation={navigation} title={group.name} showExit={false}  />
         <View style={styles.body}>
-          <Text style={styles.title}>
-            {group.is_admin ? "Leader" : "Member"}
-          </Text>
           {group.is_admin && (
             <View>
-              <Text style={styles.title}>Invitation Key:</Text>
+              <Text style={styles.smallText}>
+              {group.is_admin ? "Leader" : "Member"}
+            </Text>
+            <Text style={styles.listTitle}>Invitation Key:</Text>
+
               <TouchableOpacity
                 style={styles.serialBox}
                 onPress={copyToClipboard}
@@ -64,64 +63,29 @@ export default function GroupInfo({ navigation, route }) {
               </TouchableOpacity>
               <View>
                 <MainBtn
-                  title="Add Poll"
+                  title="Create a Poll"
                   onPress={() => navigation.navigate("CreatePoll", { group })}
                 />
               </View>
             </View>
           )}
-
-          <View>
-            <Text style={styles.title}>Active Polls</Text>
+          <View style={styles.listContainer}>
+            <Text style={styles.listTitle}>Active Polls</Text>
             {polls.map((poll) => (
-              <ListItem
+              <View style={styles.listItem}>
+                <TouchableOpacity
                 key={poll.id}
-                title={poll.question}
                 onPress={() =>
                   navigation.navigate("PollCard", { poll: poll, group: group })
                 }
-              />
+                >
+                  <Text style={styles.mediumText}>{poll.question}</Text>
+                </TouchableOpacity>
+              </View>
             ))}
           </View>
         </View>
-      </LinearGradient>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  linearGradient: {
-    flex: 1,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 5,
-  },
-  body: {
-    flex: 1,
-    flexDirection: "column",
-    alignContent: "center",
-    padding: 10,
-  },
-  serialBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: 60,
-    borderWidth: 1,
-    borderColor: "white",
-    backgroundColor: "white",
-    width: 300,
-    alignSelf: "center",
-    padding: 10,
-    borderRadius: 5,
-  },
-  title: {
-    fontSize: 15,
-    color: "white",
-    fontWeight: "bold",
-    marginVertical: 20,
-  },
-});

@@ -1,18 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  InteractionManager,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import Header from "../components/Header";
-import { UserContext } from "../navigation/ScreenNav";
 import { getGroupsByUser } from "../services/accountSetup";
-import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../components/ListItem";
 import { RootState } from "../redux/types/types";
 import { useSelector } from "react-redux";
+import styles from "../styles/styles";
 
 export default function Groups({ navigation }) {
   const user = useSelector((state: RootState) => state.user);
@@ -44,11 +37,14 @@ export default function Groups({ navigation }) {
   const handleRenderGroups = () => {
     return groups.map((group) => {
       return (
-        <ListItem
-          key={group.id}
-          title={group.name}
-          onPress={() => navigation.navigate("GroupInfo", { group: group })}
-        />
+        <View style={styles.listItem}>
+          <TouchableOpacity
+            key={group.id}
+            onPress={() => navigation.navigate("GroupInfo", { group: group })}
+          >
+            <Text style={styles.listTitle}>{group.name}</Text>
+          </TouchableOpacity>
+        </View>
       );
     });
   };
@@ -62,73 +58,16 @@ export default function Groups({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#3c41cf", "#1d9afd"]}
-        style={styles.linearGradient}
-      >
-        <Header navigation={navigation} title={"Groups"} showExit={true} site={"Home"}/>
-        <View style={styles.headerBtn}>
-          <>
-            <TouchableOpacity onPress={handleJoinTeam} style={styles.btn}>
-              <Text style={{ color: "white", fontSize: 20 }}>Join a Team</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleCreateTeam} style={styles.btn}>
-              <Text style={{ color: "white", fontSize: 20 }}>
-                Create a Team
-              </Text>
-            </TouchableOpacity>
-          </>
-        </View>
-        <View style={styles.body}>{handleRenderGroups()}</View>
-      </LinearGradient>
+      <Header navigation={navigation} title={"Your Groups"} showExit={true} />
+      <View style={styles.tabs}>
+        <TouchableOpacity onPress={() => handleJoinTeam()}>
+          <Text style={{ color: "white" }}>Join Team</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleCreateTeam()}>
+          <Text style={{ color: "white" }}>Create Team</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.listContainer}>{handleRenderGroups()}</View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  linearGradient: {
-    flex: 1,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 5,
-  },
-  headerBtn: {
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  btn: {
-    backgroundColor: "#1d9afd",
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 10,
-    width: 150,
-  },
-  body: {
-    marginTop: 20,
-    flex: 1,
-    color: "white",
-    alignItems: "center",
-    flexDirection: "column",
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    borderColor: "white",
-    backgroundColor: "white",
-    padding: 10,
-    width: 300,
-    borderRadius: 5,
-  },
-  inputText: {
-    fontSize: 12,
-    color: "white",
-  },
-});

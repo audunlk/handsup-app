@@ -7,28 +7,18 @@ import {
 } from "../services/accountSetup";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import ShortUniqueId from "short-unique-id";
-import { UserContext } from "../navigation/ScreenNav";
 import { insertUserIntoGroup } from "../services/accountSetup";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
+import { RootState, User } from "../redux/types/types";
+import { useSelector } from "react-redux";
 
 export default function JoinTeam({ navigation }) {
   const [teamName, setTeamName] = useState("");
   const [successful, setSuccessful] = useState(false);
-  const { user, setUser } = useContext(UserContext);
+  const user: User = useSelector((state: RootState) => state.user);
   const [error, setError] = useState("");
   const [isLoading, setisLoading] = useState(false);
-
-  interface CurrentUser {
-    id: number;
-    username: string;
-    email: string;
-    password: string;
-    first_name: string;
-    last_name: string;
-    admin: boolean;
-    group_id: number;
-  }
 
   useEffect(() => {
     if (successful) {
@@ -72,7 +62,7 @@ export default function JoinTeam({ navigation }) {
           navigation={navigation}
           title={"Create Group"}
           showExit={true}
-          site={"Groups"}
+       
         />
 
         <View style={styles.body}>

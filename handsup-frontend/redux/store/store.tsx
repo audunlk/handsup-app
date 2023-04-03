@@ -3,6 +3,7 @@ import userSlice from '../slices/userSlice';
 import tokenSlice from '../slices/tokenSlice';
 import loadingSlice from '../slices/loadingSlice';
 import pollSlice from '../slices/pollSlice';
+import loggedInSlice from '../slices/loggedInSlice';
 
 const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
         token: tokenSlice,
         polls: pollSlice,
         isLoading: loadingSlice,
+        isLoggedIn: loggedInSlice
     }
 })
 

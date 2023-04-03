@@ -79,7 +79,7 @@ export default function JoinTeam({route, navigation}) {
         colors={["#3c41cf", "#1d9afd"]}
         style={styles.linearGradient}
       >
-        <Header title='Join Team'  showExit={true} navigation={navigation} site={"Groups"}/>
+        <Header title='Join Team'  showExit={true} navigation={navigation}/>
         <View style={styles.body}>
             <TextInput
             id='serialkey'

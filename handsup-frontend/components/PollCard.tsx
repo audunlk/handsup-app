@@ -7,6 +7,7 @@ import Loading from "../screens/Loading";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/types/types";
 import { User } from "../redux/types/types";
+import Header from "./Header";
 
 
 
@@ -94,6 +95,7 @@ export default function PollCard({ route, navigation }) {
         alignSelf: "center",
       }}
     >
+      <Header navigation={navigation} title={null} showExit={true} />
       <Text>{poll.question}</Text>
       <Text style={{ color: "red" }}>{poll.description}</Text>
       <Text>Created At:</Text>
