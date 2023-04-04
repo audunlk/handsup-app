@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, TouchableOpacity } from "react-native";
 import { getAnswerChoices, deletePoll, getAdminsByGroup } from "../services/pollSetup";
 import { ISOtoReadable } from "../utils/dateConversion";
 import IonIcons from "react-native-vector-icons/Ionicons";
@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/types/types";
 import { User } from "../redux/types/types";
 import Header from "./Header";
+import styles from "../styles/styles";
 
 
 
@@ -105,9 +106,18 @@ export default function PollCard({ route, navigation }) {
       <Text>{respondBy[0]}</Text>
       <Text>{respondBy[1]}</Text>
       <Text>{poll.group_id}</Text>
-      {answers.map((answer, index) => {
-        return <Text key={index}>{answer.text}</Text>;
-      })}
+      <View style={styles.twoByTwo}>
+        {answers.map((answer, index) => {
+          return (
+            <View style={styles.twoByTwoItem} key={index}
+            >
+              <TouchableOpacity  style={styles.btn}>
+                <Text >{answer.text}</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        })}
+      </View>
       {/* Delete icon */}
       {isAdmin && (
         <IonIcons

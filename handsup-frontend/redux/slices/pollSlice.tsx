@@ -1,21 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Poll } from '../types/types';
 
-interface PollState {
-    polls: Poll[];
-}
 
-const initialState: PollState = {
-    polls: [],
-};
+const initialState: Poll[] = [];
+
 
 const pollSlice = createSlice({
     name: 'polls',
     initialState,
     reducers: {
-        setPolls: (state, action: PayloadAction<Poll[]>) => {
-            state.polls = action.payload;
-        }
+        setPolls: (state, action: PayloadAction<Poll[]>) => action.payload,
     }
 });
 

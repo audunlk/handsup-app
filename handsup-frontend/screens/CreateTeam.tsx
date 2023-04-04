@@ -12,6 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
 import { RootState, User } from "../redux/types/types";
 import { useSelector } from "react-redux";
+import styles from "../styles/styles";
 
 export default function JoinTeam({ navigation }) {
   const [teamName, setTeamName] = useState("");
@@ -54,10 +55,7 @@ export default function JoinTeam({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#3c41cf", "#1d9afd"]}
-        style={styles.linearGradient}
-      >
+     
         <Header
           navigation={navigation}
           title={"Create Group"}
@@ -66,17 +64,18 @@ export default function JoinTeam({ navigation }) {
         />
 
         <View style={styles.body}>
-          <Text>Create a Team</Text>
+          <Text style={styles.mediumText}>Create a Team</Text>
           <TextInput
             placeholder="Enter Team Name"
             value={teamName}
+            style={styles.input}
             onChangeText={setTeamName}
           />
           <Pressable
             style={styles.btn}
             onPress={() => handleCreateTeam(teamName)}
           >
-            <Text style={styles.inputText}>Create Team</Text>
+            <Text style={styles.smallText}>Create Team</Text>
           </Pressable>
           {error && <Text>{error}</Text>}
           {successful && (
@@ -84,52 +83,11 @@ export default function JoinTeam({ navigation }) {
               style={styles.btn}
               onPress={() => navigation.navigate("Home")}
             >
-              <Text style={styles.inputText}>Go to Home</Text>
+              <Text style={styles.smallText}>Go to Home</Text>
             </Pressable>
           )}
         </View>
-      </LinearGradient>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  linearGradient: {
-    flex: 1,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 5,
-  },
-  btn: {
-    backgroundColor: "#1d9afd",
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 10,
-    width: 150,
-  },
-  body: {
-    marginTop: 20,
-    flex: 1,
-    color: "white",
-    alignItems: "center",
-    flexDirection: "column",
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    borderColor: "white",
-    backgroundColor: "white",
-    padding: 10,
-    width: 300,
-    borderRadius: 5,
-  },
-  inputText: {
-    fontSize: 12,
-    color: "white",
-  },
-});

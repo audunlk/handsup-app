@@ -14,6 +14,8 @@ import * as Device from "expo-device";
 import { Subscription } from "expo-notifications";
 import { User, RootState } from "../redux/types/types";
 import { useSelector } from "react-redux";
+import styles from "../styles/styles";
+import Header from "../components/Header";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -33,7 +35,7 @@ export default function CreatePoll({ navigation, route }) {
   const [group, setGroup] = useState(route.params.group);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState(["", ""]);
   const [poll, setPoll] = useState({
     description: "",
     created_at: new Date(),
@@ -43,28 +45,6 @@ export default function CreatePoll({ navigation, route }) {
     answer_choices: answers,
   });
 
-  useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
-    );
-
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
-
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
-
-    return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
 
   const handleCreatePoll = async () => {
     setIsLoading(true);
@@ -77,22 +57,7 @@ export default function CreatePoll({ navigation, route }) {
         group_id: poll.group_id,
         answer_choices: answers,
       };
-      const {
-        question,
-        description,
-        created_at,
-        respond_by,
-        group_id,
-        answer_choices,
-      } = pollData;
-      const pollResponse = await createPoll(
-        question,
-        description,
-        created_at,
-        respond_by,
-        group_id,
-        answer_choices
-      );
+      const pollResponse = await createPoll({ ...pollData })
       navigation.navigate("Home");
     } catch (error) {
       setError(error.message);
@@ -116,10 +81,13 @@ export default function CreatePoll({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Text>Create Poll</Text>
-    <View style={styles.body}>
+      <Header navigation={navigation} title={group.name} showExit={true} />
+    <View style={[styles.body]}>
       <View>
         <TextInput
           placeholder="Question"
+          style={styles.input}
+          autoFocus={true}
           onChangeText={(text) => setPoll({ ...poll, question: text })}
           value={poll.question}
         />
@@ -128,12 +96,12 @@ export default function CreatePoll({ navigation, route }) {
           {answers.map((answer, index) => (
             <TextInput
               key={index}
+              style={styles.input}
               placeholder={`Answer ${index + 1}`}
               onChangeText={(text) => handleAnswerTextChange(index, text)}
-              value={answer.text}
+              value={answer}
             />
           ))}
-
           <Button title="Add more answers" onPress={handleAddAnswer} />
         </View>
       </View>
@@ -205,22 +173,4 @@ async function registerForPushNotificationsAsync() {
   return token;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  body: {
-    flex: 1,
-    height: "70%",
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
 
-  answer: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

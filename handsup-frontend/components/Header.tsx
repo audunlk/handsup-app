@@ -24,12 +24,10 @@ export default function Header({navigation, title, showExit }) {
 
 
 const styles = StyleSheet.create({
-    
     title: {
       fontSize: 30,
       color: "white",
       fontWeight: "bold",
-      marginVertical: 20,
     },
     header: {
       justifyContent: "space-between",

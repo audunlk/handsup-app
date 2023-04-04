@@ -35,9 +35,9 @@ export default function Groups({ navigation }) {
   };
 
   const handleRenderGroups = () => {
-    return groups.map((group) => {
+    return groups.map((group, i) => {
       return (
-        <View style={styles.listItem}>
+        <View style={styles.listItem} key={i}>
           <TouchableOpacity
             key={group.id}
             onPress={() => navigation.navigate("GroupInfo", { group: group })}

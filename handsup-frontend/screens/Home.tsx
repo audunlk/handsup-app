@@ -13,21 +13,21 @@ import { getGroupsByUser } from "../services/accountSetup";
 import { getPollsByGroups } from "../services/pollSetup";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { User } from "../redux/types/types";
+import { Poll, User } from "../redux/types/types";
 import { setIsLoading } from "../redux/slices/loadingSlice";
 
 import BottomNav from "../navigation/BottomNav";
-import MainBtn from "../components/MainBtn";
 import { RootState } from "../redux/types/types";
 import styles from "../styles/styles";
-import { ListItem } from "@rneui/base";
+import { setPolls } from "../redux/slices/pollSlice";
+
 
 export default function Home({ navigation }) {
   const user: User = useSelector((state: RootState) => state.user);
   const isLoading = useSelector((state: RootState) => state.isLoading);
+  const polls = useSelector((state: RootState) => state.polls);
   const dispatch = useDispatch();
   const [error, setError] = useState("");
-  const [polls, setPolls] = useState([]);
   const [selectedTab, setSelectedTab] = useState("active");
   const [isContentLoaded, setIsContentLoaded] = useState(false);
 
@@ -38,7 +38,8 @@ export default function Home({ navigation }) {
         console.log(groups);
         const group_ids = groups.map((group: any) => group.id);
         const userPolls = await getPollsByGroups(group_ids);
-        setPolls(userPolls);
+        console.log({userPolls})
+        dispatch(setPolls(userPolls));
       } catch (error) {
         console.log(error);
         setError(error);
@@ -85,28 +86,27 @@ export default function Home({ navigation }) {
           {isLoading ? (
             <Text>Loading...</Text>
           ) : selectedTab === "active" ? (
-            activePolls.map((poll) => (
-              <View style={styles.listItem}>
+            activePolls.map((poll, i) => (
+              <View style={styles.listItem} key={poll.id}>
                 <TouchableOpacity
-                  key={poll.id}
-                  
+                  key={i}
                   onPress={() => navigation.navigate("PollCard", { poll: poll })}
                   >
-                  <Text style={styles.listTitle}>{poll.name}</Text>
-                  <Text style={styles.listDescription}>{poll.question}</Text>
+                  <Text style={styles.listTitle}>{poll.question}</Text>
+                  <Text style={styles.listDescription}>{poll.name}</Text>
                 </TouchableOpacity>
               </View>
             ))
           ) : (
-            expiredPolls.map((poll) => (
-              <View style={styles.listItem}>
+            expiredPolls.map((poll, i) => (
+              <View style={styles.listItem} key={poll.id}>
                 <TouchableOpacity
-                  key={poll.id}
+                  key={i}
                   
                   onPress={() => navigation.navigate("PollCard", { poll: poll })}
                   >
-                  <Text style={styles.listTitle}>{poll.name}</Text>
-                  <Text style={styles.listDescription}>{poll.question}</Text>
+                  <Text style={styles.listTitle}>{poll.question}</Text>
+                  <Text style={styles.listDescription}>{poll.name}</Text>
                 </TouchableOpacity>
               </View>
             ))

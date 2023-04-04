@@ -3,7 +3,7 @@ import { listGroupsByKey, insertUserIntoGroup } from '../services/accountSetup'
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native'
 import { checkUserInGroup } from '../services/accountSetup'
 import Header from '../components/Header'
-import { LinearGradient } from 'expo-linear-gradient'
+import styles from '../styles/styles'
 
 export default function JoinTeam({route, navigation}) {
     const [serialkey, setSerialkey] = useState('')
@@ -75,16 +75,15 @@ export default function JoinTeam({route, navigation}) {
 
   return (
     <View style={styles.container}>
-         <LinearGradient
-        colors={["#3c41cf", "#1d9afd"]}
-        style={styles.linearGradient}
-      >
+         
         <Header title='Join Team'  showExit={true} navigation={navigation}/>
         <View style={styles.body}>
+            <Text style={styles.mediumText}>Join Team</Text>
             <TextInput
             id='serialkey'
             placeholder='Enter Team Serial Key'
             autoCapitalize='none'
+            style={styles.input}
             value={serialkey} onChangeText={setSerialkey}
              />
             <Pressable 
@@ -99,50 +98,9 @@ export default function JoinTeam({route, navigation}) {
             }
             {error && <Text>{error}</Text>}
         </View>
-        </LinearGradient>
 
     </View>
   )
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    linearGradient: {
-        flex: 1,
-        paddingLeft: 15,
-        paddingRight: 15,
-        borderRadius: 5,
-      },
-    btn: {
-        backgroundColor: "#1d9afd",
-        padding: 10,
-        alignItems: "center",
-        justifyContent: "center",
-        marginVertical: 10,
-        width: 150,
-      },
-    body: {
-    marginTop: 20,
-      flex: 1,
-      color: "white",
-      alignItems: "center",
-      flexDirection: "column",
-    },
-    input: {
-      height: 40,
-      margin: 12,
-      borderWidth: 1,
-      borderColor: "white",
-      backgroundColor: "white",
-      padding: 10,
-      width: 300,
-      borderRadius: 5,
-    },
-    inputText: {
-      fontSize: 12,
-      color: "white",
-    },
-})
 

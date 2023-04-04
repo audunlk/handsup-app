@@ -54,7 +54,6 @@ export default function ScreenNav() {
       }
     };
     checkToken();
-    console.log('App mounted');
   }, [dispatch, user, isLoggedIn]);
 
   useEffect(() => {
