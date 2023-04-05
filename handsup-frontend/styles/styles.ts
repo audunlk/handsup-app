@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   scrollBody:{
-    flexGrow: 1,
     color: "white",
     justifyContent: "center",
     alignItems: "center",

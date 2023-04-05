@@ -29,7 +29,9 @@ const Stack = createStackNavigator();
 export default function ScreenNav() {
   const dispatch = useDispatch();
   const isLoading: boolean = useSelector((state: RootState) => state.isLoading);
-  const isLoggedIn: boolean = useSelector((state: RootState) => state.isLoggedIn);
+  const isLoggedIn: boolean = useSelector(
+    (state: RootState) => state.isLoggedIn
+  );
   const user: User = useSelector((state: RootState) => state.user);
   const [token, setToken] = useState<string | null>(null);
 
@@ -37,18 +39,18 @@ export default function ScreenNav() {
     const checkToken = async () => {
       try {
         dispatch(setIsLoading(true));
-        const token = await AsyncStorage.getItem('handsup-token');
+        const token = await AsyncStorage.getItem("handsup-token");
         token ? setToken(token) : setToken(null);
         if (token) {
           dispatch(setIsLoggedIn(true));
           const decodedUser = jwtDecode(token);
-          console.log({decodedUser} + "decoded user")
+          console.log({ decodedUser } + "decoded user");
           dispatch(setUser(decodedUser as User));
         } else {
           dispatch(setIsLoggedIn(false));
         }
       } catch (err) {
-        console.log('Error getting token from AsyncStorage:', err.message);
+        console.log("Error getting token from AsyncStorage:", err.message);
       } finally {
         dispatch(setIsLoading(false));
       }
@@ -58,22 +60,20 @@ export default function ScreenNav() {
 
   useEffect(() => {
     dispatch(setIsLoggedIn(Boolean(token)));
-    console.log(Boolean(token) + "isLoggedIn")
+    console.log(Boolean(token) + "isLoggedIn");
   }, [token]);
 
   return isLoading ? (
     <Loading />
   ) : (
     <NavigationContainer>
-      <Stack.Navigator
-      initialRouteName={isLoggedIn ? "Home" : "Login"}
-      >
-      <Stack.Screen
+      <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Login"}>
+        <Stack.Screen
           name="Home"
           component={Home}
           options={{ headerShown: false, animationEnabled: false }}
         />
-      <Stack.Screen
+        <Stack.Screen
           name="Login"
           component={Login}
           options={{ headerShown: false }}
@@ -83,7 +83,7 @@ export default function ScreenNav() {
           component={Signup}
           options={{ headerShown: false }}
         />
-        
+
         <Stack.Screen
           name="CreatePoll"
           component={CreatePoll}
@@ -123,7 +123,6 @@ export default function ScreenNav() {
             presentation: "modal",
           }}
         />
-        
       </Stack.Navigator>
     </NavigationContainer>
   );

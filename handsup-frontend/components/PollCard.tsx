@@ -12,7 +12,10 @@ import { useSelector } from "react-redux";
 import { RootState, User } from "../redux/types/types";
 import Header from "./Header";
 import styles from "../styles/styles";
-import { createPollResponse, insertResponseChoice } from "../services/pollResponseSetup";
+import {
+  createPollResponse,
+  insertResponseChoice,
+} from "../services/pollResponseSetup";
 
 export default function PollCard({ route, navigation }) {
   const [answers, setAnswers] = useState([]);
@@ -88,22 +91,26 @@ export default function PollCard({ route, navigation }) {
     );
   };
 
-  const handleSelectAnswer = async (answer_id: Number, poll_id: Number, user_id: Number) => {
+  const handleSelectAnswer = async (
+    answer_id: Number,
+    poll_id: Number,
+    user_id: Number
+  ) => {
     try {
       const pollResponse = await createPollResponse(user_id, poll_id);
-      console.log(pollResponse.id + "response id")
-      console.log(pollResponse)
-      if(pollResponse.error) throw new Error(pollResponse.error)
-      const choiceResponse = await insertResponseChoice(pollResponse.id, answer_id);
-      console.log(choiceResponse)
-      if(choiceResponse.error) throw new Error(choiceResponse.error)
-      
-      console.log(pollResponse)
+      if (pollResponse.error) throw new Error(pollResponse.error);
+
+      const choiceResponse = await insertResponseChoice(
+        pollResponse.id,
+        answer_id
+      );
+      if (choiceResponse.error) throw new Error(choiceResponse.error);
+
       navigation.navigate("Home");
       Alert.alert("Answer Selected");
     } catch (error) {
       setError(error.message);
-      console.log(error)
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -129,28 +136,31 @@ export default function PollCard({ route, navigation }) {
         <View style={styles.twoByTwo}>
           {answers.map((answer, index) => {
             return (
-              <View
-                key={index}
-              >
-                <TouchableOpacity style={styles.btn}
-                  onPress={() => handleSelectAnswer(answer.id, poll.id, user.id)}
+              <View key={index}>
+                <TouchableOpacity
+                  style={styles.btn}
+                  onPress={() =>
+                    handleSelectAnswer(answer.id, poll.id, user.id)
+                  }
                 >
-                  <Text>{answer.text}{answer.id}</Text>
+                  <Text>
+                    {answer.text}
+                    {answer.id}
+                  </Text>
                 </TouchableOpacity>
               </View>
             );
           })}
         </View>
+        {isAdmin && (
+          <IonIcons
+            name="trash"
+            size={30}
+            color="red"
+            onPress={handleDeletionAlert}
+          />
+        )}
       </View>
-      {/* Delete icon */}
-      {isAdmin && (
-        <IonIcons
-          name="trash"
-          size={30}
-          color="red"
-          onPress={handleDeletionAlert}
-        />
-      )}
     </View>
   );
 }

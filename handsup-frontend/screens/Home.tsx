@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
-  Touchable,
   ScrollView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,8 +17,8 @@ import BottomNav from "../navigation/BottomNav";
 import { RootState } from "../redux/types/types";
 import styles from "../styles/styles";
 import { setPolls } from "../redux/slices/pollSlice";
-import { renderNode } from "@rneui/themed/dist/config";
 import { renderPolls } from "../utils/renderPolls";
+import Loading from "./Loading";
 
 
 export default function Home({ navigation }) {
@@ -56,14 +53,16 @@ export default function Home({ navigation }) {
     }
   }, [dispatch, user]);
 
-
-  if (isLoading || !isContentLoaded) {
-    return <ActivityIndicator />;
-  }
+  if(!isContentLoaded || isLoading) return (<Loading />)
 
   const now = new Date();
-  const activePolls = polls.filter((poll) => new Date(poll.respond_by) > now);
-  const expiredPolls = polls.filter((poll) => new Date(poll.respond_by) <= now);
+  const activePolls = polls
+  .filter((poll) => new Date(poll.respond_by) > now)
+  .sort((a, b) => new Date(a.respond_by).getTime() - new Date(b.respond_by).getTime());
+
+  const expiredPolls = polls
+  .filter((poll) => new Date(poll.respond_by) <= now)
+  .sort((a, b) => new Date(a.respond_by).getTime() - new Date(b.respond_by).getTime());
 
   return (
     <View style={styles.container}>
@@ -87,7 +86,9 @@ export default function Home({ navigation }) {
           <Text style={{ color: "white" }}>Expired</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={styles.body}>
+      <ScrollView contentContainerStyle={styles.scrollBody}
+      keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.listContainer}>
           {isLoading ? (
             <Text>Loading...</Text>
