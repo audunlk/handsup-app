@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { getLoginToken, updateUser } from "../services/accountSetup";
-import { Ionicons } from "@expo/vector-icons";
 import { clearUser } from "../redux/slices/userSlice";
 import { setUser } from "../redux/slices/userSlice";
-import { setToken } from "../redux/slices/tokenSlice";
 import { RootState, User } from "../redux/types/types";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoading } from "../redux/slices/loadingSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setIsLoggedIn } from "../redux/slices/loggedInSlice";
-import styles from "../styles/styles";
+import Header from "../components/Header";
 
 export default function UserProfile({ navigation }) {
   const user = useSelector((state: RootState) => state.user);
@@ -45,6 +41,7 @@ export default function UserProfile({ navigation }) {
       handleUpdateUser();
     }
   };
+  
 
   const handleUpdateUser = async () => {
     setIsEditing(true);
@@ -99,80 +96,118 @@ export default function UserProfile({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Your Profile</Text>
-        {/* X icon */}
-        <Ionicons
-          name="close"
-          size={30}
-          color="white"
-          onPress={() => navigation.goBack()}
-        />
+      <Header navigation={navigation} title="Your Profile" showExit={true} />
+      <View style={styles.body}>
+  <View style={styles.inputStack}>
+    <View style={styles.inputHorizontal}>
+      <Text style={[styles.mediumText, styles.label]}>
+        Username
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={username}
+        editable={isEditable}
+        onChangeText={setUsername}
+      />
+    </View>
+    <View style={styles.inputHorizontal}>
+      <Text style={[styles.mediumText, styles.label]}>
+        First Name
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={first_name}
+        editable={isEditable}
+        onChangeText={setfirst_name}
+      />
+    </View>
+    <View style={styles.inputHorizontal}>
+      <Text style={[styles.mediumText, styles.label]}>
+        Last Name
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={last_name}
+        editable={isEditable}
+        onChangeText={setlast_name}
+      />
+    </View>
+    <View style={styles.inputHorizontal}>
+      <Text style={[styles.mediumText, styles.label]}>
+        Email
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={email}
+        editable={isEditable}
+        onChangeText={setEmail}
+      />
+    </View>
+    <View style={styles.btn}>
+      <Button
+        title={isEditable ? "Save" : "Edit"}
+        onPress={handleEdit}
+        color={"white"}
+      />
+    </View>
+    <View style={styles.btn}>
+      <Button
+        title="Log out"
+        onPress={handleLogout}
+        color={"white"}
+      />
       </View>
-      <View style={styles.listContainer}>
-        <Text style={[styles.mediumText, { alignSelf: "flex-start", marginLeft: '10%' }]}>
-          Username
-        </Text>
-        <TextInput
-          style={styles.input}
-          value={username}
-          editable={isEditable}
-          onChangeText={setUsername}
-        />
-        <Text style={[styles.mediumText, { alignSelf: "flex-start", marginLeft: '10%' }]}>
-          First Name
-        </Text>
-        <TextInput
-          style={styles.input}
-          value={first_name}
-          editable={isEditable}
-          onChangeText={setfirst_name}
-        />
-        <Text style={[styles.mediumText, { alignSelf: "flex-start", marginLeft: '10%' }]}>
-          Last Name
-        </Text>
-
-        <TextInput
-          style={styles.input}
-          value={last_name}
-          editable={isEditable}
-          onChangeText={setlast_name}
-        />
-        <Text style={[styles.mediumText, { alignSelf: "flex-start", marginLeft: '10%' }]}>
-          Email
-        </Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          editable={isEditable}
-          onChangeText={setEmail}
-        />
-        <View style={styles.btn}>
-          <Button
-            title={isEditable ? "Save" : "Edit"}
-            onPress={handleEdit}
-            color={"white"}
-          />
-        </View>
-        <View
-          style={[
-            styles.btn,
-            {
-              position: "absolute",
-              bottom: 40,
-              backgroundColor: "black",
-              borderRadius: 10,
-            },
-          ]}
-        >
-          <Button
-            title="Log out"
-            onPress={handleLogout}
-            disabled={isLoggingOut}
-            color={"white"}
-          />
-        </View>
-      </View>
+  </View>
+</View>
     </View>
   );
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#141d26",
+  },
+  body: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  inputStack: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputHorizontal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  label: {
+    width: '30%',
+    marginRight: 20,
+  },
+  mediumText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    marginBottom: 10,
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+    textAlignVertical: 'top',
+  },
+  btn: {
+    width: '100%',
+    marginTop: 20,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+  },
+});

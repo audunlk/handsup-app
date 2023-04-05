@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { localToUTC } from '../utils/dateConversion';
@@ -16,7 +16,6 @@ export default function DateSelector({ setPoll, poll }) {
   };
 
 
-
   return (
     <View>      
         <View>
@@ -25,7 +24,9 @@ export default function DateSelector({ setPoll, poll }) {
             mode="datetime"
             display="inline"
             onChange={onChange}
-            minimumDate={new Date()}
+            minimumDate={
+              new Date()
+            }
           />
         </View>
 

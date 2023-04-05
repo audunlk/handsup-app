@@ -1,83 +1,27 @@
 const HANDSUP_API_URL = "http://192.168.0.106:1903";
 
 
-// const pollData = {
-//     question: poll.question,
-//     description: poll.description,
-//     created_at: poll.created_at,
-//     respond_by: poll.respond_by.toISOString(),
-//     group_id: poll.group_id,
-//     answer_choices: answers,
-//   };
-//   const pollResponse = await createPoll({pollData})
-
-export async function createPoll ({ question, description, created_at, respond_by, group_id, answer_choices }) {
-    const response = await fetch(`${HANDSUP_API_URL}/create-poll`, {
+export async function createPollResponse(poll_id, user_id){
+    const response = await fetch(`${HANDSUP_API_URL}/create-poll-response/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ question, description, created_at, respond_by,  group_id, answer_choices }),
+        body: JSON.stringify({ poll_id, user_id }),
     });
     return response.json();
 }
 
-export async function getPollsByGroup(group_id) {
-    const response = await fetch(`${HANDSUP_API_URL}/polls-by-group/${group_id}`, {
-        method: 'GET',
+export async function insertResponseChoice(poll_response_id, choice_id){
+    const response = await fetch(`${HANDSUP_API_URL}/insert-response-choice/`, {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ poll_response_id, choice_id }),
     });
     return response.json();
 }
-
-export async function getAnswerChoices(poll_id) {
-    const response = await fetch(`${HANDSUP_API_URL}/answer-choices/${poll_id}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    return response.json();
-}
-
-export async function deletePoll(poll_id) {
-    const response = await fetch(`${HANDSUP_API_URL}/delete-poll/${poll_id}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    return response.json();
-}
-
-//takes a group id array and returns an array of polls
-export async function getPollsByGroups(group_ids) {
-    const response = await fetch(`${HANDSUP_API_URL}/polls-by-groups/${
-        group_ids
-    }`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    return response.json();
-
-}
-
-export async function getAdminsByGroup(group_id) {
-    const response = await fetch(`${HANDSUP_API_URL}/admins-by-group/${group_id}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    return response.json();
-}
-
-
-
 
 // -- Create tables
 // CREATE TABLE IF NOT EXISTS groups (
@@ -139,7 +83,3 @@ export async function getAdminsByGroup(group_id) {
 //   poll_response_id INTEGER REFERENCES poll_response(id),
 //   choice_id INTEGER REFERENCES choices(id)
 // );
-
-
-    
-

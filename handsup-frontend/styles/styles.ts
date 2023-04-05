@@ -25,6 +25,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
   },
+  scrollBody:{
+    flexGrow: 1,
+    color: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+  },
   body: {
     flex: 1,
     color: "white",
@@ -61,13 +68,12 @@ const styles = StyleSheet.create({
   },
   mediumText: {
     color: "white",
-    fontSize: 20,
+    fontSize: 15,
     marginLeft: 10,
   },
   smallText: {
     color: "white",
     fontSize: 10,
-    marginLeft: 10,
   },
 
   listItem: {
@@ -109,22 +115,22 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   twoByTwo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  inputStack:{
     width: "100%",
     alignItems: "center",
-    color: "white",
-  },
-  twoByTwoItem: {
-    width: "45%",
-    height: 100,
-    borderColor: "white",
-    borderBottomWidth: 0.3,
-    padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    color: "white",
-  },
+    justifyContent: "center",
+    },
+    inputHorizontal:{
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    
+  }
 });
 
 export default styles;

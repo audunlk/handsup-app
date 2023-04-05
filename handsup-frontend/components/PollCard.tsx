@@ -1,16 +1,18 @@
 import React, { useEffect, useState, useContext } from "react";
 import { View, Text, Alert, TouchableOpacity } from "react-native";
-import { getAnswerChoices, deletePoll, getAdminsByGroup } from "../services/pollSetup";
+import {
+  getAnswerChoices,
+  deletePoll,
+  getAdminsByGroup,
+} from "../services/pollSetup";
 import { ISOtoReadable } from "../utils/dateConversion";
 import IonIcons from "react-native-vector-icons/Ionicons";
 import Loading from "../screens/Loading";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/types/types";
-import { User } from "../redux/types/types";
+import { RootState, User } from "../redux/types/types";
 import Header from "./Header";
 import styles from "../styles/styles";
-
-
+import { createPollResponse, insertResponseChoice } from "../services/pollResponseSetup";
 
 export default function PollCard({ route, navigation }) {
   const [answers, setAnswers] = useState([]);
@@ -21,13 +23,17 @@ export default function PollCard({ route, navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const { poll } = route.params;
   // user from usecontext
-  const user = useSelector((state: RootState) => state.user);
+  const user: User = useSelector((state: RootState) => state.user);
+
   const getAnswers = async (id: Number) => {
     try {
       const answerChoices = await getAnswerChoices(id);
       setAnswers(answerChoices);
-      setCreationDate(ISOtoReadable(poll.created_at));
-      setRespondBy(ISOtoReadable(poll.respond_by));
+      //make the UTCisostring to readable date
+      const creationDate = ISOtoReadable(poll.created_at);
+      const respondBy = ISOtoReadable(poll.respond_by);
+      setCreationDate(creationDate);
+      setRespondBy(respondBy);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -38,8 +44,8 @@ export default function PollCard({ route, navigation }) {
   const getAdmins = async (id: Number) => {
     try {
       const admins = await getAdminsByGroup(id);
-      console.log({admins})
-      const isAdmin = admins.find((admin) => admin.id === user.id);
+      const isAdmin = admins.find((admin: any) => admin.id === user.id);
+      setIsAdmin(isAdmin);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -51,7 +57,10 @@ export default function PollCard({ route, navigation }) {
     setIsLoading(true);
     getAdmins(poll.group_id);
     getAnswers(poll.id);
-    console.log(isAdmin)
+    console.log(answers)
+    console.log(isAdmin);
+    console.log(poll.id)
+    console.log(user.id)
   }, [poll]);
 
   const handleDeletePoll = async () => {
@@ -83,51 +92,69 @@ export default function PollCard({ route, navigation }) {
     );
   };
 
+  const handleSelectAnswer = async (answer_id: Number, poll_id: Number, user_id: Number) => {
+    try {
+      const pollResponse = await createPollResponse(user_id, poll_id);
+      console.log(pollResponse.id + "response id")
+      console.log(pollResponse)
+      if(pollResponse.error) throw new Error(pollResponse.error)
+      const choiceResponse = await insertResponseChoice(pollResponse.id, answer_id);
+      console.log(choiceResponse)
+      if(choiceResponse.error) throw new Error(choiceResponse.error)
+      
+      console.log(pollResponse)
+      navigation.navigate("Home");
+      Alert.alert("Answer Selected");
+    } catch (error) {
+      setError(error.message);
+      console.log(error)
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isLoading) {
     return <Loading />;
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "center",
-      }}
-    >
+    <View style={styles.container}>
       <Header navigation={navigation} title={null} showExit={true} />
-      <Text>{poll.question}</Text>
-      <Text style={{ color: "red" }}>{poll.description}</Text>
-      <Text>Created At:</Text>
-      <Text>{creationDate[0]}</Text>
-      <Text>{creationDate[1]}</Text>
-      <Text>Respond By:</Text>
-      <Text>{respondBy[0]}</Text>
-      <Text>{respondBy[1]}</Text>
-      <Text>{poll.group_id}</Text>
-      <View style={styles.twoByTwo}>
-        {answers.map((answer, index) => {
-          return (
-            <View style={styles.twoByTwoItem} key={index}
-            >
-              <TouchableOpacity  style={styles.btn}>
-                <Text >{answer.text}</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
+      <View style={styles.body}>
+        <Text>{poll.question}</Text>
+        <Text style={{ color: "red" }}>{poll.description}</Text>
+        <Text style={styles.smallText}>Created At:</Text>
+        <Text style={styles.smallText}>{creationDate[0]}</Text>
+        <Text style={styles.smallText}>{creationDate[1]}</Text>
+        <Text style={styles.smallText}>Respond By:</Text>
+        <Text style={styles.smallText}>{respondBy[0]}</Text>
+        <Text style={styles.smallText}>{respondBy[1]}</Text>
+        <Text style={styles.smallText}>{poll.group_id}</Text>
+        <View style={styles.twoByTwo}>
+          {answers.map((answer, index) => {
+            return (
+              <View
+                key={index}
+              >
+                <TouchableOpacity style={styles.btn}
+                  onPress={() => handleSelectAnswer(answer.id, poll.id, user.id)}
+                >
+                  <Text>{answer.text}{answer.id}</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
       </View>
       {/* Delete icon */}
       {isAdmin && (
         <IonIcons
-        name="trash"
-        size={30}
-        color="red"
-        onPress={handleDeletionAlert}
-      />
-      )
-      }
+          name="trash"
+          size={30}
+          color="red"
+          onPress={handleDeletionAlert}
+        />
+      )}
     </View>
   );
 }

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Touchable,
+  ScrollView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -65,7 +66,10 @@ export default function Home({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{user.username}</Text>
+      <View>
+        <Text style={styles.title}>{user.first_name}</Text>
+          <Text style={styles.smallText}>@{user.username}</Text>
+      </View>
         <Ionicons
           name="ios-person"
           size={24}
@@ -81,7 +85,7 @@ export default function Home({ navigation }) {
           <Text style={{ color: "white" }}>Expired</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.body}>
+      <ScrollView contentContainerStyle={styles.body}>
         <View style={styles.listContainer}>
           {isLoading ? (
             <Text>Loading...</Text>
@@ -112,7 +116,7 @@ export default function Home({ navigation }) {
             ))
           )}
         </View>
-      </View>
+      </ScrollView>
       <BottomNav navigation={navigation} />
     </View>
   );
