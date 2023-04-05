@@ -9,7 +9,6 @@ import {
   ScrollView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { getGroupsByUser } from "../services/accountSetup";
 import { getPollsByGroups } from "../services/pollSetup";
 import { useDispatch } from "react-redux";
@@ -21,6 +20,8 @@ import BottomNav from "../navigation/BottomNav";
 import { RootState } from "../redux/types/types";
 import styles from "../styles/styles";
 import { setPolls } from "../redux/slices/pollSlice";
+import { renderNode } from "@rneui/themed/dist/config";
+import { renderPolls } from "../utils/renderPolls";
 
 
 export default function Home({ navigation }) {
@@ -54,6 +55,7 @@ export default function Home({ navigation }) {
       getPolls();
     }
   }, [dispatch, user]);
+
 
   if (isLoading || !isContentLoaded) {
     return <ActivityIndicator />;
@@ -90,30 +92,9 @@ export default function Home({ navigation }) {
           {isLoading ? (
             <Text>Loading...</Text>
           ) : selectedTab === "active" ? (
-            activePolls.map((poll, i) => (
-              <View style={styles.listItem} key={poll.id}>
-                <TouchableOpacity
-                  key={i}
-                  onPress={() => navigation.navigate("PollCard", { poll: poll })}
-                  >
-                  <Text style={styles.listTitle}>{poll.question}</Text>
-                  <Text style={styles.listDescription}>{poll.name}</Text>
-                </TouchableOpacity>
-              </View>
-            ))
+            renderPolls(activePolls, navigation)
           ) : (
-            expiredPolls.map((poll, i) => (
-              <View style={styles.listItem} key={poll.id}>
-                <TouchableOpacity
-                  key={i}
-                  
-                  onPress={() => navigation.navigate("PollCard", { poll: poll })}
-                  >
-                  <Text style={styles.listTitle}>{poll.question}</Text>
-                  <Text style={styles.listDescription}>{poll.name}</Text>
-                </TouchableOpacity>
-              </View>
-            ))
+            renderPolls(expiredPolls, navigation)
           )}
         </View>
       </ScrollView>

@@ -57,10 +57,6 @@ export default function PollCard({ route, navigation }) {
     setIsLoading(true);
     getAdmins(poll.group_id);
     getAnswers(poll.id);
-    console.log(answers)
-    console.log(isAdmin);
-    console.log(poll.id)
-    console.log(user.id)
   }, [poll]);
 
   const handleDeletePoll = async () => {
