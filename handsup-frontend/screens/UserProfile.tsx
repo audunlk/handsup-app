@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'left',
     marginBottom: 10,
+    color: 'white',
   },
   input: {
     flex: 1,
@@ -203,6 +204,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     textAlignVertical: 'top',
+    backgroundColor: 'white',
   },
   btn: {
     width: '100%',

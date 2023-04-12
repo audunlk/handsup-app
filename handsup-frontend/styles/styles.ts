@@ -4,6 +4,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#141d26",
+    //to account for 120 height bottom bar
+    paddingBottom: 120,
   },
   header: {
     justifyContent: "space-between",
@@ -26,10 +28,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   scrollBody:{
-    color: "white",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "column",
+    height: 1000,
   },
   body: {
     flex: 1,

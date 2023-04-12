@@ -3,7 +3,8 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  FlatList
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getGroupsByUser } from "../services/accountSetup";
@@ -86,20 +87,16 @@ export default function Home({ navigation }) {
           <Text style={{ color: "white" }}>Expired</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollBody}
+      {/* <ScrollView contentContainerStyle={styles.scrollBody}
       keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.listContainer}>
-          {isLoading ? (
-            <Text>Loading...</Text>
-          ) : selectedTab === "active" ? (
-            renderPolls(activePolls, navigation)
-          ) : (
-            renderPolls(expiredPolls, navigation)
-          )}
-        </View>
-      </ScrollView>
-      <BottomNav navigation={navigation} />
+      > */}
+      <FlatList 
+        data={selectedTab === "active" ? renderPolls(activePolls, navigation) : renderPolls(expiredPolls, navigation)}
+        renderItem={({item}) => item}
+        keyExtractor={(item, index) => index.toString()}
+        />
+        <BottomNav navigation={navigation} />
     </View>
+    
   );
 }
