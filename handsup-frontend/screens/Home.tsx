@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   FlatList
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,6 +30,7 @@ export default function Home({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("active");
   const [isContentLoaded, setIsContentLoaded] = useState(false);
 
+  
   useEffect(() => {
     const getPolls = async () => {
       try {
@@ -87,9 +87,7 @@ export default function Home({ navigation }) {
           <Text style={{ color: "white" }}>Expired</Text>
         </TouchableOpacity>
       </View>
-      {/* <ScrollView contentContainerStyle={styles.scrollBody}
-      keyboardShouldPersistTaps="handled"
-      > */}
+      
       <FlatList 
         data={selectedTab === "active" ? renderPolls(activePolls, navigation) : renderPolls(expiredPolls, navigation)}
         renderItem={({item}) => item}
