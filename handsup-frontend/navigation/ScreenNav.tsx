@@ -23,6 +23,9 @@ import Loading from "../screens/Loading";
 import GroupInfo from "../screens/GroupInfo";
 import PollCard from "../components/PollCard";
 import { setIsLoggedIn } from "../redux/slices/loggedInSlice";
+import LoginOrRegister from "../screens/LoginOrRegister";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/firebase"; 
 
 const Stack = createStackNavigator();
 
@@ -38,21 +41,24 @@ export default function ScreenNav() {
   useEffect(() => {
     const checkToken = async () => {
       try {
-        dispatch(setIsLoading(true));
         const token = await AsyncStorage.getItem("handsup-token");
         token ? setToken(token) : setToken(null);
         if (token) {
           dispatch(setIsLoggedIn(true));
-          const decodedUser = jwtDecode(token);
-          console.log({ decodedUser } + "decoded user");
-          dispatch(setUser(decodedUser as User));
+          console.log(isLoggedIn)
+          const decodedUser: any = jwtDecode(token);
+          const userDoc = doc(db, 'users', decodedUser.user_id);
+          const userDocSnap = await getDoc(userDoc);
+          const userDocData = userDocSnap.data();
+          console.log(userDocData)
+          dispatch(setUser(userDocData as User));
+          console.log({ decodedUser })
         } else {
           dispatch(setIsLoggedIn(false));
         }
       } catch (err) {
         console.log("Error getting token from AsyncStorage:", err.message);
       } finally {
-        dispatch(setIsLoading(false));
       }
     };
     checkToken();
@@ -75,15 +81,9 @@ export default function ScreenNav() {
         />
         <Stack.Screen
           name="Login"
-          component={Login}
+          component={LoginOrRegister}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="Signup"
-          component={Signup}
-          options={{ headerShown: false }}
-        />
-
         <Stack.Screen
           name="CreatePoll"
           component={CreatePoll}

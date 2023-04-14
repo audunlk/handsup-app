@@ -10,9 +10,8 @@ import { getGroupsByUser } from "../services/accountSetup";
 import { getPollsByGroups } from "../services/pollSetup";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { Poll, User } from "../redux/types/types";
+import { User } from "../redux/types/types";
 import { setIsLoading } from "../redux/slices/loadingSlice";
-
 import BottomNav from "../navigation/BottomNav";
 import { RootState } from "../redux/types/types";
 import styles from "../styles/styles";
@@ -45,7 +44,7 @@ export default function Home({ navigation }) {
         setError(error);
       } finally {
         //in response to dispatch in screenNav in checkToken
-        dispatch(setIsLoading(false));
+        //dispatch(setIsLoading(false));
         setIsContentLoaded(true);
       }
     };
@@ -54,7 +53,7 @@ export default function Home({ navigation }) {
     }
   }, [dispatch, user]);
 
-  if(!isContentLoaded || isLoading) return (<Loading />)
+  //if(!isContentLoaded || isLoading) return (<Loading />)
 
   const now = new Date();
   const activePolls = polls
@@ -69,7 +68,7 @@ export default function Home({ navigation }) {
     <View style={styles.container}>
       <View style={styles.header}>
       <View>
-        <Text style={styles.title}>{user.first_name}</Text>
+        <Text style={styles.title}>{user.firstName}</Text>
           <Text style={styles.smallText}>@{user.username}</Text>
       </View>
         <Ionicons

@@ -15,17 +15,16 @@ export default function UserProfile({ navigation }) {
   const dispatch = useDispatch();
   const [isEditable, setIsEditable] = useState(false);
   const [username, setUsername] = useState("");
-  const [first_name, setfirst_name] = useState("");
-  const [last_name, setlast_name] = useState("");
-  const [password, setPassword] = useState(user.password);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   const resetInfo = async () => {
     setUsername(user.username);
-    setfirst_name(user.first_name);
-    setlast_name(user.last_name);
+    setFirstName(user.firstName);
+    setLastName(user.lastName);
     setEmail(user.email);
     setIsLoading(false);
   };
@@ -59,11 +58,11 @@ export default function UserProfile({ navigation }) {
           const updatedUser = await updateUser(
             user.id,
             email,
-            first_name,
-            last_name,
+            firstName,
+            lastName,
             username
           );
-          const newToken = await getLoginToken(email, password);
+          const newToken = await getLoginToken(email);
           AsyncStorage.setItem("handsup-token", newToken.token);
           dispatch(setUser(updatedUser));
         },
@@ -116,9 +115,9 @@ export default function UserProfile({ navigation }) {
       </Text>
       <TextInput
         style={styles.input}
-        value={first_name}
+        value={firstName}
         editable={isEditable}
-        onChangeText={setfirst_name}
+        onChangeText={setFirstName}
       />
     </View>
     <View style={styles.inputHorizontal}>
@@ -127,9 +126,9 @@ export default function UserProfile({ navigation }) {
       </Text>
       <TextInput
         style={styles.input}
-        value={last_name}
+        value={lastName}
         editable={isEditable}
-        onChangeText={setlast_name}
+        onChangeText={setLastName}
       />
     </View>
     <View style={styles.inputHorizontal}>

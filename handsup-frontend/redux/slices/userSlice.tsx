@@ -6,11 +6,9 @@ import { User } from "../types/types";
 const initialState: User = {
   id: null,
   email: null,
-  first_name: null,
-  last_name: null,
-    username: null,
-  password: null,
-
+  firstName: null,
+  lastName: null,
+  username: null,
 };
 
 const userSlice = createSlice({
@@ -20,20 +18,16 @@ const userSlice = createSlice({
     setUser: (state, action: PayloadAction<User>) => {
       state.id = action.payload.id;
       state.email = action.payload.email;
-      state.first_name = action.payload.first_name;
-      state.last_name = action.payload.last_name;
+      state.firstName = action.payload.firstName;
+      state.lastName = action.payload.lastName;
       state.username = action.payload.username;
-        state.password = action.payload.password;
-
     },
     clearUser: (state) => {
       state.id = null;
       state.email = null;
-      state.first_name = null;
-      state.last_name = null;
-        state.username = null;
-        state.password = null;
-
+      state.firstName = null;
+      state.lastName = null;
+      state.username = null;
     },
   },
 });
