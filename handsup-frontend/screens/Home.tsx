@@ -6,8 +6,6 @@ import {
   FlatList
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getGroupsByUser } from "../services/accountSetup";
-import { getPollsByGroups } from "../services/pollSetup";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { User } from "../redux/types/types";

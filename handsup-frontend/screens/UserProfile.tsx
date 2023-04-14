@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
-import { getLoginToken, updateUser } from "../services/accountSetup";
 import { clearUser } from "../redux/slices/userSlice";
 import { setUser } from "../redux/slices/userSlice";
 import { RootState, User } from "../redux/types/types";

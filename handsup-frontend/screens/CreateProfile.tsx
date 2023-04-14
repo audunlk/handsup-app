@@ -45,7 +45,6 @@ export default function CreateProfile({ navigation }) {
         dispatch(setIsLoading(true));
         if (checkValidity()) {
           console.log('Valid input');
-      
           const updatedUser = {
             id: user.id,
             email: user.email,
