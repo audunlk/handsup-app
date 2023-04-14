@@ -13,7 +13,7 @@ import { setUser } from '../redux/slices/userSlice'
 import { setIsLoading } from '../redux/slices/loadingSlice'
 import { doc, setDoc, getDoc } from 'firebase/firestore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createUser } from '../services/firebase'
+import { createUser, loginUser } from '../services/firebaseRequests'
 
 
 export default function LoginOrRegister({ navigation }) {
@@ -24,19 +24,13 @@ export default function LoginOrRegister({ navigation }) {
 
 
     const handleLogin = async () => {
-        await signInWithEmailAndPassword(auth, email, password)
-            .then(async () => {
-                console.log('User logged in successfully');
-                const accessToken = await auth.currentUser.getIdToken()
-                await AsyncStorage.setItem('handsup-token', accessToken)
-                dispatch(setIsLoggedIn(true))
-                navigation.navigate('Home')
-            })
-            .catch(error => {
-                console.error('Error logging in:', error.message, error.code);
-                setError(transformError(error.code))
-            });
-
+        try{
+            await loginUser(email, password)
+            dispatch(setIsLoggedIn(true))
+        }catch(error){
+            console.log(error.code)
+            setError(transformError(error.code))
+        }
     };
 
     const handleRegister = async () => {
@@ -44,9 +38,8 @@ export default function LoginOrRegister({ navigation }) {
             await AsyncStorage.clear()
         }
         try {
-            await createUser(auth, db, email, password)
+            await createUser(email, password)
             dispatch(setIsLoggedIn(true))
-            navigation.navigate('Home')
         } catch (error) {
             console.log(error.code)
             setError(transformError(error.code))

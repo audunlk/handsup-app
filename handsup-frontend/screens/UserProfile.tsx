@@ -86,7 +86,6 @@ export default function UserProfile({ navigation }) {
           onPress: async () => {
             AsyncStorage.clear();
             dispatch(clearUser());
-            navigation.navigate("Login");
           },
         },
       ]

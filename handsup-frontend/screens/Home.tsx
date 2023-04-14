@@ -31,30 +31,13 @@ export default function Home({ navigation }) {
 
   
   useEffect(() => {
-    const getPolls = async () => {
-      try {
-        const groups = await getGroupsByUser(user.id);
-        console.log(groups);
-        const group_ids = groups.map((group: any) => group.id);
-        const userPolls = await getPollsByGroups(group_ids);
-        console.log({userPolls})
-        dispatch(setPolls(userPolls));
-      } catch (error) {
-        console.log(error);
-        setError(error);
-      } finally {
-        //in response to dispatch in screenNav in checkToken
-        //dispatch(setIsLoading(false));
-        setIsContentLoaded(true);
-      }
-    };
-    if (user) {
-      getPolls();
-    }
-  }, [dispatch, user]);
+    
+   
+  }, [dispatch, user, navigation]);
 
-  //if(!isContentLoaded || isLoading) return (<Loading />)
-
+  
+  
+  
   const now = new Date();
   const activePolls = polls
   .filter((poll) => new Date(poll.respond_by) > now)

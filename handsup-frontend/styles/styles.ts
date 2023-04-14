@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 10,
   },
-
+  
   listItem: {
     width: "100%",
     height: 100,
