@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsLoading } from "../redux/slices/loadingSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header";
+import { updateUser } from "../services/firebaseRequests";
 
 export default function UserProfile({ navigation }) {
   const user = useSelector((state: RootState) => state.user);
@@ -31,6 +32,7 @@ export default function UserProfile({ navigation }) {
   useEffect(() => {
     setIsLoading(true);
     resetInfo();
+    console.log({user})
   }, []);
 
   const handleEdit = () => {
@@ -39,7 +41,6 @@ export default function UserProfile({ navigation }) {
       handleUpdateUser();
     }
   };
-  
 
   const handleUpdateUser = async () => {
     setIsEditing(true);
@@ -54,15 +55,14 @@ export default function UserProfile({ navigation }) {
       {
         text: "Update",
         onPress: async () => {
-          const updatedUser = await updateUser(
-            user.id,
-            email,
+          const updatedUserData = {
+            ...user,
+            username,
             firstName,
             lastName,
-            username
-          );
-          const newToken = await getLoginToken(email);
-          AsyncStorage.setItem("handsup-token", newToken.token);
+            email,
+          };
+          const updatedUser = await updateUser(user.id, updatedUserData);
           dispatch(setUser(updatedUser));
         },
       },

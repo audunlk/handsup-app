@@ -1,48 +1,54 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Header from "../components/Header";
-import { getGroupsByUser } from "../services/accountSetup";
 import ListItem from "../components/ListItem";
 import { RootState } from "../redux/types/types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/styles";
+import { getTeamsByUserId } from "../services/firebaseRequests";
+import { setIsLoading } from "../redux/slices/loadingSlice";
 
-export default function Groups({ navigation }) {
+export default function Teams({ navigation }) {
+  const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
-  const [groups, setGroups] = useState([]);
+  const isLoading = useSelector((state: RootState) => state.isLoading);
+  const [teams, setTeams] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    dispatch(setIsLoading(true));
     console.log(user);
-    console.log("user in groups");
-    defineGroups();
-  }, []);
+    console.log("user in teams");
+    if(user.id){
+      defineTeams();
+    }
 
-  const defineGroups = async () => {
+  }, [user]);
+
+  const defineTeams = async () => {
+    console.log("defining teams")
     try {
-      const groups = await getGroupsByUser(user.id);
-      console.log(groups);
-      setGroups(groups);
+      const teams = await getTeamsByUserId(user.id);
+      console.log(teams + "teams");
+      setTeams(teams);
     } catch (error) {
       console.log(error);
       setError(error);
     } finally {
+      dispatch(setIsLoading(false));
     }
   };
 
-  const openInfo = () => {
-    console.log("open info");
-  };
 
-  const handleRenderGroups = () => {
-    return groups.map((group, i) => {
+  const handleRenderTeams = () => {
+    return teams.map((team, i) => {
       return (
         <View style={styles.listItem} key={i}>
           <TouchableOpacity
-            key={group.id}
-            onPress={() => navigation.navigate("GroupInfo", { group: group })}
+            key={team.id}
+            onPress={() => navigation.navigate("GroupInfo", { team })}
           >
-            <Text style={styles.listTitle}>{group.name}</Text>
+            <Text style={styles.listTitle}>{team.name}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -58,7 +64,7 @@ export default function Groups({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} title={"Your Groups"} showExit={true} />
+      <Header navigation={navigation} title={"Your teams"} showExit={true} />
       <View style={styles.tabs}>
         <TouchableOpacity onPress={() => handleJoinTeam()}>
           <Text style={{ color: "white" }}>Join Team</Text>
@@ -67,7 +73,7 @@ export default function Groups({ navigation }) {
           <Text style={{ color: "white" }}>Create Team</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.listContainer}>{handleRenderGroups()}</View>
+      <View style={styles.listContainer}>{handleRenderTeams()}</View>
     </View>
   );
 }

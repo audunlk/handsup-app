@@ -50,7 +50,6 @@ export default function ScreenNav() {
           const userDocSnap = await getDoc(userDoc);
           const userDocData = userDocSnap.data();
           console.log({ userDocData })
-          
           !userDocData.firstName ? setIsFirstTime(true) : setIsFirstTime(false);
           dispatch(setUser(userDocData as User));
           console.log({ decodedUser })

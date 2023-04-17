@@ -1,10 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { View, Text, Alert, TouchableOpacity } from "react-native";
-import {
-  getAnswerChoices,
-  deletePoll,
-  getAdminsByGroup,
-} from "../services/pollSetup";
+
 import { ISOtoReadable } from "../utils/dateConversion";
 import IonIcons from "react-native-vector-icons/Ionicons";
 import Loading from "../screens/Loading";
@@ -12,10 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState, User } from "../redux/types/types";
 import Header from "./Header";
 import styles from "../styles/styles";
-import {
-  createPollResponse,
-  insertResponseChoice,
-} from "../services/pollResponseSetup";
+
 
 export default function PollCard({ route, navigation }) {
   const [answers, setAnswers] = useState([]);

@@ -10,39 +10,48 @@ import {
 import * as Clipboard from "expo-clipboard";
 import Header from "../components/Header";
 import { Ionicons as IonIcons } from "@expo/vector-icons";
-import { getPollsByGroup } from "../services/pollSetup";
 import MainBtn from "../components/MainBtn";
 import styles from "../styles/styles";
 
 export default function GroupInfo({ navigation, route }) {
-  const { group } = route.params;
+  const { team } = route.params;
   const [polls, setPolls] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    console.log(group);
-    console.log("group in group info");
-    listPollsInGroup();
+    console.log({team});
+    console.log("teams in teams info");
+    setIsAdmin(checkAdmin());
   }, []);
 
+  const checkAdmin = () => {
+    const isAdmin = team.members.find((member) => member.admin === true);
+    if(isAdmin) {
+      return true;
+    }
+    return false;
+  };
+    
+
   const copyToClipboard = async () => {
-    Clipboard.setStringAsync(group.serialkey);
+    Clipboard.setStringAsync(team.serialKey);
     Alert.alert(`Copied to clipboard`);
   };
 
-  const listPollsInGroup = async () => {
-    const listPolls = await getPollsByGroup(group.id);
-    console.log({ listPolls });
-    setPolls(listPolls);
-  };
+  // const listPollsInteams = async () => {
+  //   const listPolls = await getPollsByTeams(teams.id);
+  //   console.log({ listPolls });
+  //   setPolls(listPolls);
+  // };
 
   return (
     <ScrollView style={styles.container}>
-      <Header navigation={navigation} title={group.name} showExit={true} />
+      <Header navigation={navigation} title={team.name} showExit={true} />
       <View style={styles.body}>
-        {group.is_admin && (
+        {isAdmin && (
           <View>
             <Text style={styles.smallText}>
-              {group.is_admin ? "Leader" : "Member"}
+              {isAdmin ? "Leader" : "Member"}
             </Text>
             <Text style={styles.listTitle}>Invitation Key:</Text>
             <TouchableOpacity
@@ -50,7 +59,7 @@ export default function GroupInfo({ navigation, route }) {
               onPress={copyToClipboard}
             >
               <TextInput
-                value={group.serialkey}
+                value={team.serialKey}
                 caretHidden={true}
                 autoCorrect={false}
                 editable={false}
@@ -60,7 +69,7 @@ export default function GroupInfo({ navigation, route }) {
             <View>
               <MainBtn
                 title="Create a Poll"
-                onPress={() => navigation.navigate("CreatePoll", { group })}
+                onPress={() => navigation.navigate("CreatePoll", { team })}
               />
             </View>
           </View>
@@ -71,7 +80,7 @@ export default function GroupInfo({ navigation, route }) {
             <View style={styles.listItem} key={i}>
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate("PollCard", { poll: poll, group: group })
+                  navigation.navigate("PollCard", { poll: poll, team })
                 }
               >
                 <Text style={styles.mediumText}>{poll.question}</Text>

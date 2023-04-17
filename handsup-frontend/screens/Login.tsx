@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
-import { getLoginToken } from "../services/accountSetup";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoading } from "../redux/slices/loadingSlice";
 import { RootState } from "../redux/types/types";

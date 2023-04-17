@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, Touchable } from "react-native";
-import { createPoll } from "../services/pollSetup";
 import DateSelector from "../components/DateSelector";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
