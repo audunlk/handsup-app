@@ -11,7 +11,7 @@ npm-debug.*
 web-build/
 package-lock.json
 .env
-firebase/
+/firebase/firebase.tsx
 
 # macOS
 .DS_Store
