@@ -7,6 +7,7 @@ import styles from "../styles/styles";
 import { getTeamsByUserId } from "../services/firebaseRequests";
 import BottomNav from "../navigation/BottomNav";
 import { Ionicons } from "@expo/vector-icons";
+import ProfilePicture from "../components/ProfilePicture";
 
 export default function Teams({ navigation }) {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export default function Teams({ navigation }) {
     return teams.map((team, i) => {
       return (
         <View style={styles.listItem} key={i}>
-          <Ionicons name="ios-people-circle-outline" size={50} color="black" />  
+          <ProfilePicture id={team.serialKey} size={50} type={"team"} />
           <TouchableOpacity
             key={team.id}
             onPress={() => navigation.navigate("GroupInfo", { team })}

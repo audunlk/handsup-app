@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Poll } from "../redux/types/types";
 import styles from "../styles/styles";
 import { ISOtoReadable } from "./dateConversion";
+import ProfilePicture from "../components/ProfilePicture";
 
 export const renderPolls = (polls: any, navigation: any) => {
   const today = new Date().setHours(0, 0, 0, 0);

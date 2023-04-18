@@ -4,10 +4,12 @@ import {
 } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import { auth, db } from '../firebase/firebase';
+import { auth, db, storage } from '../firebase/firebase';
 import { FirestoreError } from 'firebase/firestore';
-import { User, Poll } from '../redux/types/types';
+import { User } from '../redux/types/types';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { uploadBytes } from 'firebase/storage';
+
 
 //USER 
 export const createUser = async (email: string, password: string) => {
@@ -232,7 +234,6 @@ export const insertAnswer = async (pollId: string, userId: string, answer: strin
     const pollQuerySnapshot = await getDocs(
     query(collection(db, 'polls'), 
     where('id', '==', pollId)));
-  
     if (pollQuerySnapshot.empty) {
       throw new Error('Poll does not exist');
     }
@@ -270,4 +271,37 @@ export const hasUserAnsweredPoll = async (pollId: string, userId: string) => {
     }
 }
 
+//IMAGE
+export const uploadImageBlob = async (blob: Blob, id: string, type: string) => {
+    const storageRef = ref(storage, `${type}/${id}`);
+    const uploadTask = uploadBytesResumable(storageRef, blob);
+    uploadTask.on('state_changed', (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+            case 'paused':
+                console.log('Upload is paused');
+                break;
+            case 'running':
+                console.log('Upload is running');
+                break;
+        }
+    }
+        , (error) => {
+            throw error;
+        }
+        , () => {
+            console.log('Image uploaded successfully');
+        }
+    );
+  }
 
+export const getImage = async (id: string, type: string) => {
+    try{
+        const storageRef = ref(storage, `${type}/${id}`);
+        const url = await getDownloadURL(storageRef);
+        return url ? url : null;
+    }catch(err){
+        console.log('Image not found');
+    }
+}

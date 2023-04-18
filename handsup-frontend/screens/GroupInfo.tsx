@@ -13,6 +13,8 @@ import { Ionicons as IonIcons } from "@expo/vector-icons";
 import MainBtn from "../components/MainBtn";
 import styles from "../styles/styles";
 import { getPollsByTeamSerial } from "../services/firebaseRequests";
+import ProfilePicture from "../components/ProfilePicture";
+import { handlePickAvatar } from "../utils/pickAvatar";
 
 export default function GroupInfo({ navigation, route }) {
   const { team } = route.params;
@@ -55,9 +57,9 @@ export default function GroupInfo({ navigation, route }) {
       <Header navigation={navigation} title={team.name} showExit={true} />
       <View style={styles.body}>
         {isAdmin && (
-          
           <View style={{padding: 20, justifyContent: "center", alignItems: "center"}}>
             {/* key icon */}
+            <ProfilePicture id={team.serialKey} size={200} type={"team"}    />
             <Text style={styles.listTitle}>Invitation Key</Text>
             <IonIcons name="key-outline" size={24} color="white" />
             <TouchableOpacity

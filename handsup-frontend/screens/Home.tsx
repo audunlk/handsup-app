@@ -17,6 +17,7 @@ import { setPolls } from "../redux/slices/pollSlice";
 import { renderPolls } from "../utils/renderPolls";
 import Loading from "./Loading";
 import { getPollsByTeamSerials, getPollsByUserId, getTeamsByUserId } from "../services/firebaseRequests";
+import ProfilePicture from "../components/ProfilePicture";
 
 
 export default function Home({ navigation }) {
@@ -74,6 +75,8 @@ export default function Home({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+      <ProfilePicture id={user.id} size={50} type={"user"} />
+
       <View>
         <Text style={styles.title}>{user.firstName}</Text>
           <Text style={styles.smallText}>@{user.username}</Text>
