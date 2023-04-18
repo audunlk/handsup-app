@@ -55,11 +55,11 @@ export default function GroupInfo({ navigation, route }) {
       <Header navigation={navigation} title={team.name} showExit={true} />
       <View style={styles.body}>
         {isAdmin && (
-          <View>
-            <Text style={styles.smallText}>
-              {isAdmin ? "Leader" : "Member"}
-            </Text>
-            <Text style={styles.listTitle}>Invitation Key:</Text>
+          
+          <View style={{padding: 20, justifyContent: "center", alignItems: "center"}}>
+            {/* key icon */}
+            <Text style={styles.listTitle}>Invitation Key</Text>
+            <IonIcons name="key-outline" size={24} color="white" />
             <TouchableOpacity
               style={styles.serialBox}
               onPress={copyToClipboard}
@@ -91,7 +91,6 @@ export default function GroupInfo({ navigation, route }) {
               >
                 <Text style={styles.mediumText}>{poll.question}</Text>
               </TouchableOpacity>
-              
             </View>
           ))}
         </View>

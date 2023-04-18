@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Header from "../components/Header";
-import ListItem from "../components/ListItem";
 import { RootState } from "../redux/types/types";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/styles";
 import { getTeamsByUserId } from "../services/firebaseRequests";
-import { setIsLoading } from "../redux/slices/loadingSlice";
+import BottomNav from "../navigation/BottomNav";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Teams({ navigation }) {
   const dispatch = useDispatch();
@@ -41,6 +41,7 @@ export default function Teams({ navigation }) {
     return teams.map((team, i) => {
       return (
         <View style={styles.listItem} key={i}>
+          <Ionicons name="ios-people-circle-outline" size={50} color="black" />  
           <TouchableOpacity
             key={team.id}
             onPress={() => navigation.navigate("GroupInfo", { team })}
@@ -71,6 +72,8 @@ export default function Teams({ navigation }) {
         </TouchableOpacity>
       </View>
       <View style={styles.listContainer}>{handleRenderTeams()}</View>
+      <BottomNav navigation={navigation} />
+
     </View>
   );
 }

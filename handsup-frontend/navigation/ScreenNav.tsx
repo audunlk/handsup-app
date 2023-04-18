@@ -83,45 +83,46 @@ export default function ScreenNav() {
         <Stack.Screen
           name="CreateProfile"
           component={CreateProfile}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animationEnabled: false }}
         />
         <Stack.Screen
           name="CreatePoll"
           component={CreatePoll}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animationEnabled: false }}
         />
         <Stack.Screen
           name="PollCard"
           component={PollCard}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animationEnabled: false }}
         />
         <Stack.Screen
           name="UserProfile"
           component={UserProfile}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animationEnabled: false }}
         />
         <Stack.Screen
           name="Groups"
           component={Groups}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animationEnabled: false }}
         />
         <Stack.Screen
           name="JoinTeam"
           component={JoinTeam}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animationEnabled: false }}
         />
         <Stack.Screen
           name="CreateTeam"
           component={CreateTeam}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animationEnabled: false }}
         />
         <Stack.Screen
           name="GroupInfo"
           component={GroupInfo}
           options={{
             headerShown: false,
-            animationTypeForReplace: "push",
-            presentation: "modal",
+            animationTypeForReplace: "pop",
+            presentation: "card",
+
           }}
         />
       </Stack.Navigator>

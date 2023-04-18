@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
+    
   },
   listContainer: {
     flex: 1,
@@ -68,15 +69,15 @@ const styles = StyleSheet.create({
     borderColor: "red",
     borderWidth: 2,
   },
- 
   serialBox: {
     backgroundColor: "white",
     padding: 10,
     borderRadius: 10,
     margin: 10,
     width: 200,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
   mediumText: {
     color: "white",
@@ -87,7 +88,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 10,
   },
-  
   listItem: {
     width: "100%",
     height: 100,

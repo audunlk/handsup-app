@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
-
+import styles from "../styles/styles";
 const MainBtn = ({ title = "Button", onPress = () => null }) => {
   return (
     <TouchableOpacity style={styles.btn} onPress={onPress}>
@@ -11,14 +11,4 @@ const MainBtn = ({ title = "Button", onPress = () => null }) => {
 
 export default MainBtn;
 
-const styles = StyleSheet.create({
-  btn: {
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    marginVertical: 10,
-    color: "white",
-  },
-});
+
