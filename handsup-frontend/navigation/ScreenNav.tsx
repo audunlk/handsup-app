@@ -35,7 +35,6 @@ export default function ScreenNav() {
   const [token, setToken] = useState<string | null>(null);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
 
-  
 
   useEffect(() => {
     dispatch(setIsLoading(true));

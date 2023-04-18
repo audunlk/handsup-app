@@ -16,6 +16,7 @@ import styles from "../styles/styles";
 import { setPolls } from "../redux/slices/pollSlice";
 import { renderPolls } from "../utils/renderPolls";
 import Loading from "./Loading";
+import { getPollsByTeamSerials, getPollsByUserId, getTeamsByUserId } from "../services/firebaseRequests";
 
 
 export default function Home({ navigation }) {
@@ -24,16 +25,41 @@ export default function Home({ navigation }) {
   const polls = useSelector((state: RootState) => state.polls);
   const dispatch = useDispatch();
   const [error, setError] = useState("");
+  const [teams, setTeams] = useState([]);
   const [selectedTab, setSelectedTab] = useState("active");
   const [isContentLoaded, setIsContentLoaded] = useState(false);
+
+  const getPolls = async () => {
+    try {
+      const polls = await getPollsByTeamSerials(teams.map(team => team.serialKey));
+      dispatch(setPolls(polls));
+      setIsContentLoaded(true);
+    } catch (error) {
+      console.log(error);
+      setError(error);
+    } 
+  };
+
+  const getTeams = async () => {
+    try {
+      const teams = await getTeamsByUserId(user.id);
+      setTeams(teams);
+    } catch (error) {
+      console.log(error);
+      setError(error);
+    } 
+  }
 
   
   useEffect(() => {
     
-   
-  }, [dispatch, user, navigation]);
+    console.log("use effect ran");
+    getTeams();
+    getPolls();
+  }, [dispatch, user, navigation, isContentLoaded]);
 
   
+
   
   
   const now = new Date();
@@ -67,7 +93,7 @@ export default function Home({ navigation }) {
           <Text style={{ color: "white" }}>Expired</Text>
         </TouchableOpacity>
       </View>
-      
+
       <FlatList 
         data={selectedTab === "active" ? renderPolls(activePolls, navigation) : renderPolls(expiredPolls, navigation)}
         renderItem={({item}) => item}
@@ -78,3 +104,4 @@ export default function Home({ navigation }) {
     
   );
 }
+

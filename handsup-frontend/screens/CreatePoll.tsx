@@ -1,44 +1,54 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, Touchable } from "react-native";
 import DateSelector from "../components/DateSelector";
-import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
-import { Subscription } from "expo-notifications";
-import { User, RootState } from "../redux/types/types";
+import { User, RootState, Poll } from "../redux/types/types";
 import { useSelector } from "react-redux";
 import styles from "../styles/styles";
 import Header from "../components/Header";
+import { createPoll } from "../services/firebaseRequests";
+import 'react-native-get-random-values';
+
+import { v4 as uuidv4 } from "uuid";
 
 export default function CreatePoll({ navigation, route }) {
   const user: User = useSelector((state: RootState) => state.user);
-  const [group, setGroup] = useState(route.params.group);
+  const [team, setTeam] = useState(route.params.team);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [answers, setAnswers] = useState(["", ""]);
   const [poll, setPoll] = useState({
+    id: uuidv4(),
     description: "",
     created_at: new Date(),
     respond_by: new Date(new Date().toUTCString()),
     question: "",
-    group_id: group.id,
+    teamSerial: team.serialKey,
     answer_choices: answers,
   });
+
+  useEffect(() => {
+    console.log(team);
+  }, [team]);
   const hasEmptyAnswers =  answers.some(answer => answer.trim() === "");
   const canCreatePoll = poll.question.trim() !== "" && !hasEmptyAnswers;
 
   const handleCreatePoll = async () => {
-    setIsLoading(true);
+    console.log("creating poll")
+    const isMultipleChoice = answers.length > 2;
     try {
       const pollData = {
+        id: poll.id,
         question: poll.question,
-        description: poll.description,
-        created_at: poll.created_at,
+        created_at: poll.created_at.toISOString(),
         respond_by: poll.respond_by.toISOString(),
-        group_id: poll.group_id,
+        teamSerial: poll.teamSerial,
+        teamName: team.name,
         answer_choices: answers,
+        membersAnswered: [],
       };
+      console.log(pollData)
       const pollResponse = await createPoll(pollData)
-      console.log()
+      console.log(pollResponse);
       if(pollResponse) {
       navigation.navigate("Home");
       } else {
@@ -46,9 +56,7 @@ export default function CreatePoll({ navigation, route }) {
       }
     } catch (error) {
       setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
   const handleAddAnswer = () => {
@@ -65,7 +73,7 @@ export default function CreatePoll({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} title={group.name} showExit={true} />
+      <Header navigation={navigation} title={team.name} showExit={true} />
       <ScrollView contentContainerStyle={styles.scrollBody}>
         <TextInput
           placeholder="Question"
@@ -74,7 +82,9 @@ export default function CreatePoll({ navigation, route }) {
           onChangeText={(text) => setPoll({ ...poll, question: text })}
           value={poll.question}
         />
-        <DateSelector setPoll={setPoll} poll={poll} />
+        <View>
+          <DateSelector setPoll={setPoll} poll={poll} />
+        </View>
         {answers.map((answer, index) => (
           <TextInput
             key={index}

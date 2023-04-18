@@ -9,7 +9,7 @@ export default function DateSelector({ setPoll, poll }) {
   const onChange = (event, selectedDate) => {
     setSelectedDate(selectedDate);
     const UTCdate = localToUTC(selectedDate);
-    console.log(UTCdate.toISOString());
+    console.log(UTCdate.toISOString() + " UTC DateSelector");
     setPoll({ ...poll, respond_by: UTCdate });
   };
 
@@ -20,6 +20,7 @@ export default function DateSelector({ setPoll, poll }) {
           value={selectedDate}
           mode="datetime"
           display="inline"
+          style={{ width: 300, height: 400 }}
           onChange={onChange}
           minimumDate={new Date()}
         />

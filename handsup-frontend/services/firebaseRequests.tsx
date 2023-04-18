@@ -1,11 +1,13 @@
-import { doc, getDoc, setDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import {
+    doc, getDoc, setDoc, getDocs, collection, addDoc, query, where,
+    updateDoc, arrayUnion
+} from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch } from 'react-redux';
-import { setIsLoggedIn } from '../redux/slices/loggedInSlice';
+
 import { auth, db } from '../firebase/firebase';
 import { FirestoreError } from 'firebase/firestore';
-import { User } from '../redux/types/types';
+import { User, Poll } from '../redux/types/types';
 
 //USER 
 export const createUser = async (email: string, password: string) => {
@@ -111,7 +113,7 @@ export const getTeamsByUserId = async (userId: string) => {
         querySnapshot.forEach((doc) => {
             const members = doc.data().members;
             const user = members.find(member => member.id === userId);
-            if (user){
+            if (user) {
                 teams.push(doc.data());
             }
         });
@@ -134,19 +136,138 @@ export const getTeamBySerialKey = async (serialKey: string) => {
     }
 }
 
-export const checkUserInGroup = async (userId: string, serialKey: string) => {
-    try{
+export const checkUserInTeam = async (userId: string, serialKey: string) => {
+    try {
         const teamDoc = doc(db, 'teams', serialKey);
-    const teamDocSnap = await getDoc(teamDoc);
-    if (teamDocSnap.exists()) {
-        const teamData = teamDocSnap.data();
-        const members = teamData.members;
-        const user = members.find(member => member.id === userId);
-        return user ? true : false;
-    } else {
-        throw new Error('This team does not exist');
-    }
-    }catch(err){
+        const teamDocSnap = await getDoc(teamDoc);
+        if (teamDocSnap.exists()) {
+            const teamData = teamDocSnap.data();
+            const members = teamData.members;
+            const user = members.find(member => member.id === userId);
+            return user ? true : false;
+        } else {
+            throw new Error('This team does not exist');
+        }
+    } catch (err) {
         throw err;
     }
 }
+
+//POLLS
+export const createPoll = async (poll: any) => {
+    try {
+        const pollDoc = await addDoc(collection(db, 'polls'), poll);
+        console.log('Poll created successfully');
+        return pollDoc.id;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getPollsByTeamSerial = async (serial: string) => {
+    try {
+        const polls = [];
+        const querySnapshot = await getDocs(collection(db, 'polls'));
+        querySnapshot.forEach((doc) => {
+            if (doc.data().teamSerial === serial) {
+                polls.push(doc.data());
+            }
+        });
+        return polls;
+    } catch (err) {
+        console.log(err);
+        throw new Error ('An unexpected error occurred while getting polls');
+    }
+};
+
+export const getPollsByUserId = async (userId: string) => {
+    try {
+        const polls = [];
+        const querySnapshot = await getDocs(collection(db, 'polls'));
+        querySnapshot.forEach((doc) => {
+            const members = doc.data().members;
+            const user = members.find(member => member.id === userId);
+            if (user) {
+                polls.push(doc.data());
+            }
+        });
+        return polls;
+    } catch (err) {
+        console.log(err)
+        throw new Error('An unexpected error occurred while getting polls');
+    }
+}
+
+export const getPollById = async (pollId: string) => {
+    try {
+        const pollDoc = doc(db, 'polls', pollId);
+        const pollDocSnap = await getDoc(pollDoc);
+        if (pollDocSnap.exists()) {
+            return pollDocSnap.data();
+        }
+        return null;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getPollsByTeamSerials = async (serials: string[]) => {
+    try {
+        const polls = [];
+        const querySnapshot = await getDocs(collection(db, 'polls'));
+        querySnapshot.forEach((doc) => {
+            if (serials.includes(doc.data().teamSerial)) {
+                polls.push(doc.data());
+            }
+        });
+        return polls;
+    } catch (err) {
+        console.log(err);
+        throw new Error ('An unexpected error occurred while getting polls');
+    }
+};
+
+
+export const insertAnswer = async (pollId: string, userId: string, answer: string) => {
+    const pollQuerySnapshot = await getDocs(
+    query(collection(db, 'polls'), 
+    where('id', '==', pollId)));
+  
+    if (pollQuerySnapshot.empty) {
+      throw new Error('Poll does not exist');
+    }
+    const pollDocRef = doc(db, 'polls', pollQuerySnapshot.docs[0].id);
+    try {
+      await updateDoc(pollDocRef, {
+        membersAnswered: arrayUnion({ answer, userId }),
+      });
+    } catch (err) {
+      throw new Error('Error updating poll');
+    }
+  };
+
+export const hasUserAnsweredPoll = async (pollId: string, userId: string) => {
+    try {
+        const pollQuerySnapshot = await getDocs(
+            query(collection(db, 'polls'),
+                where('id', '==', pollId)));
+        if (pollQuerySnapshot.empty) {
+            throw new Error('Poll does not exist');
+        }
+        const pollDocRef = doc(db, 'polls', pollQuerySnapshot.docs[0].id);
+        const pollDocSnap = await getDoc(pollDocRef);
+        if (pollDocSnap.exists()) {
+            const membersAnswered = pollDocSnap.data().membersAnswered;
+            const user = membersAnswered.find(member => member.userId === userId);
+            if(user){
+                return user.answer;
+            }
+            return false;
+        }
+        return null;
+    } catch (err) {
+        throw err;
+    }
+}
+
+

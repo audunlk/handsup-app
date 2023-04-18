@@ -12,6 +12,7 @@ import Header from "../components/Header";
 import { Ionicons as IonIcons } from "@expo/vector-icons";
 import MainBtn from "../components/MainBtn";
 import styles from "../styles/styles";
+import { getPollsByTeamSerial } from "../services/firebaseRequests";
 
 export default function GroupInfo({ navigation, route }) {
   const { team } = route.params;
@@ -22,7 +23,8 @@ export default function GroupInfo({ navigation, route }) {
     console.log({team});
     console.log("teams in teams info");
     setIsAdmin(checkAdmin());
-  }, []);
+    getPolls();
+  }, [team]);
 
   const checkAdmin = () => {
     const isAdmin = team.members.find((member) => member.admin === true);
@@ -32,17 +34,21 @@ export default function GroupInfo({ navigation, route }) {
     return false;
   };
     
-
   const copyToClipboard = async () => {
     Clipboard.setStringAsync(team.serialKey);
     Alert.alert(`Copied to clipboard`);
   };
 
-  // const listPollsInteams = async () => {
-  //   const listPolls = await getPollsByTeams(teams.id);
-  //   console.log({ listPolls });
-  //   setPolls(listPolls);
-  // };
+  const getPolls = async () => {
+    try {
+      const polls = await getPollsByTeamSerial(team.serialKey);
+      console.log(team.serialKey)
+      setPolls(polls);
+      console.log({polls})
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -85,6 +91,7 @@ export default function GroupInfo({ navigation, route }) {
               >
                 <Text style={styles.mediumText}>{poll.question}</Text>
               </TouchableOpacity>
+              
             </View>
           ))}
         </View>

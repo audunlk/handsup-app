@@ -4,7 +4,7 @@ import { Poll } from "../redux/types/types";
 import styles from "../styles/styles";
 import { ISOtoReadable } from "./dateConversion";
 
-export const renderPolls = (polls: Poll[], navigation) => {
+export const renderPolls = (polls: any, navigation: any) => {
   const today = new Date().setHours(0, 0, 0, 0);
 
   return polls.map((poll, i) => {
@@ -20,7 +20,6 @@ export const renderPolls = (polls: Poll[], navigation) => {
           onPress={() => navigation.navigate("PollCard", { poll: poll })}
         >
           <Text style={styles.listTitle}>{poll.question}</Text>
-          <Text style={styles.listDescription}>{poll.name}</Text>
           <Text style={styles.listDescription}>
             {isExpired}: {respondByText}
           </Text>

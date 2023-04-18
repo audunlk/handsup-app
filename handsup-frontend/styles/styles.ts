@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     borderColor: "red",
     borderWidth: 2,
   },
+ 
   serialBox: {
     backgroundColor: "white",
     padding: 10,
@@ -115,6 +116,7 @@ const styles = StyleSheet.create({
     margin: 10,
     width: 200,
     alignItems: "center",
+    alignSelf: "center",
     justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: {

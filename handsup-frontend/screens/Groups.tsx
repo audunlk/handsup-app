@@ -16,13 +16,11 @@ export default function Teams({ navigation }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    dispatch(setIsLoading(true));
     console.log(user);
     console.log("user in teams");
     if(user.id){
       defineTeams();
     }
-
   }, [user]);
 
   const defineTeams = async () => {
@@ -35,7 +33,6 @@ export default function Teams({ navigation }) {
       console.log(error);
       setError(error);
     } finally {
-      dispatch(setIsLoading(false));
     }
   };
 

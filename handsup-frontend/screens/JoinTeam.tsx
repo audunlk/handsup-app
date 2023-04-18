@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, Pressable, Alert } from 'react-native'
 import Header from '../components/Header'
 import styles from '../styles/styles'
-import { checkUserInGroup, getTeamBySerialKey, insertUserIntoTeam } from '../services/firebaseRequests'
+import { checkUserInTeam, getTeamBySerialKey, insertUserIntoTeam } from '../services/firebaseRequests'
 
 export default function JoinTeam({route, navigation}) {
     const [serialkey, setSerialkey] = useState('')
@@ -24,7 +24,7 @@ export default function JoinTeam({route, navigation}) {
         setError('')
         // const isKeyValid = await checkKey(serialkey)        
         try{
-            const alreadyMember = await checkUserInGroup(user.id, serialkey)
+            const alreadyMember = await checkUserInTeam(user.id, serialkey)
         console.log(alreadyMember)
         if(!alreadyMember) {
             try {

@@ -7,11 +7,9 @@ export type User = {
   };
 
   export type Poll = {
-    id: number;
     question: string;
-    group_id: number;
+    teamId: string;
     created_at: string;
-    name: string;
     respond_by: string;
     multiple_choice: boolean;
   };

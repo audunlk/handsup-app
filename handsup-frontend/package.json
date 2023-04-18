@@ -39,16 +39,21 @@
     "react-native-device-info": "^10.4.0",
     "react-native-dotenv": "^3.4.8",
     "react-native-elements": "^3.4.3",
+    "react-native-get-random-values": "^1.8.0",
     "react-native-linear-gradient": "^2.6.2",
     "react-native-modal-datetime-picker": "^14.0.1",
+    "react-native-multiple-choice-picker": "^1.0.6",
+    "react-native-wheel-pick": "^1.2.0",
     "react-redux": "^8.0.5",
     "redux-thunk": "^2.4.2",
     "short-unique-id": "^4.4.4",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@types/react-native-datepicker": "^1.7.1"
+    "@types/react-native-datepicker": "^1.7.1",
+    "@types/uuid": "^9.0.1"
   },
   "private": true
 }

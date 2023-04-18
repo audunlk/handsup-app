@@ -14,8 +14,8 @@ export const UTCtoLocal = (UTCdate: Date) => {
 
 export const ISOtoReadable = (ISOdate: string) => {
     const dateObj = new Date(ISOdate);
-    const localDate = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000); // convert to local time
-    const readableDate = localDate.toLocaleDateString();
-    const readableTime = localDate.toLocaleTimeString().slice(0, -3);
+    //const localDate = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000); // convert to local time
+    const readableDate = dateObj.toLocaleDateString();
+    const readableTime = dateObj.toLocaleTimeString().slice(0, -3);
     return [readableDate, readableTime];
   };
