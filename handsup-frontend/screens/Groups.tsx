@@ -42,7 +42,7 @@ export default function Teams({ navigation }) {
     return teams.map((team, i) => {
       return (
         <View style={styles.listItem} key={i}>
-          <ProfilePicture id={team.serialKey} size={50} type={"team"} />
+          <ProfilePicture id={team.serialKey} size={50} type={"team"} allowPress={false} />
           <TouchableOpacity
             key={team.id}
             onPress={() => navigation.navigate("GroupInfo", { team })}

@@ -20,4 +20,7 @@ export type User = {
     token: string | null;
     polls: Poll[];
     isLoggedIn: boolean;
+    reRender: boolean;
   };
+
+export type ReRenderState = boolean;

@@ -9,21 +9,22 @@ import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { User } from "../redux/types/types";
-import { setIsLoading } from "../redux/slices/loadingSlice";
 import BottomNav from "../navigation/BottomNav";
 import { RootState } from "../redux/types/types";
 import styles from "../styles/styles";
 import { setPolls } from "../redux/slices/pollSlice";
 import { renderPolls } from "../utils/renderPolls";
 import Loading from "./Loading";
-import { getPollsByTeamSerials, getPollsByUserId, getTeamsByUserId } from "../services/firebaseRequests";
+import { getPollsByTeamSerials, getTeamsByUserId } from "../services/firebaseRequests";
 import ProfilePicture from "../components/ProfilePicture";
+import { triggerReRender } from "../redux/slices/reRenderSlice";
 
 
 export default function Home({ navigation }) {
   const user: User = useSelector((state: RootState) => state.user);
   const isLoading = useSelector((state: RootState) => state.isLoading);
   const polls = useSelector((state: RootState) => state.polls);
+  const reRender = useSelector((state: RootState) => state.reRender);
   const dispatch = useDispatch();
   const [error, setError] = useState("");
   const [teams, setTeams] = useState([]);
@@ -53,15 +54,12 @@ export default function Home({ navigation }) {
 
   
   useEffect(() => {
-    
     console.log("use effect ran");
     getTeams();
     getPolls();
-  }, [dispatch, user, navigation, isContentLoaded]);
+    console.log(reRender)
+  }, [dispatch, user, navigation, isContentLoaded, reRender]);
 
-  
-
-  
   
   const now = new Date();
   const activePolls = polls
@@ -75,11 +73,12 @@ export default function Home({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-      <ProfilePicture id={user.id} size={50} type={"user"} />
-
-      <View>
-        <Text style={styles.title}>{user.firstName}</Text>
-          <Text style={styles.smallText}>@{user.username}</Text>
+      <View style={{flexDirection: "row"}}>
+        <ProfilePicture id={user.id} size={50} type={"user"} allowPress={false} />
+        <View style={{paddingLeft: 10}}>
+          <Text style={styles.title}>{user.firstName}</Text>
+            <Text style={styles.smallText}>@{user.username}</Text>
+        </View>
       </View>
         <Ionicons
           name="ios-person"

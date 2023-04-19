@@ -7,8 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db, storage } from '../firebase/firebase';
 import { FirestoreError } from 'firebase/firestore';
 import { User } from '../redux/types/types';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { uploadBytes } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
 
 //USER 
@@ -273,27 +272,36 @@ export const hasUserAnsweredPoll = async (pollId: string, userId: string) => {
 
 //IMAGE
 export const uploadImageBlob = async (blob: Blob, id: string, type: string) => {
-    const storageRef = ref(storage, `${type}/${id}`);
-    const uploadTask = uploadBytesResumable(storageRef, blob);
-    uploadTask.on('state_changed', (snapshot) => {
+    return new Promise<void>(async (resolve, reject)  => {
+      const storageRef = ref(storage, `/${type}/${id}`);
+  
+      const existingImageRef = ref(storage, `/${type}/${id}`);
+      const existingImageSnapshot = await getDownloadURL(existingImageRef).catch(() => null);
+  
+      if (existingImageSnapshot) {
+        await deleteObject(existingImageRef);
+        console.log('Old image deleted')
+      }
+  
+      const uploadTask = uploadBytesResumable(storageRef, blob);
+      uploadTask.on('state_changed', (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log('Upload is ' + progress + '% done');
         switch (snapshot.state) {
-            case 'paused':
-                console.log('Upload is paused');
-                break;
-            case 'running':
-                console.log('Upload is running');
-                break;
+          case 'paused':
+            console.log('Upload is paused');
+            break;
+          case 'running':
+            console.log('Upload is running');
+            break;
         }
-    }
-        , (error) => {
-            throw error;
-        }
-        , () => {
-            console.log('Image uploaded successfully');
-        }
-    );
+      }, (error) => {
+        reject(error);
+      }, () => {
+        console.log('Image uploaded successfully');
+        resolve();
+      });
+    });
   }
 
 export const getImage = async (id: string, type: string) => {

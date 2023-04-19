@@ -3,9 +3,18 @@ import { View, Text, TouchableOpacity, Image } from 'react-native'
 import {Ionicons} from '@expo/vector-icons'
 import { handlePickAvatar } from '../utils/pickAvatar'
 import { getImage } from '../services/firebaseRequests'
+import { useDispatch, useSelector } from 'react-redux'
+import { triggerReRender } from "../redux/slices/reRenderSlice";
+import { RootState } from "../redux/types/types";
 
-export default function ProfilePicture({id, size, type}) {
+
+
+
+export default function ProfilePicture({id, size, type, allowPress}) {
     const [imageURL, setImageURL] = useState('')
+    const dispatch = useDispatch();
+    const reRender = useSelector((state: RootState) => state.reRender);
+
     //MANUAL INPUTS
     //insert userId for profile picture
     //insert teamSerialKey for team picture
@@ -18,8 +27,6 @@ export default function ProfilePicture({id, size, type}) {
 
     //if no id is provided, return default profile picture
     //if id is provided, return profile picture from database
-    
-
     useEffect(() => {
         async function getImageURL() {
           try {
@@ -36,7 +43,20 @@ export default function ProfilePicture({id, size, type}) {
         } else {
           setImageURL('');
         }
-      }, [id, type]);
+      }, [id, type, dispatch, reRender]);
+
+
+      const handlePickAndTriggerReRender = async (id, type) => {
+        try{
+          await handlePickAvatar(id, type);
+
+          dispatch(triggerReRender(!reRender));
+          console.log(reRender)
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
 
     const noUserImage = () => {
         switch(type){
@@ -55,13 +75,12 @@ export default function ProfilePicture({id, size, type}) {
         }
     }
 
-
-
   return (
     <View>
+    {allowPress ? (
       <TouchableOpacity
         onPress={() => {
-          handlePickAvatar(id, type);
+          handlePickAndTriggerReRender(id, type);
         }}
       >
         {imageURL ? (
@@ -70,6 +89,15 @@ export default function ProfilePicture({id, size, type}) {
           noUserImage()
         )}
       </TouchableOpacity>
-    </View>
-  )
+    ) : (
+      <View>
+        {imageURL ? (
+          <Image source={{ uri: imageURL }} style={{ width: size, height: size, borderRadius: size / 2 }} />
+        ) : (
+          noUserImage()
+        )}
+      </View>
+    )}
+  </View>
+)
 }

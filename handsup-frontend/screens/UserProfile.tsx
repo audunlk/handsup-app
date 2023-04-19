@@ -8,9 +8,10 @@ import { setIsLoading } from "../redux/slices/loadingSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header";
 import { updateUser } from "../services/firebaseRequests";
+import ProfilePicture from "../components/ProfilePicture";
 
 export default function UserProfile({ navigation }) {
-  const user = useSelector((state: RootState) => state.user);
+  const user: User = useSelector((state: RootState) => state.user);
 
   const dispatch = useDispatch();
   const [isEditable, setIsEditable] = useState(false);
@@ -33,7 +34,7 @@ export default function UserProfile({ navigation }) {
     setIsLoading(true);
     resetInfo();
     console.log({user})
-  }, []);
+  }, [user]);
 
   const handleEdit = () => {
     setIsEditable(!isEditable);
@@ -95,6 +96,7 @@ export default function UserProfile({ navigation }) {
     <View style={styles.container}>
       <Header navigation={navigation} title="Your Profile" showExit={true} />
       <View style={styles.body}>
+      <ProfilePicture id={user.id} size={200} type={"user"} allowPress={true}   />
   <View style={styles.inputStack}>
     <View style={styles.inputHorizontal}>
       <Text style={[styles.mediumText, styles.label]}>

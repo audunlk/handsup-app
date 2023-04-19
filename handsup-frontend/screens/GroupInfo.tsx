@@ -59,7 +59,7 @@ export default function GroupInfo({ navigation, route }) {
         {isAdmin && (
           <View style={{padding: 20, justifyContent: "center", alignItems: "center"}}>
             {/* key icon */}
-            <ProfilePicture id={team.serialKey} size={200} type={"team"}    />
+            <ProfilePicture id={team.serialKey} size={200} type={"team"} allowPress={true}   />
             <Text style={styles.listTitle}>Invitation Key</Text>
             <IonIcons name="key-outline" size={24} color="white" />
             <TouchableOpacity
