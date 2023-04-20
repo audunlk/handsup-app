@@ -5,7 +5,7 @@ import { User, RootState, Poll } from "../redux/types/types";
 import { useSelector } from "react-redux";
 import styles from "../styles/styles";
 import Header from "../components/Header";
-import { createPoll } from "../services/firebaseRequests";
+import { createPoll, createPollChat } from "../services/firebaseRequests";
 import 'react-native-get-random-values';
 
 import { v4 as uuidv4 } from "uuid";
@@ -48,6 +48,7 @@ export default function CreatePoll({ navigation, route }) {
       };
       console.log(pollData)
       const pollResponse = await createPoll(pollData)
+      await createPollChat(poll.id, user.id);
       console.log(pollResponse);
       if(pollResponse) {
       navigation.navigate("Home");

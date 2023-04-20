@@ -8,6 +8,7 @@ import { auth, db, storage } from '../firebase/firebase';
 import { FirestoreError } from 'firebase/firestore';
 import { User } from '../redux/types/types';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { FieldValue } from 'firebase/firestore';
 
 
 //USER 
@@ -106,6 +107,7 @@ export const insertUserIntoTeam = async (userId: string, teamSerial: string, adm
         throw new Error('This team does not exist');
     }
 }
+
 
 export const getTeamsByUserId = async (userId: string) => {
     try {
@@ -314,3 +316,77 @@ export const getImage = async (id: string, type: string) => {
         console.log('Image not found');
     }
 }
+
+
+//Chat
+export const createGroupChat = async (teamSerial: string, userId: string) => {
+    try {
+        const newChat = await addDoc(collection(db, 'chat'), {
+            id: teamSerial,
+            members: [userId],
+            messages: [],
+        });
+        return newChat.id;
+    } catch (err) {
+        console.log(err);
+        throw new Error ('An unexpected error occurred while creating chat');
+    }
+}
+
+export const createPollChat = async (pollId: string, userId: string) => {
+    try {
+        const newChat = await addDoc(collection(db, 'chat'), {
+            id: pollId,
+            members: [userId],
+            messages: [],
+        });
+        return newChat.id;
+    } catch (err) {
+        console.log(err);
+        throw new Error ('An unexpected error occurred while creating chat');
+    }
+}   
+
+//render chat with either teamSerial or pollId
+export const getChatById = async (id: string) => {
+    try {
+        const chatQuerySnapshot = await getDocs(
+            query(collection(db, 'chat'),
+                where('id', '==', id)));
+        if (chatQuerySnapshot.empty) {
+            throw new Error('Chat does not exist');
+        }
+        const chatDocRef = doc(db, 'chat', chatQuerySnapshot.docs[0].id);
+        const chatDocSnap = await getDoc(chatDocRef);
+        if (chatDocSnap.exists()) {
+            console.log(chatDocSnap.data());
+            console.log(chatDocSnap.data().messages[0].message);
+            return chatDocSnap.data()
+            
+        }
+        return null;
+    } catch (err) {
+        throw err;
+    }
+}
+
+
+
+export const insertChat = async (id: string,  message: object) => {
+    try{
+        const chatQuerySnapshot = await getDocs(
+            query(collection(db, 'chat'),
+                where('id', '==', id)));
+        if (chatQuerySnapshot.empty) {
+            throw new Error('Chat does not exist');
+        }
+        const chatDocRef = doc(db, 'chat', chatQuerySnapshot.docs[0].id);
+        await updateDoc(chatDocRef, {
+            messages: arrayUnion(message),
+        });
+    }
+    catch(err){
+        throw err;
+    }
+}
+

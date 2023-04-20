@@ -8,7 +8,7 @@ export default function BottomNav({ navigation }) {
       <TouchableOpacity
       onPress={() => navigation.navigate("Home")}
        
-      style={[styles.iconContainer, {borderColor: "red", borderWidth: 2}]}>
+      style={[styles.iconContainer]}>
         <IonIcons
           name="home"
           size={24}

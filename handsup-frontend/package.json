@@ -25,6 +25,8 @@
     "expo": "~48.0.4",
     "expo-clipboard": "~4.1.2",
     "expo-device": "~5.2.1",
+    "expo-image-manipulator": "~11.1.1",
+    "expo-image-picker": "~14.1.1",
     "expo-linear-gradient": "~12.1.2",
     "expo-modules-core": "~1.2.3",
     "expo-notifications": "~0.18.1",
@@ -40,6 +42,7 @@
     "react-native-dotenv": "^3.4.8",
     "react-native-elements": "^3.4.3",
     "react-native-get-random-values": "^1.8.0",
+    "react-native-gifted-chat": "^2.0.1",
     "react-native-linear-gradient": "^2.6.2",
     "react-native-modal-datetime-picker": "^14.0.1",
     "react-native-multiple-choice-picker": "^1.0.6",
@@ -48,9 +51,7 @@
     "redux-thunk": "^2.4.2",
     "short-unique-id": "^4.4.4",
     "typescript": "^4.9.4",
-    "uuid": "^9.0.0",
-    "expo-image-picker": "~14.1.1",
-    "expo-image-manipulator": "~11.1.1"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

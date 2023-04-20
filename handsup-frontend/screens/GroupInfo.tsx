@@ -14,7 +14,7 @@ import MainBtn from "../components/MainBtn";
 import styles from "../styles/styles";
 import { getPollsByTeamSerial } from "../services/firebaseRequests";
 import ProfilePicture from "../components/ProfilePicture";
-import { handlePickAvatar } from "../utils/pickAvatar";
+import { handlePickAvatar } from "../utils/handlePickAvatar";
 
 export default function GroupInfo({ navigation, route }) {
   const { team } = route.params;
@@ -52,6 +52,10 @@ export default function GroupInfo({ navigation, route }) {
     }
   };
 
+  const redirectToChat = () => {
+    navigation.navigate("Chat", { team, teamSerial: team.serialKey });
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Header navigation={navigation} title={team.name} showExit={true} />
@@ -79,6 +83,8 @@ export default function GroupInfo({ navigation, route }) {
                 title="Create a Poll"
                 onPress={() => navigation.navigate("CreatePoll", { team })}
               />
+              <IonIcons name="chatbox-ellipses-outline" size={24} color="white" />
+              <MainBtn title="Chat" onPress={redirectToChat} />
             </View>
           </View>
         )}

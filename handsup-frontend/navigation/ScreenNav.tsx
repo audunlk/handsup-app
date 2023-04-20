@@ -24,6 +24,7 @@ import Loading from "../screens/Loading";
 import GroupInfo from "../screens/GroupInfo";
 import PollCard from "../components/PollCard";
 import CreateProfile from "../screens/CreateProfile";
+import Chat from "../components/Chat";
 
 const Stack = createStackNavigator();
 
@@ -124,6 +125,15 @@ export default function ScreenNav() {
             presentation: "card",
 
           }}
+        />
+        <Stack.Screen
+        name='Chat'
+        component={Chat}
+        options={{
+          headerShown: false,
+          animationTypeForReplace: "pop",
+          presentation: "card",
+        }}
         />
       </Stack.Navigator>
     );

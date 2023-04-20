@@ -1,12 +1,11 @@
 import React, {useState, useEffect} from 'react'
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
 import {Ionicons} from '@expo/vector-icons'
-import { handlePickAvatar } from '../utils/pickAvatar'
+import { handlePickAvatar } from '../utils/handlePickAvatar'
 import { getImage } from '../services/firebaseRequests'
 import { useDispatch, useSelector } from 'react-redux'
 import { triggerReRender } from "../redux/slices/reRenderSlice";
 import { RootState } from "../redux/types/types";
-import Loading from '../screens/Loading'
 
 
 

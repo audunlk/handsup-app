@@ -63,6 +63,7 @@ export default function Teams({ navigation }) {
   const handleJoinTeam = () => {
     navigation.navigate("JoinTeam", { user: user });
   };
+  
 
   if(isLoading) return <Loading />
 

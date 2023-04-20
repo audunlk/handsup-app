@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 10,
     borderWidth: 2,
-    width: "100%",
     alignItems: "center",
+    width: "100%",
     justifyContent: "center",
   },
   inputError:{
@@ -142,8 +142,41 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+  },
+inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#fff',
+    justifyContent: 'space-between',
+},
+messageInputContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    backgroundColor: '#fff',
+    justifyContent: 'space-between',
     
-  }
+},
+messageInput: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 2,
+    alignItems: "center",
+    width: "80%",
+    justifyContent: "center",
+    padding: 5,
+},
+messageInputButton: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 2,
+    alignItems: "center",
+    width: "20%",
+    justifyContent: "center",
+    marginLeft: 10,
+},
+
 });
 
 export default styles;

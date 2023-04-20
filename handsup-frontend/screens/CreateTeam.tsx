@@ -2,12 +2,11 @@ import jwtDecode from "jwt-decode";
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import ShortUniqueId from "short-unique-id";
-import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
 import { RootState, User } from "../redux/types/types";
 import { useSelector } from "react-redux";
 import styles from "../styles/styles";
-import { createTeam, insertUserIntoTeam } from "../services/firebaseRequests";
+import { createGroupChat, createTeam, insertUserIntoTeam } from "../services/firebaseRequests";
 
 export default function JoinTeam({ navigation }) {
   const [teamName, setTeamName] = useState("");
@@ -30,6 +29,7 @@ export default function JoinTeam({ navigation }) {
       const serialkey = new ShortUniqueId().randomUUID(6);
       const newGroupSerial = await createTeam(name, serialkey);
       const { id } = user;
+      await createGroupChat(newGroupSerial, id);
       await insertUserIntoTeam(id, newGroupSerial, true);
       console.log("inserted user");
     } catch (error) {
