@@ -1,20 +1,23 @@
 import React, {useState, useEffect} from 'react'
-import { View, Text, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
 import {Ionicons} from '@expo/vector-icons'
 import { handlePickAvatar } from '../utils/pickAvatar'
 import { getImage } from '../services/firebaseRequests'
 import { useDispatch, useSelector } from 'react-redux'
 import { triggerReRender } from "../redux/slices/reRenderSlice";
 import { RootState } from "../redux/types/types";
+import Loading from '../screens/Loading'
 
 
 
 
 export default function ProfilePicture({id, size, type, allowPress}) {
     const [imageURL, setImageURL] = useState('')
+    const [startUpload, setStartUpload] = useState(false)
+    const [progress, setProgress] = useState(0)
+    const [isLoading, setIsLoading] = useState(false)
     const dispatch = useDispatch();
     const reRender = useSelector((state: RootState) => state.reRender);
-
     //MANUAL INPUTS
     //insert userId for profile picture
     //insert teamSerialKey for team picture
@@ -28,6 +31,7 @@ export default function ProfilePicture({id, size, type, allowPress}) {
     //if no id is provided, return default profile picture
     //if id is provided, return profile picture from database
     useEffect(() => {
+        setIsLoading(true);
         async function getImageURL() {
           try {
             const image = await getImage(id, type);
@@ -43,20 +47,25 @@ export default function ProfilePicture({id, size, type, allowPress}) {
         } else {
           setImageURL('');
         }
+        setIsLoading(false);
       }, [id, type, dispatch, reRender]);
 
 
       const handlePickAndTriggerReRender = async (id, type) => {
         try{
-          await handlePickAvatar(id, type);
-
+          await handlePickAvatar(id, type, (progress) => {
+            setStartUpload(true);
+          });
           dispatch(triggerReRender(!reRender));
           console.log(reRender)
         } catch (error) {
           console.error(error);
+        }finally{
+          setStartUpload(false);
         }
       }
 
+      
 
     const noUserImage = () => {
         switch(type){
@@ -75,8 +84,11 @@ export default function ProfilePicture({id, size, type, allowPress}) {
         }
     }
 
+
   return (
-    <View>
+    <View 
+    style={[startUpload && {opacity: 0.5}]}
+    >
     {allowPress ? (
       <TouchableOpacity
         onPress={() => {
@@ -97,7 +109,9 @@ export default function ProfilePicture({id, size, type, allowPress}) {
           noUserImage()
         )}
       </View>
+    
     )}
+  
   </View>
 )
 }

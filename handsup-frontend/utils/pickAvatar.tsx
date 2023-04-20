@@ -2,7 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { uploadImageBlob } from '../services/firebaseRequests';
 
-export const handlePickAvatar = async (id: string, type: string): Promise<void> => {
+export const handlePickAvatar = async (id: string, type: string, onProgress: (progress: number) => void): Promise<void> => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -20,7 +20,9 @@ export const handlePickAvatar = async (id: string, type: string): Promise<void> 
   
         const response = await fetch(resizedImage.uri);
         const blob = await response.blob();
-        await uploadImageBlob(blob, id, type);
+        await uploadImageBlob(blob, id, type, (progress) =>
+            onProgress(progress)
+        );
         console.log(result.assets[0].uri);
       }
       console.log('User cancelled image picker');

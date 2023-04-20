@@ -8,20 +8,23 @@ import { getTeamsByUserId } from "../services/firebaseRequests";
 import BottomNav from "../navigation/BottomNav";
 import { Ionicons } from "@expo/vector-icons";
 import ProfilePicture from "../components/ProfilePicture";
+import Loading from "./Loading";
 
 export default function Teams({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
-  const isLoading = useSelector((state: RootState) => state.isLoading);
   const [teams, setTeams] = useState([]);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     console.log(user);
     console.log("user in teams");
     if(user.id){
       defineTeams();
     }
+    setIsLoading(false);
   }, [user]);
 
   const defineTeams = async () => {
@@ -60,6 +63,8 @@ export default function Teams({ navigation }) {
   const handleJoinTeam = () => {
     navigation.navigate("JoinTeam", { user: user });
   };
+
+  if(isLoading) return <Loading />
 
   return (
     <View style={styles.container}>

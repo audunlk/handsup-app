@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, Text, Alert, TouchableOpacity } from "react-native";
+import { View, Text, Alert, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Picker } from "react-native-wheel-pick";
 import { ISOtoReadable } from "../utils/dateConversion";
 import IonIcons from "react-native-vector-icons/Ionicons";
@@ -16,11 +16,11 @@ import { hasUserAnsweredPoll, insertAnswer } from "../services/firebaseRequests"
 export default function PollCard({ route, navigation }) {
   const { poll } = route.params;
   const dispatch = useDispatch();
-  const isLoading = useSelector((state: RootState) => state.isLoading);
   const [answers, setAnswers] = useState(poll.answer_choices.map((answer: any) => answer));
   const [creationDate, setCreationDate] = useState(ISOtoReadable(poll.created_at))
   const [respondBy, setRespondBy] = useState(ISOtoReadable(poll.respond_by));
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(answers[0]);
@@ -31,17 +31,15 @@ export default function PollCard({ route, navigation }) {
     handleCheckAnswer();
     console.log(user)
     console.log({ poll })
-    console.log(poll.id)
-    console.log(poll.created_at)
-    console.log(poll.teamSerial)
-    console.log(answers)
+    
     console.log(selectedAnswer)
     console.log("poll card")
   }, [poll, user, hasAnswered]);
 
   const handleCheckAnswer = async () => {
+    setIsLoading(true);
     try {
-      //returns actual answer or false
+      //function returns actual answer or false
       const givenAnswer = await hasUserAnsweredPoll(poll.id, user.id);
       if (givenAnswer) {
         setHasAnswered(givenAnswer);
@@ -50,6 +48,7 @@ export default function PollCard({ route, navigation }) {
       console.log(error)
       setError(error.message);
     }
+    setIsLoading(false);
   };
 
   const handleSubmitAnswer = async (answer: string) => {
@@ -66,6 +65,10 @@ export default function PollCard({ route, navigation }) {
     setSelectedAnswer(answer);
     console.log(answer)
   };
+
+  if(isLoading){
+    return <Loading />
+  }
 
   return (
     <View style={styles.container}>
@@ -96,9 +99,7 @@ export default function PollCard({ route, navigation }) {
             </TouchableOpacity>
           </View>
 
-        )
-
-        }
+        )}
 
         {isAdmin && (
           <IonIcons

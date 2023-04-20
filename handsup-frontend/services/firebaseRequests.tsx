@@ -271,7 +271,7 @@ export const hasUserAnsweredPoll = async (pollId: string, userId: string) => {
 }
 
 //IMAGE
-export const uploadImageBlob = async (blob: Blob, id: string, type: string) => {
+export const uploadImageBlob = async (blob: Blob, id: string, type: string, onProgress: (progress: number) => void) => {
     return new Promise<void>(async (resolve, reject)  => {
       const storageRef = ref(storage, `/${type}/${id}`);
   
@@ -286,6 +286,7 @@ export const uploadImageBlob = async (blob: Blob, id: string, type: string) => {
       const uploadTask = uploadBytesResumable(storageRef, blob);
       uploadTask.on('state_changed', (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        onProgress(progress);
         console.log('Upload is ' + progress + '% done');
         switch (snapshot.state) {
           case 'paused':
