@@ -1,11 +1,11 @@
 //chat screen for the application using FCM and realtime database
 //gifted chat
 
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, KeyboardAvoidingView, Platform, Keyboard, ScrollView, Alert } from 'react-native';
-import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Keyboard, ScrollView, Alert, Image } from 'react-native';
+import { Bubble, GiftedChat } from 'react-native-gifted-chat';
 import { Ionicons } from '@expo/vector-icons';
-import { db, auth } from '../firebase/firebase';
+import { db, auth, storage } from '../firebase/firebase';
 import { getChatById, getImage, insertChat } from '../services/firebaseRequests';
 import { User } from '../redux/types/types';
 import { useSelector } from 'react-redux';
@@ -15,27 +15,24 @@ import BottomNav from '../navigation/BottomNav';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from "uuid";
 import ProfilePicture from './ProfilePicture';
+import { ref, getDownloadURL } from 'firebase/storage';
 
 
 export default function Chat({ navigation, route }) {
     const user: User = useSelector((state: any) => state.user)
     const [messages, setMessages] = useState([]);
     const [name, setName] = useState('');
+    const [chatName, setChatName] = useState(route.params.name)
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(true);
     const [keyboard, setKeyboard] = useState(false);
-    const [avatar, setAvatar] = useState('');
+    const [avatar, setAvatar] = useState(null);
 
-    const scrollViewRef = useRef();
 
-    const getAvatar = async () => {
-        const avatar = await getImage(user.id, 'user');
-        setAvatar(avatar);
-    }
 
     useEffect(() => {
         getAvatar();
-    }, []);
+    }, [user]);
 
 
     useEffect(() => {
@@ -47,7 +44,6 @@ export default function Chat({ navigation, route }) {
                 })
                 .catch((err) => {
                     console.log(err);
-                    Alert.alert('Error', 'An unexpected error occurred while getting chat');
                 });
         } else {
             getChatById(route.params.pollId)
@@ -57,17 +53,26 @@ export default function Chat({ navigation, route }) {
                 })
                 .catch((err) => {
                     console.log(err);
-                    Alert.alert('Error', 'An unexpected error occurred while getting chat');
                 });
         }
     }, [route.params.teamSerial, route.params.pollId]);
 
     useEffect(() => {
         if (user) {
-            console.log({user})
+            console.log({ user })
             setName(user.username);
         }
     }, [user]);
+
+    
+    const getAvatar = async () => {
+        try {
+            const avatar = await getImage(user.id, 'user');
+            setAvatar(avatar);
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const sendMessage = () => {
         if (text) {
@@ -78,7 +83,6 @@ export default function Chat({ navigation, route }) {
                 user: {
                     _id: user.id,
                     name: user.username,
-                    avatar: avatar || null
                 },
             };
             if (route.params.teamSerial) {
@@ -109,31 +113,22 @@ export default function Chat({ navigation, route }) {
         setKeyboard(true);
     };
 
-    const handleKeyboardDismiss = () => {
-        setKeyboard(false);
-    };
-
     const sortedMessages = messages.sort((a, b) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-
-
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
-        >
-            <Header title={route.params.team.name} navigation={navigation} showExit={true} />
-            <View style={[styles.body, { paddingBottom: 120 }]}>
+        <View style={styles.container}>
+            <Header title={chatName} navigation={navigation} showExit={true} />
+            <View style={[styles.body]}>
                 <GiftedChat
                     messages={sortedMessages}
                     onInputTextChanged={handleKeyboard}
                     user={{
                         _id: user.id,
                         name: user.username,
-                        avatar: avatar
                     }}
+                    keyboardShouldPersistTaps='handled'
                     renderUsernameOnMessage={true}
                     alwaysShowSend={true}
                     showUserAvatar={true}
@@ -142,9 +137,11 @@ export default function Chat({ navigation, route }) {
                     renderAvatar={
                         (props) => {
                             return (
-                                <Image
-                                    source={{ uri: props.currentMessage.user.avatar }}
-                                    style={{ width: 30, height: 30, borderRadius: 15 }}
+                                <ProfilePicture 
+                                    id={props.currentMessage.user._id}
+                                    size={40}
+                                    type={"user"}
+                                    allowPress={false}
                                 />
                             );
                         }
@@ -169,13 +166,9 @@ export default function Chat({ navigation, route }) {
                                         color: 'black',
                                     },
                                 }}
-                                // onLongPress={
-                                //     (context, message) => {
-                                //         handleReply(message);
-
-                                // }
                             />
-                        )}}
+                        )
+                    }}
                     renderInputToolbar={(props) => (
                         <View style={styles.messageInputContainer}>
                             <TextInput
@@ -189,7 +182,7 @@ export default function Chat({ navigation, route }) {
                             />
                             <View style={styles.messageInputButton}>
                                 <TouchableOpacity onPress={sendMessage}>
-                                <Ionicons name="send" size={24} color="black" />
+                                    <Ionicons name="send" size={24} color="#141d26" />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -197,13 +190,6 @@ export default function Chat({ navigation, route }) {
                 />
             </View>
             <BottomNav navigation={navigation} />
-
-        </KeyboardAvoidingView>
+        </View>
     );
 }
-
-
-
-
-
-

@@ -33,7 +33,7 @@ export default function UserProfile({ navigation }) {
   useEffect(() => {
     setIsLoading(true);
     resetInfo();
-    console.log({user})
+    console.log({ user })
   }, [user]);
 
   const handleEdit = () => {
@@ -96,68 +96,68 @@ export default function UserProfile({ navigation }) {
     <View style={styles.container}>
       <Header navigation={navigation} title="Your Profile" showExit={true} />
       <View style={styles.body}>
-      <ProfilePicture id={user.id} size={200} type={"user"} allowPress={true}   />
-  <View style={styles.inputStack}>
-    <View style={styles.inputHorizontal}>
-      <Text style={[styles.mediumText, styles.label]}>
-        Username
-      </Text>
-      <TextInput
-        style={styles.input}
-        value={username}
-        editable={isEditable}
-        onChangeText={setUsername}
-      />
-    </View>
-    <View style={styles.inputHorizontal}>
-      <Text style={[styles.mediumText, styles.label]}>
-        First Name
-      </Text>
-      <TextInput
-        style={styles.input}
-        value={firstName}
-        editable={isEditable}
-        onChangeText={setFirstName}
-      />
-    </View>
-    <View style={styles.inputHorizontal}>
-      <Text style={[styles.mediumText, styles.label]}>
-        Last Name
-      </Text>
-      <TextInput
-        style={styles.input}
-        value={lastName}
-        editable={isEditable}
-        onChangeText={setLastName}
-      />
-    </View>
-    <View style={styles.inputHorizontal}>
-      <Text style={[styles.mediumText, styles.label]}>
-        Email
-      </Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        editable={isEditable}
-        onChangeText={setEmail}
-      />
-    </View>
-    <View style={styles.btn}>
-      <Button
-        title={isEditable ? "Save" : "Edit"}
-        onPress={handleEdit}
-        color={"white"}
-      />
-    </View>
-    <View style={styles.btn}>
-      <Button
-        title="Log out"
-        onPress={handleLogout}
-        color={"white"}
-      />
+        <ProfilePicture id={user.id} size={200} type={"user"} allowPress={true} />
+        <View style={styles.inputStack}>
+          <View style={styles.inputHorizontal}>
+            <Text style={[styles.mediumText, styles.label]}>
+              Username
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={username}
+              editable={isEditable}
+              onChangeText={setUsername}
+            />
+          </View>
+          <View style={styles.inputHorizontal}>
+            <Text style={[styles.mediumText, styles.label]}>
+              First Name
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={firstName}
+              editable={isEditable}
+              onChangeText={setFirstName}
+            />
+          </View>
+          <View style={styles.inputHorizontal}>
+            <Text style={[styles.mediumText, styles.label]}>
+              Last Name
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={lastName}
+              editable={isEditable}
+              onChangeText={setLastName}
+            />
+          </View>
+          <View style={styles.inputHorizontal}>
+            <Text style={[styles.mediumText, styles.label]}>
+              Email
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              editable={isEditable}
+              onChangeText={setEmail}
+            />
+          </View>
+          <View style={styles.btn}>
+            <Button
+              title={isEditable ? "Save" : "Edit"}
+              onPress={handleEdit}
+              color={"white"}
+            />
+          </View>
+          <View style={styles.btn}>
+            <Button
+              title="Log out"
+              onPress={handleLogout}
+              color={"white"}
+            />
+          </View>
+        </View>
       </View>
-  </View>
-</View>
     </View>
   );
 }

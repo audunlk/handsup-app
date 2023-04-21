@@ -1,14 +1,16 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, Touchable } from "react-native";
+import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView } from "react-native";
 import DateSelector from "../components/DateSelector";
 import { User, RootState, Poll } from "../redux/types/types";
 import { useSelector } from "react-redux";
-import styles from "../styles/styles";
 import Header from "../components/Header";
 import { createPoll, createPollChat } from "../services/firebaseRequests";
 import 'react-native-get-random-values';
-
+import styles from "../styles/styles";
 import { v4 as uuidv4 } from "uuid";
+import Swiper from "react-native-swiper";
+import IonIcons from "react-native-vector-icons/Ionicons";
+import { ISOtoReadable } from "../utils/dateConversion";
 
 export default function CreatePoll({ navigation, route }) {
   const user: User = useSelector((state: RootState) => state.user);
@@ -34,7 +36,6 @@ export default function CreatePoll({ navigation, route }) {
 
   const handleCreatePoll = async () => {
     console.log("creating poll")
-    const isMultipleChoice = answers.length > 2;
     try {
       const pollData = {
         id: poll.id,
@@ -45,6 +46,7 @@ export default function CreatePoll({ navigation, route }) {
         teamName: team.name,
         answer_choices: answers,
         membersAnswered: [],
+        anonymous: false,
       };
       console.log(pollData)
       const pollResponse = await createPoll(pollData)
@@ -72,47 +74,124 @@ export default function CreatePoll({ navigation, route }) {
     console.log(answers);
   };
 
+  //make a swiper for each input
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container}>
       <Header navigation={navigation} title={team.name} showExit={true} />
-      <ScrollView contentContainerStyle={styles.scrollBody}>
-        <TextInput
-          placeholder="Question"
-          style={styles.input}
-          autoFocus={true}
-          onChangeText={(text) => setPoll({ ...poll, question: text })}
-          value={poll.question}
-        />
-        <View>
+      <Swiper style={styles.wrapper} 
+      showsButtons={true} 
+      loop={false} 
+      showsPagination={false} 
+      buttonWrapperStyle={styles.buttonWrapper}
+      nextButton={
+        <IonIcons name="arrow-forward-outline" size={30} color="white" />
+      }
+      prevButton={
+        <IonIcons name="arrow-back-outline" size={30} color="white" />
+      }
+      >
+        <View style={styles.slide1}>
+          <Text style={styles.mediumText}>Question</Text>
+          <TextInput
+            placeholder="Question"
+            style={styles.input}
+            autoFocus={true}
+            onChangeText={(text) => setPoll({ ...poll, question: text })}
+            value={poll.question}
+          />
+        </View>
+        <View style={styles.slide2}>
+          <Text style={styles.mediumText}>Respond By</Text>
           <DateSelector setPoll={setPoll} poll={poll} />
         </View>
-        {answers.map((answer, index) => (
-          <TextInput
-            key={index}
-            style={styles.input}
-            placeholder={`Answer ${index + 1}`}
-            onChangeText={(text) => handleAnswerTextChange(index, text)}
-            value={answer}
-          />
-        ))}
-        {hasEmptyAnswers && (
-          <Text style={{ color: "red", marginBottom: 10 }}>
-            Please provide an answer for each choice
-          </Text>
-        )}
-        <TouchableOpacity style={styles.btn} onPress={handleAddAnswer}>
-          <Text style={styles.mediumText}>Add Answer</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={
-            () => handleCreatePoll()
-          }
-          disabled={!canCreatePoll}
-        >
-          <Text style={styles.mediumText}>Create Poll</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+        <View style={styles.slide3}>
+          <Text style={styles.mediumText}>Answers</Text>
+          {answers.map((answer, index) => (
+            <TextInput
+              key={index}
+              style={styles.input}
+              placeholder={`Answer ${index + 1}`}
+              onChangeText={(text) => handleAnswerTextChange(index, text)}
+              value={answer}
+            />
+          ))}
+          {hasEmptyAnswers && (
+            <Text style={{ color: "red", marginBottom: 10 }}>
+              Please provide an answer for each choice
+            </Text>
+          )}
+          <TouchableOpacity style={styles.btn} onPress={handleAddAnswer}>
+            <Text style={styles.mediumText}>Add Answer</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.slide4}>
+          <Text style={styles.mediumText}>Question</Text>
+        <Text style={styles.largeText}>{poll.question}</Text>
+            <Text style={styles.mediumText}>Respond By</Text>
+            <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[0]}</Text>
+            <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[1]}</Text>
+            <Text style={styles.mediumText}>Answers</Text>
+            {answers.map((answer, index) => (
+              <Text style={styles.largeText} key={index}>{index + 1}. {answer}</Text>)
+            )}
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => handleCreatePoll()}
+            disabled={!canCreatePoll}
+          >
+                        <Text style={styles.mediumText}>Create Poll</Text>
+          </TouchableOpacity>
+        </View>
+      </Swiper>
+    </KeyboardAvoidingView>
   );
 }
+
+
+
+
+// return (
+//   <View style={styles.container}>
+//     <Header navigation={navigation} title={team.name} showExit={true} />
+//     <ScrollView contentContainerStyle={[styles.scrollBody]}>
+//       <Text style={styles.mediumText}>Question</Text>
+//       <TextInput
+//         placeholder="Question"
+//         style={styles.input}
+//         autoFocus={true}
+//         onChangeText={(text) => setPoll({ ...poll, question: text })}
+//         value={poll.question}
+//       />
+//       <View>
+//         <Text style={styles.mediumText}>Respond By</Text>
+//         <DateSelector setPoll={setPoll} poll={poll} />
+//       </View>
+//       {answers.map((answer, index) => (
+//         <TextInput
+//           key={index}
+//           style={styles.input}
+//           placeholder={`Answer ${index + 1}`}
+//           onChangeText={(text) => handleAnswerTextChange(index, text)}
+//           value={answer}
+//         />
+//       ))}
+//       {hasEmptyAnswers && (
+//         <Text style={{ color: "red", marginBottom: 10 }}>
+//           Please provide an answer for each choice
+//         </Text>
+//       )}
+//       <TouchableOpacity style={styles.btn} onPress={handleAddAnswer}>
+//         <Text style={styles.mediumText}>Add Answer</Text>
+//       </TouchableOpacity>
+//       <TouchableOpacity
+//         style={styles.btn}
+//         onPress={
+//           () => handleCreatePoll()
+//         }
+//         disabled={!canCreatePoll}
+//       >
+//         <Text style={styles.mediumText}>Create Poll</Text>
+//       </TouchableOpacity>
+//     </ScrollView>
+//   </View>
+// );

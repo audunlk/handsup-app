@@ -1,3 +1,5 @@
+import { StorageReference } from "firebase/storage";
+
 export type User = {
     id: string;
     email: string;
@@ -13,6 +15,16 @@ export type User = {
     respond_by: string;
     multiple_choice: boolean;
   };
+
+  export interface Message {
+    _id: string;
+    text: string;
+    createdAt: string;
+    user: {
+      _id: string;
+      name: string;
+    };
+  }
 
   export type RootState = {
     user: User | null;

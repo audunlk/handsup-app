@@ -14,15 +14,11 @@ import { RootState } from "../redux/types/types";
 import styles from "../styles/styles";
 import { setPolls } from "../redux/slices/pollSlice";
 import { renderPolls } from "../utils/renderPolls";
-import Loading from "./Loading";
 import { getPollsByTeamSerials, getTeamsByUserId } from "../services/firebaseRequests";
 import ProfilePicture from "../components/ProfilePicture";
-import { triggerReRender } from "../redux/slices/reRenderSlice";
-
 
 export default function Home({ navigation }) {
   const user: User = useSelector((state: RootState) => state.user);
-  const isLoading = useSelector((state: RootState) => state.isLoading);
   const polls = useSelector((state: RootState) => state.polls);
   const reRender = useSelector((state: RootState) => state.reRender);
   const dispatch = useDispatch();
@@ -95,7 +91,6 @@ export default function Home({ navigation }) {
           <Text style={{ color: "white" }}>Expired</Text>
         </TouchableOpacity>
       </View>
-
       <FlatList 
         data={selectedTab === "active" ? renderPolls(activePolls, navigation) : renderPolls(expiredPolls, navigation)}
         renderItem={({item}) => item}
@@ -103,7 +98,6 @@ export default function Home({ navigation }) {
         />
         <BottomNav navigation={navigation} />
     </View>
-    
   );
 }
 

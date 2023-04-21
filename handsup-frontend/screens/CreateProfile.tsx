@@ -65,7 +65,6 @@ export default function CreateProfile({ navigation }) {
       };
 
 
-
     return (
         <KeyboardAvoidingView
             behavior="padding"
@@ -79,6 +78,7 @@ export default function CreateProfile({ navigation }) {
                     editable={isEditable}
                     onChangeText={setUsername}
                     placeholder="Username"
+                    placeholderTextColor={error ? "red" : "black"}
                     onChange={() => { setError("") }}
                 />
                 <TextInput
@@ -87,6 +87,7 @@ export default function CreateProfile({ navigation }) {
                     editable={isEditable}
                     onChangeText={setFirstName}
                     placeholder="First Name"
+                    placeholderTextColor={error ? "red" : "black"}
                     onChange={() => { setError("") }}
                 />
                 <TextInput
@@ -95,6 +96,7 @@ export default function CreateProfile({ navigation }) {
                     editable={isEditable}
                     onChangeText={setLastName}
                     placeholder="Last Name"
+                    placeholderTextColor={error ? "red" : "black"}
                     onChange={() => { setError("") }}
                 />
                 <View style={styles.btn}>

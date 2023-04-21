@@ -8,7 +8,7 @@ import { auth, db, storage } from '../firebase/firebase';
 import { FirestoreError } from 'firebase/firestore';
 import { User } from '../redux/types/types';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { FieldValue } from 'firebase/firestore';
+import { Message } from '../redux/types/types';
 
 
 //USER 
@@ -370,9 +370,7 @@ export const getChatById = async (id: string) => {
     }
 }
 
-
-
-export const insertChat = async (id: string,  message: object) => {
+export const insertChat = async (id: string,  message: Message) => {
     try{
         const chatQuerySnapshot = await getDocs(
             query(collection(db, 'chat'),

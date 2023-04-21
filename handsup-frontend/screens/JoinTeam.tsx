@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, Pressable, Alert } from 'react-native'
 import Header from '../components/Header'
 import styles from '../styles/styles'
-import { checkUserInTeam, getTeamBySerialKey, insertUserIntoTeam } from '../services/firebaseRequests'
+import { checkUserInTeam, insertUserIntoTeam } from '../services/firebaseRequests'
+import Loading from './Loading'
+import { setIsLoading } from '../redux/slices/loadingSlice'
 
 export default function JoinTeam({route, navigation}) {
+    
     const [serialkey, setSerialkey] = useState('')
     const [successful, setSuccessful] = useState(false)
     const [user, setUser] = useState(route.params.user)
@@ -22,10 +25,11 @@ export default function JoinTeam({route, navigation}) {
 
     const handleJoinTeam = async (serialkey: string) => {
         setError('')
-        // const isKeyValid = await checkKey(serialkey)        
+        // const isKeyValid = await checkKey(serialkey)
+        setIsLoading(true)      
         try{
             const alreadyMember = await checkUserInTeam(user.id, serialkey)
-        console.log(alreadyMember)
+            console.log(alreadyMember)
         if(!alreadyMember) {
             try {
                 const insertUser = await insertUserIntoTeam(user.id, serialkey, false)
@@ -46,6 +50,8 @@ export default function JoinTeam({route, navigation}) {
         }
 
     }
+
+    if(loading) return <Loading />
 
 
   return (

@@ -79,10 +79,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  largeText: {
+    color: "white",
+    fontSize: 40,
+    fontWeight: "bold",
+  },
   mediumText: {
     color: "white",
     fontSize: 15,
-    marginLeft: 10,
   },
   smallText: {
     color: "white",
@@ -153,8 +157,9 @@ inputContainer: {
 messageInputContainer: {
     flexDirection: 'row',
     width: '100%',
-    backgroundColor: '#fff',
-    justifyContent: 'space-between',
+    backgroundColor: "#141d26",
+    justifyContent: 'space-around',
+    marginBottom: 10,
     
 },
 messageInput: {
@@ -169,13 +174,47 @@ messageInput: {
 messageInputButton: {
     backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 10,
-    borderWidth: 2,
     alignItems: "center",
     width: "20%",
     justifyContent: "center",
     marginLeft: 10,
+    borderRadius: 10,
 },
+wrapper: {},
+buttonWrapper: {
+    flex: 1,
+    alignItems: "flex-end",
+    flexDirection: "row",
+    color: "white",
+},
+  slide1: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#141d26",
+    padding: 20,
+  },
+  slide2: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#141d26",
+    padding: 20,
+  },
+  slide3: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#141d26",
+    padding: 20,
+  },
+  slide4: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#141d26",
+    padding: 20,
+  },
 
 });
 

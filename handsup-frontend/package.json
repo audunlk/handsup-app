@@ -46,6 +46,8 @@
     "react-native-linear-gradient": "^2.6.2",
     "react-native-modal-datetime-picker": "^14.0.1",
     "react-native-multiple-choice-picker": "^1.0.6",
+    "react-native-notifications": "^4.3.3",
+    "react-native-swiper": "^1.6.0",
     "react-native-wheel-pick": "^1.2.0",
     "react-redux": "^8.0.5",
     "redux-thunk": "^2.4.2",

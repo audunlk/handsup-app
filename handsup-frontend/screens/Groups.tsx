@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Header from "../components/Header";
 import { RootState } from "../redux/types/types";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import styles from "../styles/styles";
 import { getTeamsByUserId } from "../services/firebaseRequests";
 import BottomNav from "../navigation/BottomNav";
-import { Ionicons } from "@expo/vector-icons";
 import ProfilePicture from "../components/ProfilePicture";
 import Loading from "./Loading";
 
 export default function Teams({ navigation }) {
-  const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
   const [teams, setTeams] = useState([]);
   const [error, setError] = useState("");
@@ -80,7 +78,6 @@ export default function Teams({ navigation }) {
       </View>
       <View style={styles.listContainer}>{handleRenderTeams()}</View>
       <BottomNav navigation={navigation} />
-
     </View>
   );
 }

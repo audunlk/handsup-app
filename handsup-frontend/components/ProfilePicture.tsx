@@ -13,19 +13,18 @@ import { RootState } from "../redux/types/types";
 export default function ProfilePicture({id, size, type, allowPress}) {
     const [imageURL, setImageURL] = useState('')
     const [startUpload, setStartUpload] = useState(false)
-    const [progress, setProgress] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
     const dispatch = useDispatch();
     const reRender = useSelector((state: RootState) => state.reRender);
     //MANUAL INPUTS
     //insert userId for profile picture
     //insert teamSerialKey for team picture
-    //insert pollId for poll picture
+    //insert pollId for poll picture (not implemented yet)
 
     //TYPES
     //user
     //team
-    //poll
+    //poll (not implemented yet)
 
     //if no id is provided, return default profile picture
     //if id is provided, return profile picture from database

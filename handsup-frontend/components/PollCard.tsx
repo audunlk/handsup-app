@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import Header from "./Header";
 import styles from "../styles/styles";
 import { hasUserAnsweredPoll, insertAnswer } from "../services/firebaseRequests";
+import MainBtn from "./MainBtn";
 
 
 export default function PollCard({ route, navigation }) {
@@ -66,6 +67,11 @@ export default function PollCard({ route, navigation }) {
     console.log(answer)
   };
 
+  const redirectToChat = () => {
+    navigation.navigate("Chat", { poll, pollId: poll.id, name: poll.question });
+  };
+
+
   if(isLoading){
     return <Loading />
   }
@@ -74,6 +80,8 @@ export default function PollCard({ route, navigation }) {
     <View style={styles.container}>
       <Header navigation={navigation} title={poll.question} showExit={true} />
       <View style={styles.body}>
+          <IonIcons name="chatbox-ellipses-outline" size={24} color="white" />
+          <MainBtn title="Chat" onPress={redirectToChat} />
         <Text style={styles.smallText}>Created At:</Text>
         <Text style={styles.smallText}>{creationDate[0]}</Text>
         <Text style={styles.smallText}>{creationDate[1]}</Text>
