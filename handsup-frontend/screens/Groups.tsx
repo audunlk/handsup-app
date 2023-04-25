@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import Header from "../components/Header";
 import { RootState } from "../redux/types/types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/styles";
 import { getTeamsByUserId } from "../services/firebaseRequests";
 import BottomNav from "../navigation/BottomNav";
 import ProfilePicture from "../components/ProfilePicture";
 import Loading from "./Loading";
 
+
 export default function Teams({ navigation }) {
+  const dispatch = useDispatch();
+  const reRender = useSelector((state: RootState) => state.reRender);
   const user = useSelector((state: RootState) => state.user);
   const [teams, setTeams] = useState([]);
   const [error, setError] = useState("");
@@ -23,7 +26,7 @@ export default function Teams({ navigation }) {
       defineTeams();
     }
     setIsLoading(false);
-  }, [user]);
+  }, [user, reRender]);
 
   const defineTeams = async () => {
     console.log("defining teams")
@@ -76,7 +79,11 @@ export default function Teams({ navigation }) {
           <Text style={{ color: "white" }}>Create Team</Text>
         </TouchableOpacity>
       </View>
+      <ScrollView
+
+      >
       <View style={styles.listContainer}>{handleRenderTeams()}</View>
+      </ScrollView>
       <BottomNav navigation={navigation} />
     </View>
   );

@@ -97,6 +97,7 @@ export default function UserProfile({ navigation }) {
       <Header navigation={navigation} title="Your Profile" showExit={true} />
       <View style={styles.body}>
         <ProfilePicture id={user.id} size={200} type={"user"} allowPress={true} />
+        <Text style={styles.smallText}>Tap to upload</Text>
         <View style={styles.inputStack}>
           <View style={styles.inputHorizontal}>
             <Text style={[styles.mediumText, styles.label]}>
@@ -192,6 +193,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'left',
+    marginBottom: 10,
+    color: 'white',
+  },
+  smallText: {
+    fontSize: 14,
+    textAlign: 'center',
     marginBottom: 10,
     color: 'white',
   },

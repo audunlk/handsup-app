@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView } from "react-native";
 import DateSelector from "../components/DateSelector";
 import { User, RootState, Poll } from "../redux/types/types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
 import { createPoll, createPollChat } from "../services/firebaseRequests";
 import 'react-native-get-random-values';
@@ -11,9 +11,13 @@ import { v4 as uuidv4 } from "uuid";
 import Swiper from "react-native-swiper";
 import IonIcons from "react-native-vector-icons/Ionicons";
 import { ISOtoReadable } from "../utils/dateConversion";
+import { Picker } from "react-native-wheel-pick";
+import { triggerReRender } from "../redux/slices/reRenderSlice";
 
 export default function CreatePoll({ navigation, route }) {
+  const dispatch = useDispatch();
   const user: User = useSelector((state: RootState) => state.user);
+  const reRender = useSelector((state: RootState) => state.reRender);
   const [team, setTeam] = useState(route.params.team);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -53,6 +57,7 @@ export default function CreatePoll({ navigation, route }) {
       await createPollChat(poll.id, user.id);
       console.log(pollResponse);
       if(pollResponse) {
+      dispatch(triggerReRender(!reRender))
       navigation.navigate("Home");
       } else {
         setError("Error creating poll");
@@ -126,20 +131,28 @@ export default function CreatePoll({ navigation, route }) {
         </View>
         <View style={styles.slide4}>
           <Text style={styles.mediumText}>Question</Text>
-        <Text style={styles.largeText}>{poll.question}</Text>
+          <Text style={[styles.largeText, {textAlign: "center"}]}>{poll.question}</Text>
             <Text style={styles.mediumText}>Respond By</Text>
             <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[0]}</Text>
             <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[1]}</Text>
             <Text style={styles.mediumText}>Answers</Text>
-            {answers.map((answer, index) => (
-              <Text style={styles.largeText} key={index}>{index + 1}. {answer}</Text>)
-            )}
+            <Picker
+              style={{ backgroundColor: 'black', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black',}}
+              pickerData={answers}
+              onValueChange={(value) => {
+                console.log(value);
+              }}
+              itemSpace={20}
+              backgroundColor={'#FFFFFF'}
+              itemStyle={{ color: 'white', fontSize: 20 }}
+            >
+            </Picker>
           <TouchableOpacity
             style={styles.btn}
             onPress={() => handleCreatePoll()}
             disabled={!canCreatePoll}
           >
-                        <Text style={styles.mediumText}>Create Poll</Text>
+            <Text style={styles.mediumText}>Create Poll</Text>
           </TouchableOpacity>
         </View>
       </Swiper>

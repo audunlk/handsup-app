@@ -5,7 +5,6 @@ import { ISOtoReadable } from "../utils/dateConversion";
 import IonIcons from "react-native-vector-icons/Ionicons";
 import Loading from "../screens/Loading";
 import { useSelector } from "react-redux";
-import { setIsLoading } from "../redux/slices/loadingSlice";
 import { RootState, User } from "../redux/types/types";
 import { useDispatch } from "react-redux";
 import Header from "./Header";
@@ -30,11 +29,6 @@ export default function PollCard({ route, navigation }) {
 
   useEffect(() => {
     handleCheckAnswer();
-    console.log(user)
-    console.log({ poll })
-    
-    console.log(selectedAnswer)
-    console.log("poll card")
   }, [poll, user, hasAnswered]);
 
   const handleCheckAnswer = async () => {
@@ -93,7 +87,6 @@ export default function PollCard({ route, navigation }) {
           <Text style={styles.smallText}>Your answer: {hasAnswered}</Text>
         ) : (
           <View
-          //style={styles.pickerContainer}
           >
             <Picker
               style={{ backgroundColor: 'white', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black' }}

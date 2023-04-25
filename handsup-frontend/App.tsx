@@ -8,7 +8,8 @@ import store from './redux/store/store';
 
 
 export default function App() {
-
+  
+  
   
   return (
     <Provider store={store}>

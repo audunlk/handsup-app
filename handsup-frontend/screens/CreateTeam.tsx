@@ -4,11 +4,15 @@ import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import ShortUniqueId from "short-unique-id";
 import Header from "../components/Header";
 import { RootState, User } from "../redux/types/types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/styles";
+import { triggerReRender } from "../redux/slices/reRenderSlice";
 import { createGroupChat, createTeam, insertUserIntoTeam } from "../services/firebaseRequests";
 
 export default function JoinTeam({ navigation }) {
+  const dispatch = useDispatch();
+  const reRender = useSelector((state: RootState) => state.reRender);
+
   const [teamName, setTeamName] = useState("");
   const [successful, setSuccessful] = useState(false);
   const user: User = useSelector((state: RootState) => state.user);
@@ -35,10 +39,10 @@ export default function JoinTeam({ navigation }) {
     } catch (error) {
       setError(error.message);
     } finally {
-      Alert.alert("Team Created", "Your team has been created successfully")
       setSuccessful(true);
-      navigation.navigate('Groups')
+      dispatch(triggerReRender(!reRender));
       setisLoading(false);
+      navigation.navigate('Groups')
     }
   };
 

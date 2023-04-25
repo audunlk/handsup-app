@@ -2,7 +2,7 @@
 //gifted chat
 
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Keyboard, ScrollView, Alert, Image } from 'react-native';
+import { View, TouchableOpacity, TextInput, Text, Alert, Image } from 'react-native';
 import { Bubble, GiftedChat } from 'react-native-gifted-chat';
 import { Ionicons } from '@expo/vector-icons';
 import { db, auth, storage } from '../firebase/firebase';
@@ -27,8 +27,6 @@ export default function Chat({ navigation, route }) {
     const [loading, setLoading] = useState(true);
     const [keyboard, setKeyboard] = useState(false);
     const [avatar, setAvatar] = useState(null);
-
-
 
     useEffect(() => {
         getAvatar();
@@ -105,6 +103,7 @@ export default function Chat({ navigation, route }) {
                     });
             }
             setMessages((previousMessages) => GiftedChat.append(previousMessages, [newMessage]));
+            setText('');
         }
     };
 
@@ -182,7 +181,7 @@ export default function Chat({ navigation, route }) {
                             />
                             <View style={styles.messageInputButton}>
                                 <TouchableOpacity onPress={sendMessage}>
-                                    <Ionicons name="send" size={24} color="#141d26" />
+                                    <Text style={styles.mediumText}>Send</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

@@ -20,6 +20,8 @@ export const renderPolls = (polls: any, navigation: any) => {
           key={i}
           onPress={() => navigation.navigate("PollCard", { poll: poll })}
         >
+          <Text style={styles.smallText}>{poll.teamName}</Text>
+
           <Text style={styles.listTitle}>{poll.question}</Text>
           <Text style={styles.listDescription}>
             {isExpired}: {respondByText}

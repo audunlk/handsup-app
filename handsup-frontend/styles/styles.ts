@@ -170,14 +170,15 @@ messageInput: {
     width: "80%",
     justifyContent: "center",
     padding: 5,
+    marginHorizontal: 10,
 },
 messageInputButton: {
-    backgroundColor: '#fff',
+    
     padding: 10,
     alignItems: "center",
-    width: "20%",
+    width: "15%",
     justifyContent: "center",
-    marginLeft: 10,
+    marginHorizontal: 10,
     borderRadius: 10,
 },
 wrapper: {},
