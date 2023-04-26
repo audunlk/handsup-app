@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { KeyboardAvoidingView, Text, TouchableOpacity, View } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler'
 import Header from '../components/Header'
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
 import styles from '../styles/styles'
-import { auth, db } from '../firebase/firebase'
 import transformError from '../utils/transformError'
-import { Dispatch } from '@reduxjs/toolkit'
 import { setIsLoggedIn } from '../redux/slices/loggedInSlice'
 import { useDispatch } from 'react-redux'
-import { setUser } from '../redux/slices/userSlice'
-import { setIsLoading } from '../redux/slices/loadingSlice'
-import { doc, setDoc, getDoc } from 'firebase/firestore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createUser, loginUser } from '../services/firebaseRequests'
+// import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
+import { 
+    createUser, 
+    loginUser, 
+    // googleSignInUser 
+} from '../services/firebaseRequests'
 
 
 export default function LoginOrRegister({ navigation }) {
@@ -24,10 +23,10 @@ export default function LoginOrRegister({ navigation }) {
 
 
     const handleLogin = async () => {
-        try{
+        try {
             await loginUser(email, password)
             dispatch(setIsLoggedIn(true))
-        }catch(error){
+        } catch (error) {
             console.log(error.code)
             setError(transformError(error.code))
         }
@@ -45,6 +44,17 @@ export default function LoginOrRegister({ navigation }) {
             setError(transformError(error.code))
         }
     };
+
+    //Doesnt work in expo go
+    // const handleGoogleSignIn = async () => {
+    //     try {
+    //         await googleSignInUser()
+    //         dispatch(setIsLoggedIn(true))
+    //     } catch (error) {
+    //         console.log(error.code)
+    //         setError(transformError(error.code))
+    //     }
+    // };
 
     return (
         <KeyboardAvoidingView style={styles.container}>
@@ -84,6 +94,12 @@ export default function LoginOrRegister({ navigation }) {
                     >
                         <Text style={styles.mediumText}>Register</Text>
                     </TouchableOpacity>
+                    {/* <GoogleSigninButton
+                        style={{ width: '100%', height: 48 }}
+                        size={GoogleSigninButton.Size.Wide}
+                        color={GoogleSigninButton.Color.Dark}
+                        onPress={handleGoogleSignIn}
+                    /> */}
                 </View>
             </View>
         </KeyboardAvoidingView>

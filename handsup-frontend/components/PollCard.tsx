@@ -89,10 +89,13 @@ export default function PollCard({ route, navigation }) {
           <View
           >
             <Picker
-              style={{ backgroundColor: 'white', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black' }}
+              style={{ backgroundColor: 'black', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black', }}
               selectedValue={selectedAnswer}
               onValueChange={(value) => handleSelectAnswer(value)}
               pickerData={answers}
+              itemSpace={20}
+              itemStyle={{ color: "white", fontSize: 20, fontWeight: "bold", textAlign: "center", }}
+
             >
             </Picker>
             <TouchableOpacity style={styles.btn}>

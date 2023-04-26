@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, Pressable, Alert } from 'react-native'
-import Header from '../components/Header'
 import styles from '../styles/styles'
 import { checkUserInTeam, insertUserIntoTeam } from '../services/firebaseRequests'
 import Loading from './Loading'
 import { setIsLoading } from '../redux/slices/loadingSlice'
+import Modal from 'react-native-modal'
+import { RootState, User } from '../redux/types/types'
+import { useSelector } from 'react-redux'
 
-export default function JoinTeam({route, navigation}) {
-    
+export default function JoinTeam({navigation, isVisible, setIsVisible}) {
+    const user: User = useSelector((state: RootState) => state.user)
     const [serialkey, setSerialkey] = useState('')
     const [successful, setSuccessful] = useState(false)
-    const [user, setUser] = useState(route.params.user)
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
@@ -22,10 +23,8 @@ export default function JoinTeam({route, navigation}) {
         }
     }, [successful])
     
-
     const handleJoinTeam = async (serialkey: string) => {
         setError('')
-        // const isKeyValid = await checkKey(serialkey)
         setIsLoading(true)      
         try{
             const alreadyMember = await checkUserInTeam(user.id, serialkey)
@@ -35,7 +34,6 @@ export default function JoinTeam({route, navigation}) {
                 const insertUser = await insertUserIntoTeam(user.id, serialkey, false)
                 console.log(insertUser)
                 Alert.alert('Team Joined', 'You have successfully joined the team')
-                navigation.navigate('Groups')
             } catch (error) {
                 setError(error.message)
             }
@@ -47,40 +45,44 @@ export default function JoinTeam({route, navigation}) {
             setError(error.message)
         }finally {
             setLoading(false)
+            setIsVisible(null)
         }
-
     }
 
     if(loading) return <Loading />
 
 
   return (
-    <View style={styles.container}>
-         
-        <Header title='Join Team'  showExit={true} navigation={navigation}/>
-        <View style={styles.body}>
+    <Modal
+    isVisible={isVisible}
+    style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
+    animationIn={'slideInUp'}
+    animationOut={'slideOutDown'}
+    onBackdropPress={() => setIsVisible(null)}
+    >
             <Text style={styles.mediumText}>Join Team</Text>
             <TextInput
             id='serialkey'
             placeholder='Enter Team Serial Key'
+            placeholderTextColor={"grey"}
             autoCapitalize='none'
             style={styles.input}
-            value={serialkey} onChangeText={setSerialkey}
+            value={serialkey} 
+            onChangeText={setSerialkey}
              />
             <Pressable 
             style={styles.btn}
             onPress={() => handleJoinTeam(serialkey)} >
                 <Text style={{color: "white"}}>Join Team</Text>
             </Pressable>
-            {successful &&
-            <Pressable onPress={() => navigation.navigate("Home")}>
-                <Text style={{color: "white"}}>Go to Home</Text>
+            <Pressable 
+            style={styles.btn}
+            onPress={() => setIsVisible(null)} >
+                <Text style={{color: "white"}}>Back</Text>
             </Pressable>
-            }
             {error && <Text>{error}</Text>}
-        </View>
 
-    </View>
+    </Modal>
   )
 }
 

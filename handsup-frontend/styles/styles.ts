@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   btn: {
-    backgroundColor: "#19202b",
+    backgroundColor: "#FFA500",
     padding: 10,
     borderRadius: 10,
     margin: 10,
@@ -220,3 +220,7 @@ buttonWrapper: {
 });
 
 export default styles;
+
+// #FFA500 : orange
+// #FFD700 : gold
+// #FFC400 : yellow

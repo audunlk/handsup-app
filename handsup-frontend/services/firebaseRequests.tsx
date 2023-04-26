@@ -2,13 +2,15 @@ import {
     doc, getDoc, setDoc, getDocs, collection, addDoc, query, where,
     updateDoc, arrayUnion
 } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db, storage } from '../firebase/firebase';
 import { FirestoreError } from 'firebase/firestore';
 import { User } from '../redux/types/types';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Message } from '../redux/types/types';
+// import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
 
 
 //USER 
@@ -44,6 +46,21 @@ export const loginUser = async (email: string, password) => {
         throw err;
     }
 }
+
+// export const googleSignInUser = async () => {
+//     try {
+//         const { idToken } = await GoogleSignin.signIn();
+//         const googleCredential = GoogleAuthProvider.credential(idToken);
+//         await signInWithCredential(auth, googleCredential);
+//         const accessToken = await auth.currentUser.getIdToken();
+//         await AsyncStorage.setItem('handsup-token', accessToken);
+//     }
+//     catch (err) {
+//         throw err;
+//     }
+    
+// }
+
 
 export const getUserObject = async (uid: string) => {
     const userDoc = doc(db, 'users', uid);

@@ -1,18 +1,17 @@
 import jwtDecode from "jwt-decode";
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TextInput, Pressable, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import ShortUniqueId from "short-unique-id";
-import Header from "../components/Header";
 import { RootState, User } from "../redux/types/types";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/styles";
+import Modal from "react-native-modal";
 import { triggerReRender } from "../redux/slices/reRenderSlice";
 import { createGroupChat, createTeam, insertUserIntoTeam } from "../services/firebaseRequests";
 
-export default function JoinTeam({ navigation }) {
+export default function JoinTeam({ navigation, isVisible, setIsVisible }) {
   const dispatch = useDispatch();
   const reRender = useSelector((state: RootState) => state.reRender);
-
   const [teamName, setTeamName] = useState("");
   const [successful, setSuccessful] = useState(false);
   const user: User = useSelector((state: RootState) => state.user);
@@ -42,7 +41,7 @@ export default function JoinTeam({ navigation }) {
       setSuccessful(true);
       dispatch(triggerReRender(!reRender));
       setisLoading(false);
-      navigation.navigate('Groups')
+      setIsVisible(null);
     }
   };
 
@@ -51,32 +50,35 @@ export default function JoinTeam({ navigation }) {
   }
 
   return (
-    <View style={styles.container}>
-     
-        <Header
-          navigation={navigation}
-          title={"Create Group"}
-          showExit={true}
-       
-        />
-
-        <View style={styles.body}>
-          <Text style={styles.mediumText}>Create a Team</Text>
+    <Modal
+    isVisible={isVisible}
+    style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
+    animationIn={'slideInUp'}
+    animationOut={'slideOutDown'}
+    onBackdropPress={() => setIsVisible(null)}
+    >
           <TextInput
             placeholder="Enter Team Name"
             value={teamName}
             style={styles.input}
+            placeholderTextColor={"grey"}
             onChangeText={setTeamName}
           />
-          <Pressable
+          <TouchableOpacity
             style={styles.btn}
             onPress={() => handleCreateTeam(teamName)}
           >
             <Text style={styles.smallText}>Create Team</Text>
-          </Pressable>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => setIsVisible(null)}
+          >
+            <Text style={styles.smallText}>Back</Text>
+          </TouchableOpacity>
           {error && <Text>{error}</Text>}
-        </View>
-    </View>
+        
+    </Modal>
   );
 }
 

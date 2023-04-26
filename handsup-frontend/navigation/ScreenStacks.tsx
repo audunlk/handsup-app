@@ -10,6 +10,7 @@ import PollCard from "../components/PollCard";
 import CreateProfile from "../screens/CreateProfile";
 import Chat from "../components/Chat";
 import { createStackNavigator } from "@react-navigation/stack";
+import { Modal } from "react-native";
 
 const Stack = createStackNavigator();
 
@@ -51,7 +52,9 @@ export const LoggedInStack = (isFirstTime: boolean) => {
           <Stack.Screen
             name="JoinTeam"
             component={JoinTeam}
-            options={{ headerShown: false, animationEnabled: false }}
+            options={{ headerShown: false, 
+              animationEnabled: false,
+             }}
           />
           <Stack.Screen
             name="CreateTeam"

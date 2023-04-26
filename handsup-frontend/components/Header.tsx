@@ -7,7 +7,7 @@ export default function Header({ navigation, title, showExit }) {
 
   return (
     <View style={styles.header}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, {color: "#FFA500"}]}>{title}</Text>
       {showExitButton && (
         <Ionicons
           name="close"

@@ -84,7 +84,7 @@ export default function GroupInfo({ navigation, route }) {
               </TouchableOpacity>
               <View>
                 <MainBtn
-                  title="Create a Poll"
+                  title="Create poll"
                   onPress={() => navigation.navigate("CreatePoll", { team })}
                 />
               </View>
