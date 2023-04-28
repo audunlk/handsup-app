@@ -11,6 +11,7 @@ import CreateProfile from "../screens/CreateProfile";
 import Chat from "../components/Chat";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Modal } from "react-native";
+import Polls from "../screens/Polls";
 
 const Stack = createStackNavigator();
 
@@ -68,7 +69,14 @@ export const LoggedInStack = (isFirstTime: boolean) => {
               headerShown: false,
               animationTypeForReplace: "pop",
               presentation: "card",
-  
+            }}
+          />
+          <Stack.Screen
+            name="Polls"
+            component={Polls}
+            options={{
+              headerShown: false,
+              animationEnabled: false
             }}
           />
           <Stack.Screen

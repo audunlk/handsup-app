@@ -86,17 +86,16 @@ const styles = StyleSheet.create({
   },
   mediumText: {
     color: "white",
-    fontSize: 15,
+    fontSize: 20,
   },
   smallText: {
     color: "white",
-    fontSize: 10,
+    fontSize: 15,
   },
   listItem: {
     width: "100%",
     height: 100,
-    borderColor: "white",
-    borderBottomWidth: 0.3,
+    
     padding: 10,
     flexDirection: "row",
     alignItems: "center",
@@ -173,7 +172,6 @@ messageInput: {
     marginHorizontal: 10,
 },
 messageInputButton: {
-    
     padding: 10,
     alignItems: "center",
     width: "15%",

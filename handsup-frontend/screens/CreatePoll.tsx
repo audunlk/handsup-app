@@ -40,6 +40,10 @@ export default function CreatePoll({ navigation, route }) {
 
   const handleCreatePoll = async () => {
     console.log("creating poll")
+    const answerChoiceData = answers.map(answer => ({
+      answer_choice: answer,
+      membersAnswered: []
+    }));
     try {
       const pollData = {
         id: poll.id,
@@ -48,8 +52,7 @@ export default function CreatePoll({ navigation, route }) {
         respond_by: poll.respond_by.toISOString(),
         teamSerial: poll.teamSerial,
         teamName: team.name,
-        answer_choices: answers,
-        membersAnswered: [],
+        answer_choices: answerChoiceData,
         anonymous: false,
       };
       console.log(pollData)

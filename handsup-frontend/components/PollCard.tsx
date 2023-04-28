@@ -9,46 +9,48 @@ import { RootState, User } from "../redux/types/types";
 import { useDispatch } from "react-redux";
 import Header from "./Header";
 import styles from "../styles/styles";
-import { hasUserAnsweredPoll, insertAnswer } from "../services/firebaseRequests";
+import { insertAnswer } from "../services/firebaseRequests";
 import MainBtn from "./MainBtn";
+import PollResults from "./PollResults";
 
 
 export default function PollCard({ route, navigation }) {
   const { poll } = route.params;
   const dispatch = useDispatch();
-  const [answers, setAnswers] = useState(poll.answer_choices.map((answer: any) => answer));
+  const [answers, setAnswers] = useState(poll.answer_choices.map((answer: any) => answer.answer_choice));
   const [creationDate, setCreationDate] = useState(ISOtoReadable(poll.created_at))
   const [respondBy, setRespondBy] = useState(ISOtoReadable(poll.respond_by));
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(answers[0]);
 
   const user: User = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
-    handleCheckAnswer();
+    //handleCheckAnswer();
   }, [poll, user, hasAnswered]);
 
-  const handleCheckAnswer = async () => {
-    setIsLoading(true);
-    try {
-      //function returns actual answer or false
-      const givenAnswer = await hasUserAnsweredPoll(poll.id, user.id);
-      if (givenAnswer) {
-        setHasAnswered(givenAnswer);
-      }
-    } catch (error) {
-      console.log(error)
-      setError(error.message);
-    }
-    setIsLoading(false);
-  };
+  // const handleCheckAnswer = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     //function returns actual answer or false
+  //     const givenAnswer = await hasUserAnsweredPoll(poll.id, user.id);
+  //     if (givenAnswer) {
+  //       setHasAnswered(givenAnswer);
+  //     }
+  //   } catch (error) {
+  //     console.log(error)
+  //     setError(error.message);
+  //   }
+  //   setIsLoading(false);
+  // };
 
   const handleSubmitAnswer = async (answer: string) => {
     try {
-      await insertAnswer(poll.id, user.id, answer);
+      await insertAnswer(poll.id, user, answer);
       setHasAnswered(answer);
     } catch (error) {
       console.log(error)
@@ -104,7 +106,9 @@ export default function PollCard({ route, navigation }) {
           </View>
 
         )}
-
+        <TouchableOpacity style={styles.btn}>
+              <Text style={styles.smallText} onPress={() => setIsVisible(true)}>See Results</Text>
+            </TouchableOpacity>
         {isAdmin && (
           <IonIcons
             name="trash"
@@ -113,6 +117,10 @@ export default function PollCard({ route, navigation }) {
           //onPress={handleDeletionAlert}
           />
         )}
+        {isVisible === true && (
+          <PollResults poll={poll} isVisible={isVisible} setIsVisible={setIsVisible} />
+        )
+          }
       </View>
     </View>
   );

@@ -247,25 +247,65 @@ export const getPollsByTeamSerials = async (serials: string[]) => {
     }
 };
 
+// const answerChoiceData = answers.map(answer => ({
+//     answer_choice: answer,
+//     membersAnswered: []
+//   }));
+//   try {
+//     const pollData = {
+//       id: poll.id,
+//       question: poll.question,
+//       created_at: poll.created_at.toISOString(),
+//       respond_by: poll.respond_by.toISOString(),
+//       teamSerial: poll.teamSerial,
+//       teamName: team.name,
+//       answer_choices: answerChoiceData,
+//       anonymous: false,
+//     };
 
-export const insertAnswer = async (pollId: string, userId: string, answer: string) => {
-    const pollQuerySnapshot = await getDocs(
-    query(collection(db, 'polls'), 
-    where('id', '==', pollId)));
-    if (pollQuerySnapshot.empty) {
-      throw new Error('Poll does not exist');
-    }
-    const pollDocRef = doc(db, 'polls', pollQuerySnapshot.docs[0].id);
+// {"anonymous": false, "answer_choices": [{"answer_choice": "Hohi", "membersAnswered": [Array]}, {"answer_choice": "Hoho", "membersAnswered": [Array]}, {"answer_choice": "Hihi", "membersAnswered": [Array]}], "created_at": "2023-04-28T12:24:41.650Z", "id": "b145e95b-5fd9-4eaa-b32c-01078527f3f6", "question": "Huhi", "respond_by": "2023-04-29T12:24:00.000Z", "teamName": "Inn i mitt hjem", "teamSerial": "E9ObdH"}
+
+export const insertAnswer = async (pollId: string, user: User, answer: string) => {
     try {
-      await updateDoc(pollDocRef, {
-        membersAnswered: arrayUnion({ answer, userId }),
-      });
-    } catch (err) {
-      throw new Error('Error updating poll');
+        const pollDocRef = doc(db, 'polls', pollId);
+        const pollDocSnap = await getDoc(pollDocRef);
+        if (pollDocSnap.exists()) {
+            console.log(pollDocSnap.data());
+        }else{
+            throw new Error('Poll does not exist');
+        }
     }
-  };
+    catch (err) {
+        throw err;
+    }
+}
 
-export const hasUserAnsweredPoll = async (pollId: string, userId: string) => {
+
+// export const hasUserAnsweredPoll = async (pollId: string, userId: string) => {
+//     try {
+//         const pollQuerySnapshot = await getDocs(
+//             query(collection(db, 'polls'),
+//                 where('id', '==', pollId)));
+//         if (pollQuerySnapshot.empty) {
+//             throw new Error('Poll does not exist');
+//         }
+//         const pollDocRef = doc(db, 'polls', pollQuerySnapshot.docs[0].id);
+//         const pollDocSnap = await getDoc(pollDocRef);
+//         if (pollDocSnap.exists()) {
+//             const membersAnswered = pollDocSnap.data().membersAnswered;
+//             const user = membersAnswered.find(member => member.user.id === userId);
+//             if(user){
+//                 return user.answer;
+//             }
+//             return false;
+//         }
+//         return null;
+//     } catch (err) {
+//         throw err;
+//     }
+// }
+
+export const getAllAnswers = async (pollId: string) => {
     try {
         const pollQuerySnapshot = await getDocs(
             query(collection(db, 'polls'),
@@ -277,17 +317,14 @@ export const hasUserAnsweredPoll = async (pollId: string, userId: string) => {
         const pollDocSnap = await getDoc(pollDocRef);
         if (pollDocSnap.exists()) {
             const membersAnswered = pollDocSnap.data().membersAnswered;
-            const user = membersAnswered.find(member => member.userId === userId);
-            if(user){
-                return user.answer;
-            }
-            return false;
+            return membersAnswered;
         }
         return null;
     } catch (err) {
         throw err;
     }
 }
+
 
 //IMAGE
 export const uploadImageBlob = async (blob: Blob, id: string, type: string, onProgress: (progress: number) => void) => {

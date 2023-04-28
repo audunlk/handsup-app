@@ -181,7 +181,7 @@ export default function Chat({ navigation, route }) {
                             />
                             <View style={styles.messageInputButton}>
                                 <TouchableOpacity onPress={sendMessage}>
-                                    <Text style={styles.mediumText}>Send</Text>
+                                    <Text style={styles.smallText}>Send</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

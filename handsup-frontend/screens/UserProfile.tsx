@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, KeyboardAvoidingView } from "react-native";
 import { clearUser } from "../redux/slices/userSlice";
 import { setUser } from "../redux/slices/userSlice";
 import { RootState, User } from "../redux/types/types";
@@ -9,6 +9,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header";
 import { updateUser } from "../services/firebaseRequests";
 import ProfilePicture from "../components/ProfilePicture";
+import { checkValidity } from "../utils/regex";
+import styles from "../styles/styles";
+import MainBtn from "../components/MainBtn";
 
 export default function UserProfile({ navigation }) {
   const user: User = useSelector((state: RootState) => state.user);
@@ -17,6 +20,7 @@ export default function UserProfile({ navigation }) {
   const [isEditable, setIsEditable] = useState(false);
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [error, setError] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -56,15 +60,21 @@ export default function UserProfile({ navigation }) {
       {
         text: "Update",
         onPress: async () => {
-          const updatedUserData = {
-            ...user,
-            username,
-            firstName,
-            lastName,
-            email,
-          };
-          const updatedUser = await updateUser(user.id, updatedUserData);
-          dispatch(setUser(updatedUser));
+          try {
+            const isValid = checkValidity(firstName, lastName, username);
+            if (isValid) {
+              const updatedUserData = {
+                ...user,
+                username,
+                firstName,
+                lastName,
+              };
+              const updatedUser = await updateUser(user.id, updatedUserData);
+              dispatch(setUser(updatedUser));
+            }
+          } catch (error) {
+            setError(error.message);
+          }
         },
       },
     ]);
@@ -93,129 +103,48 @@ export default function UserProfile({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={styles.container}>
       <Header navigation={navigation} title="Your Profile" showExit={true} />
       <View style={styles.body}>
-        <ProfilePicture id={user.id} size={200} type={"user"} allowPress={true} />
-        <Text style={styles.smallText}>Tap to upload</Text>
-        <View style={styles.inputStack}>
-          <View style={styles.inputHorizontal}>
-            <Text style={[styles.mediumText, styles.label]}>
-              Username
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={username}
-              editable={isEditable}
-              onChangeText={setUsername}
-            />
-          </View>
-          <View style={styles.inputHorizontal}>
-            <Text style={[styles.mediumText, styles.label]}>
-              First Name
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={firstName}
-              editable={isEditable}
-              onChangeText={setFirstName}
-            />
-          </View>
-          <View style={styles.inputHorizontal}>
-            <Text style={[styles.mediumText, styles.label]}>
-              Last Name
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={lastName}
-              editable={isEditable}
-              onChangeText={setLastName}
-            />
-          </View>
-          <View style={styles.inputHorizontal}>
-            <Text style={[styles.mediumText, styles.label]}>
-              Email
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={email}
-              editable={isEditable}
-              onChangeText={setEmail}
-            />
-          </View>
-          <View style={styles.btn}>
-            <Button
-              title={isEditable ? "Save" : "Edit"}
-              onPress={handleEdit}
-              color={"white"}
-            />
-          </View>
-          <View style={styles.btn}>
-            <Button
-              title="Log out"
-              onPress={handleLogout}
-              color={"white"}
-            />
-          </View>
-        </View>
+        <ProfilePicture id={user.id} size={180} type={"user"} allowPress={true} />
+        <Text style={[styles.smallText, { marginBottom: 10 }]}>Tap to upload</Text>
+        <Text style={[styles.smallText]}>
+          Username
+        </Text>
+        <TextInput
+          style={[styles.input, error && styles.inputError]}
+          value={username}
+          editable={isEditable}
+          onChangeText={setUsername}
+          onChange={() => setError("")}
+        />
+        <Text style={[styles.smallText]}>
+          First Name
+        </Text>
+        <TextInput
+          style={[styles.input, error && styles.inputError]}
+          value={firstName}
+          editable={isEditable}
+          onChangeText={setFirstName}
+          onChange={() => setError("")}
+        />
+        <Text style={[styles.smallText]}>
+          Last Name
+        </Text>
+        <TextInput
+          style={[styles.input, error && styles.inputError]}
+          value={lastName}
+          editable={isEditable}
+          onChangeText={setLastName}
+          onChange={() => setError("")}
+        />
+        <Text style={[styles.smallText, { textAlign: "center" }]}>{error}</Text>
+        <MainBtn title={isEditable ? "Save" : "Edit"} onPress={handleEdit} />
+        <MainBtn title="Log out" onPress={handleLogout} />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#141d26",
-  },
-  body: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  inputStack: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inputHorizontal: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  label: {
-    width: '30%',
-    marginRight: 20,
-  },
-  mediumText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'left',
-    marginBottom: 10,
-    color: 'white',
-  },
-  smallText: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 10,
-    color: 'white',
-  },
-  input: {
-    flex: 1,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 5,
-    textAlignVertical: 'top',
-    backgroundColor: 'white',
-  },
-  btn: {
-    width: '100%',
-    marginTop: 20,
-    backgroundColor: '#007AFF',
-    borderRadius: 5,
-  },
-});

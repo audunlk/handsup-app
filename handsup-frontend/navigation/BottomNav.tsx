@@ -27,7 +27,9 @@ export default function BottomNav({ navigation }) {
         />
         <Text style={{ color: "white", fontSize: 12 }}>Teams</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.iconContainer}>
+      <TouchableOpacity 
+          onPress={() => navigation.navigate("Polls")}
+      style={styles.iconContainer}>
         <IonIcons name="ios-podium" size={24} color="white" />
         <Text style={{ color: "white", fontSize: 12 }}>Polls</Text>
       </TouchableOpacity>
