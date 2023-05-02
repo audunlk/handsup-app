@@ -9,7 +9,7 @@ import { RootState, User } from "../redux/types/types";
 import { useDispatch } from "react-redux";
 import Header from "./Header";
 import styles from "../styles/styles";
-import { insertAnswer } from "../services/firebaseRequests";
+import { addAnswer } from "../services/firebaseRequests";
 import MainBtn from "./MainBtn";
 import PollResults from "./PollResults";
 
@@ -17,7 +17,7 @@ import PollResults from "./PollResults";
 export default function PollCard({ route, navigation }) {
   const { poll } = route.params;
   const dispatch = useDispatch();
-  const [answers, setAnswers] = useState(poll.answer_choices.map((answer: any) => answer.answer_choice));
+  const [answers, setAnswers] = useState(poll.answers.map((answer: any) => answer));
   const [creationDate, setCreationDate] = useState(ISOtoReadable(poll.created_at))
   const [respondBy, setRespondBy] = useState(ISOtoReadable(poll.respond_by));
   const [error, setError] = useState("");
@@ -25,42 +25,28 @@ export default function PollCard({ route, navigation }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState(answers[0]);
+  const [selectedAnswer, setSelectedAnswer] = useState(0);
 
   const user: User = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
+    console.log(poll.id)
+    console.log(selectedAnswer);
     //handleCheckAnswer();
   }, [poll, user, hasAnswered]);
 
-  // const handleCheckAnswer = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     //function returns actual answer or false
-  //     const givenAnswer = await hasUserAnsweredPoll(poll.id, user.id);
-  //     if (givenAnswer) {
-  //       setHasAnswered(givenAnswer);
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //     setError(error.message);
-  //   }
-  //   setIsLoading(false);
-  // };
-
-  const handleSubmitAnswer = async (answer: string) => {
+  const handleSubmitAnswer = async (answerIndex: number) => {
     try {
-      await insertAnswer(poll.id, user, answer);
-      setHasAnswered(answer);
+      await addAnswer(poll.id, answerIndex, user.id);
     } catch (error) {
       console.log(error)
       setError(error.message);
     }
   };
 
-  const handleSelectAnswer = (answer: string) => {
-    setSelectedAnswer(answer);
-    console.log(answer)
+  const handleSelectAnswer = (index: number) => {
+    setSelectedAnswer(index);
+    console.log(selectedAnswer); 
   };
 
   const redirectToChat = () => {
@@ -68,9 +54,7 @@ export default function PollCard({ route, navigation }) {
   };
 
 
-  if(isLoading){
-    return <Loading />
-  }
+  isLoading && <Loading />;
 
   return (
     <View style={styles.container}>
@@ -93,11 +77,10 @@ export default function PollCard({ route, navigation }) {
             <Picker
               style={{ backgroundColor: 'black', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black', }}
               selectedValue={selectedAnswer}
-              onValueChange={(value) => handleSelectAnswer(value)}
+              onValueChange={(value) => handleSelectAnswer(answers.indexOf(value))}
               pickerData={answers}
               itemSpace={20}
               itemStyle={{ color: "white", fontSize: 20, fontWeight: "bold", textAlign: "center", }}
-
             >
             </Picker>
             <TouchableOpacity style={styles.btn}>
