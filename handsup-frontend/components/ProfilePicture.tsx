@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Image, TouchableOpacity } from 'react-native'
+import { View, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { handlePickAvatar } from '../utils/handlePickAvatar'
 import { getImage } from '../services/firebaseRequests'
@@ -7,6 +7,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { triggerReRender } from "../redux/slices/reRenderSlice";
 import { RootState } from "../redux/types/types";
 import { LogBox } from 'react-native'
+import CachedImage from 'expo-cached-image'
+import Loading from '../screens/Loading'
+
 
 LogBox.ignoreAllLogs(true)
 
@@ -29,24 +32,26 @@ export default function ProfilePicture({ id, size, type, allowPress }) {
   //if no id is provided, return default profile picture
   //if id is provided, return profile picture from database
   useEffect(() => {
-    setIsLoading(true);
-    async function getImageURL() {
-      try {
-        const image = await getImage(id, type);
-        if (image) {
-          setImageURL(image);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
     if (id && type) {
       getImageURL();
     } else {
       setImageURL('');
     }
-    setIsLoading(false);
   }, [id, type, dispatch, reRender]);
+
+  const getImageURL = async () => {
+    setIsLoading(true);
+    try {
+      const image = await getImage(id, type);
+      if (image) {
+        setImageURL(image);
+      }
+    } catch (error) {
+      console.error(error);
+    }finally{
+      setIsLoading(false);
+    }
+  }
 
 
   const handlePickAndTriggerReRender = async (id, type) => {
@@ -82,6 +87,8 @@ export default function ProfilePicture({ id, size, type, allowPress }) {
     }
   }
 
+  if(isLoading) return <ActivityIndicator style={{ width: size, height: size, borderRadius: size / 2 }} />
+
   return (
     imageURL ? (
       <View
@@ -92,17 +99,13 @@ export default function ProfilePicture({ id, size, type, allowPress }) {
             handlePickAndTriggerReRender(id, type);
           }}
         >
-          <Image
-            style={{
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            source={{
-              uri: imageURL,
-            }} />
+          <CachedImage
+            style={{ width: size, height: size, borderRadius: size / 2 }}
+            source={{ uri: imageURL }}
+            cacheKey={`${id}-${type}`}
+            resizeMode="cover"
+            
+          />
         </TouchableOpacity>
       </View>
     ) : (

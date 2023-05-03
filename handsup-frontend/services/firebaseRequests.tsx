@@ -1,5 +1,5 @@
 import {
-    doc, getDoc, setDoc, getDocs, collection, addDoc, query, where,
+    doc, getDoc, setDoc, getDocs, collection, addDoc, query, where, deleteDoc,
     updateDoc, arrayUnion
 } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
@@ -9,6 +9,7 @@ import { FirestoreError } from 'firebase/firestore';
 import { User } from '../redux/types/types';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Message } from '../redux/types/types';
+
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 //USER 
@@ -60,18 +61,22 @@ export const loginUser = async (email: string, password) => {
 
 
 export const getUserObject = async (uid: string) => {
-    const userDoc = doc(db, 'users', uid);
-    const userDocSnap = await getDoc(userDoc);
-    if (userDocSnap.exists()) {
-        return userDocSnap.data();
+    try{
+        const userDoc = doc(db, 'users', uid);
+        const userDocSnap = await getDoc(userDoc);
+        if (userDocSnap.exists()) {
+            return userDocSnap.data();
+        }
+        return null
+    } catch (err) {
+        throw err;
     }
-    return null
 }
 
 
 export const updateUser = async (userId: string, user: User): Promise<User> => {
-    const userDocRef = doc(db, 'users', userId);
     try {
+        const userDocRef = doc(db, 'users', userId);
         await setDoc(userDocRef, user, { merge: true });
         const updatedUser = { ...user, id: userId };
         console.log({ updatedUser })
@@ -122,6 +127,21 @@ export const insertUserIntoTeam = async (userId: string, teamSerial: string, adm
     }
 }
 
+export const checkUserAdmin = async (userId: string, teamSerial: string) => {
+    const teamDoc = doc(db, 'teams', teamSerial);
+    const teamDocSnap = await getDoc(teamDoc);
+    if (teamDocSnap.exists()) {
+        const teamData = teamDocSnap.data();
+        const members = teamData.members;
+        const user = members.find(member => member.id === userId);
+        if (user) {
+            return user.admin;
+        }
+        return false;
+    } else {
+        throw new Error('This team does not exist');
+    }
+}
 
 export const getTeamsByUserId = async (userId: string) => {
     try {
@@ -152,6 +172,27 @@ export const getTeamBySerialKey = async (serialKey: string) => {
         throw err;
     }
 }
+
+export const getMembersById = async (members: Array<{id: string, admin: boolean}>) => {
+    try {
+      const memberIds = members.map(member => member.id);
+      const querySnapshot = await getDocs(query(collection(db, 'users'), where('id', 'in', memberIds)));
+      const membersData = querySnapshot.docs.map((doc) => {
+        const member = members.find(member => member.id === doc.data().id);
+        return {
+          ...doc.data(),
+          admin: member.admin
+        };
+      });
+      return membersData;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+
+
+
 
 export const checkUserInTeam = async (userId: string, serialKey: string) => {
     try {
@@ -185,6 +226,17 @@ export const createPoll = async (poll: any) => {
         throw err;
     }
 }
+
+export const deletePoll = async (pollId: string) => {
+    try {
+        await deleteDoc(doc(db, 'polls', pollId));
+        await deleteDoc(doc(db, 'answers', pollId));
+        console.log('Poll deleted successfully');
+    } catch (err) {
+        throw err;
+    }
+}
+
 
 export const getPollsByTeamSerial = async (serial: string) => {
     try {
@@ -271,15 +323,61 @@ export const addAnswer = async (pollId: string, answerIndex: number, userId: str
     }
 }
 
+export const checkUserAnswer = async (pollId: string, userId: string) => {
+    try {
+        const answerDoc = doc(db, 'answers', pollId);
+        const answerDocSnap = await getDoc(answerDoc);
+        if (answerDocSnap.exists()) {
+            const answerData = answerDocSnap.data();
+            const answers = answerData.answers;
+            const userAnswer = answers.find(answer => answer.userId === userId);
+            return userAnswer
+        } else {
+            throw new Error('This poll does not exist');
+        }
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getUserPollStatus = async (pollId: string, userId: string, teamSerial: string) => {
+    //check if admin
+    try{
+        const isAdmin = await checkUserAdmin(userId, teamSerial);
+        console.log(isAdmin)
+        console.log("is admin getUserPollStatus")
+        //check if user has voted
+        const userAnswer = await checkUserAnswer(pollId, userId);
+        if(userAnswer){
+            //check the answer from polls with index
+            const pollDoc = doc(db, 'polls', pollId);
+            const pollDocSnap = await getDoc(pollDoc);
+            if (pollDocSnap.exists()) {
+                const pollData = pollDocSnap.data();
+                const pollAnswers = pollData.answers;
+                const pollAnswer = pollAnswers[userAnswer.answerIndex];
+                if(pollAnswer){
+                    return { isAdmin: isAdmin, answer: pollAnswer };
+                }
+            } else {
+                throw new Error('This poll does not exist');
+            }
+        }
+        return { isAdmin: isAdmin, answer: null };
+    }catch(err){
+        throw err;
+    }
+}
 
 export const getAnswersByPollId = async (pollId: string) => {
     try {
         const answerDoc = doc(db, 'answers', pollId);
         const answerDocSnap = await getDoc(answerDoc);
         if (answerDocSnap.exists()) {
-            return answerDocSnap.data();
+            const answerData = answerDocSnap.data();
+            return answerData.answers;
         }
-        return null;
+        return [];
     } catch (err) {
         throw err;
     }

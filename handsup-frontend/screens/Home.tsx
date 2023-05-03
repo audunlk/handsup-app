@@ -91,7 +91,7 @@ export default function Home({ navigation }) {
         </TouchableOpacity>
       </View>
       <FlatList 
-        data={selectedTab === "active" ? renderPolls(activePolls, navigation) : renderPolls(expiredPolls, navigation)}
+        data={selectedTab === "active" ? renderPolls(activePolls, navigation, teams) : renderPolls(expiredPolls, navigation, teams)}
         renderItem={({item}) => item}
         keyExtractor={(item, index) => index.toString()}
         />

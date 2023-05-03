@@ -7,6 +7,10 @@ const styles = StyleSheet.create({
     //to account for 120 height bottom bar
     paddingBottom: 120,
   },
+  fullContainer: {
+    flex: 1,
+    backgroundColor: "#141d26",
+  },
   header: {
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -36,7 +40,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    
   },
   listContainer: {
     flex: 1,
