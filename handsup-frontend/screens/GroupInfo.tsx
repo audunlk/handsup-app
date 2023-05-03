@@ -12,16 +12,17 @@ import Header from "../components/Header";
 import { Ionicons as IonIcons } from "@expo/vector-icons";
 import MainBtn from "../components/MainBtn";
 import styles from "../styles/styles";
-import { getPollsByTeamSerial } from "../services/firebaseRequests";
+import { getMembersById } from "../services/firebaseRequests";
 import ProfilePicture from "../components/ProfilePicture";
-import { handlePickAvatar } from "../utils/handlePickAvatar";
 import { User, RootState } from "../redux/types/types";
 import { useSelector } from "react-redux";
+import Loading from "./Loading";
 
 export default function GroupInfo({ navigation, route }) {
   const { team } = route.params;
   const user: User = useSelector((state: RootState) => state.user);
-  const [polls, setPolls] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [members, setMembers] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
 
@@ -29,8 +30,25 @@ export default function GroupInfo({ navigation, route }) {
     console.log({ team });
     console.log("teams in teams info");
     setIsAdmin(checkAdmin());
-    getPolls();
+    console.log(typeof (team.members))
+    if (team.members) {
+      getMembers();
+    }
+    console.log(members)
   }, [team]);
+
+
+  const getMembers = async () => {
+    try {
+      setIsLoading(true);
+      const members = await getMembersById(team.members);
+      setMembers(members);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const checkAdmin = () => {
     console.log(team.members)
@@ -42,17 +60,6 @@ export default function GroupInfo({ navigation, route }) {
   const copyToClipboard = async () => {
     Clipboard.setStringAsync(team.serialKey);
     Alert.alert(`Copied to clipboard`);
-  };
-
-  const getPolls = async () => {
-    try {
-      const polls = await getPollsByTeamSerial(team.serialKey);
-      console.log(team.serialKey)
-      setPolls(polls);
-      console.log({ polls })
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const redirectToChat = () => {
@@ -90,26 +97,21 @@ export default function GroupInfo({ navigation, route }) {
               </View>
             </View>
           )}
-          <IonIcons name="chatbox-ellipses-outline" size={24} color="white" />
           <MainBtn title="Chat" onPress={redirectToChat} />
         </View>
       </View>
 
-      <View style={styles.listContainer}>
-        <Text style={styles.listTitle}>Active Polls</Text>
-        {polls.map((poll, i) => (
-          <View style={styles.listItem} key={i}>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("PollCard", { poll: poll, team })
-              }
-            >
-              <Text style={styles.mediumText}>{poll.question}</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-
+      {isLoading ? (<Loading />) : (
+        <View style={styles.listContainer}>
+          <Text style={styles.listTitle}>{members.length} Members</Text>
+          {members.map((member) => (
+            <View key={member.id} style={styles.listItem}>
+              <ProfilePicture id={member.id} size={50} type={"user"} allowPress={false} />
+              <Text style={[styles.mediumText, { padding: 10 }]}>{member.firstName}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }

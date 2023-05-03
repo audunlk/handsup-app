@@ -1,5 +1,5 @@
 import {
-    doc, getDoc, setDoc, getDocs, collection, addDoc, query, where,
+    doc, getDoc, setDoc, getDocs, collection, addDoc, query, where, deleteDoc,
     updateDoc, arrayUnion
 } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
@@ -9,9 +9,8 @@ import { FirestoreError } from 'firebase/firestore';
 import { User } from '../redux/types/types';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Message } from '../redux/types/types';
+
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
-
 
 //USER 
 export const createUser = async (email: string, password: string) => {
@@ -58,23 +57,26 @@ export const loginUser = async (email: string, password) => {
 //     catch (err) {
 //         throw err;
 //     }
-    
 // }
 
 
 export const getUserObject = async (uid: string) => {
-    const userDoc = doc(db, 'users', uid);
-    const userDocSnap = await getDoc(userDoc);
-    if (userDocSnap.exists()) {
-        return userDocSnap.data();
+    try{
+        const userDoc = doc(db, 'users', uid);
+        const userDocSnap = await getDoc(userDoc);
+        if (userDocSnap.exists()) {
+            return userDocSnap.data();
+        }
+        return null
+    } catch (err) {
+        throw err;
     }
-    return null
 }
 
 
 export const updateUser = async (userId: string, user: User): Promise<User> => {
-    const userDocRef = doc(db, 'users', userId);
     try {
+        const userDocRef = doc(db, 'users', userId);
         await setDoc(userDocRef, user, { merge: true });
         const updatedUser = { ...user, id: userId };
         console.log({ updatedUser })
@@ -125,6 +127,21 @@ export const insertUserIntoTeam = async (userId: string, teamSerial: string, adm
     }
 }
 
+export const checkUserAdmin = async (userId: string, teamSerial: string) => {
+    const teamDoc = doc(db, 'teams', teamSerial);
+    const teamDocSnap = await getDoc(teamDoc);
+    if (teamDocSnap.exists()) {
+        const teamData = teamDocSnap.data();
+        const members = teamData.members;
+        const user = members.find(member => member.id === userId);
+        if (user) {
+            return user.admin;
+        }
+        return false;
+    } else {
+        throw new Error('This team does not exist');
+    }
+}
 
 export const getTeamsByUserId = async (userId: string) => {
     try {
@@ -156,6 +173,27 @@ export const getTeamBySerialKey = async (serialKey: string) => {
     }
 }
 
+export const getMembersById = async (members: Array<{id: string, admin: boolean}>) => {
+    try {
+      const memberIds = members.map(member => member.id);
+      const querySnapshot = await getDocs(query(collection(db, 'users'), where('id', 'in', memberIds)));
+      const membersData = querySnapshot.docs.map((doc) => {
+        const member = members.find(member => member.id === doc.data().id);
+        return {
+          ...doc.data(),
+          admin: member.admin
+        };
+      });
+      return membersData;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+
+
+
+
 export const checkUserInTeam = async (userId: string, serialKey: string) => {
     try {
         const teamDoc = doc(db, 'teams', serialKey);
@@ -176,13 +214,29 @@ export const checkUserInTeam = async (userId: string, serialKey: string) => {
 //POLLS
 export const createPoll = async (poll: any) => {
     try {
-        const pollDoc = await addDoc(collection(db, 'polls'), poll);
+        const pollDoc = await setDoc(doc(db, 'polls', poll.id), poll);
+        await setDoc(doc(db, 'answers', poll.id), {
+            pollId: poll.id,
+            answers: []
+        }
+        );
         console.log('Poll created successfully');
-        return pollDoc.id;
+        return poll.id;
     } catch (err) {
         throw err;
     }
 }
+
+export const deletePoll = async (pollId: string) => {
+    try {
+        await deleteDoc(doc(db, 'polls', pollId));
+        await deleteDoc(doc(db, 'answers', pollId));
+        console.log('Poll deleted successfully');
+    } catch (err) {
+        throw err;
+    }
+}
+
 
 export const getPollsByTeamSerial = async (serial: string) => {
     try {
@@ -247,84 +301,87 @@ export const getPollsByTeamSerials = async (serials: string[]) => {
     }
 };
 
-// const answerChoiceData = answers.map(answer => ({
-//     answer_choice: answer,
-//     membersAnswered: []
-//   }));
-//   try {
-//     const pollData = {
-//       id: poll.id,
-//       question: poll.question,
-//       created_at: poll.created_at.toISOString(),
-//       respond_by: poll.respond_by.toISOString(),
-//       teamSerial: poll.teamSerial,
-//       teamName: team.name,
-//       answer_choices: answerChoiceData,
-//       anonymous: false,
-//     };
 
-// {"anonymous": false, "answer_choices": [{"answer_choice": "Hohi", "membersAnswered": [Array]}, {"answer_choice": "Hoho", "membersAnswered": [Array]}, {"answer_choice": "Hihi", "membersAnswered": [Array]}], "created_at": "2023-04-28T12:24:41.650Z", "id": "b145e95b-5fd9-4eaa-b32c-01078527f3f6", "question": "Huhi", "respond_by": "2023-04-29T12:24:00.000Z", "teamName": "Inn i mitt hjem", "teamSerial": "E9ObdH"}
-
-export const insertAnswer = async (pollId: string, user: User, answer: string) => {
+//ANSWERS
+//send index of answer to locate in array
+export const addAnswer = async (pollId: string, answerIndex: number, userId: string) => {
     try {
-        const pollDocRef = doc(db, 'polls', pollId);
-        const pollDocSnap = await getDoc(pollDocRef);
-        if (pollDocSnap.exists()) {
-            console.log(pollDocSnap.data());
-        }else{
-            throw new Error('Poll does not exist');
+        console.log(pollId, answerIndex, userId)
+        const answerDoc = doc(db, 'answers', pollId);
+        const answerDocSnap = await getDoc(answerDoc);
+        if (answerDocSnap.exists()) {
+            const answerData = answerDocSnap.data();
+            const answers = answerData.answers;
+            const newAnswers = [...answers, { userId: userId, answerIndex: answerIndex }];
+            await setDoc(answerDoc, { answers: newAnswers }, { merge: true });
+            console.log('Vote added successfully')
+        } else {
+            throw new Error('This poll does not exist');
         }
-    }
-    catch (err) {
-        throw err;
-    }
-}
-
-
-// export const hasUserAnsweredPoll = async (pollId: string, userId: string) => {
-//     try {
-//         const pollQuerySnapshot = await getDocs(
-//             query(collection(db, 'polls'),
-//                 where('id', '==', pollId)));
-//         if (pollQuerySnapshot.empty) {
-//             throw new Error('Poll does not exist');
-//         }
-//         const pollDocRef = doc(db, 'polls', pollQuerySnapshot.docs[0].id);
-//         const pollDocSnap = await getDoc(pollDocRef);
-//         if (pollDocSnap.exists()) {
-//             const membersAnswered = pollDocSnap.data().membersAnswered;
-//             const user = membersAnswered.find(member => member.user.id === userId);
-//             if(user){
-//                 return user.answer;
-//             }
-//             return false;
-//         }
-//         return null;
-//     } catch (err) {
-//         throw err;
-//     }
-// }
-
-export const getAllAnswers = async (pollId: string) => {
-    try {
-        const pollQuerySnapshot = await getDocs(
-            query(collection(db, 'polls'),
-                where('id', '==', pollId)));
-        if (pollQuerySnapshot.empty) {
-            throw new Error('Poll does not exist');
-        }
-        const pollDocRef = doc(db, 'polls', pollQuerySnapshot.docs[0].id);
-        const pollDocSnap = await getDoc(pollDocRef);
-        if (pollDocSnap.exists()) {
-            const membersAnswered = pollDocSnap.data().membersAnswered;
-            return membersAnswered;
-        }
-        return null;
     } catch (err) {
         throw err;
     }
 }
 
+export const checkUserAnswer = async (pollId: string, userId: string) => {
+    try {
+        const answerDoc = doc(db, 'answers', pollId);
+        const answerDocSnap = await getDoc(answerDoc);
+        if (answerDocSnap.exists()) {
+            const answerData = answerDocSnap.data();
+            const answers = answerData.answers;
+            const userAnswer = answers.find(answer => answer.userId === userId);
+            return userAnswer
+        } else {
+            throw new Error('This poll does not exist');
+        }
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getUserPollStatus = async (pollId: string, userId: string, teamSerial: string) => {
+    //check if admin
+    try{
+        const isAdmin = await checkUserAdmin(userId, teamSerial);
+        console.log(isAdmin)
+        console.log("is admin getUserPollStatus")
+        //check if user has voted
+        const userAnswer = await checkUserAnswer(pollId, userId);
+        if(userAnswer){
+            //check the answer from polls with index
+            const pollDoc = doc(db, 'polls', pollId);
+            const pollDocSnap = await getDoc(pollDoc);
+            if (pollDocSnap.exists()) {
+                const pollData = pollDocSnap.data();
+                const pollAnswers = pollData.answers;
+                const pollAnswer = pollAnswers[userAnswer.answerIndex];
+                if(pollAnswer){
+                    return { isAdmin: isAdmin, answer: pollAnswer };
+                }
+            } else {
+                throw new Error('This poll does not exist');
+            }
+        }
+        return { isAdmin: isAdmin, answer: null };
+    }catch(err){
+        throw err;
+    }
+}
+
+export const getAnswersByPollId = async (pollId: string) => {
+    try {
+        const answerDoc = doc(db, 'answers', pollId);
+        const answerDocSnap = await getDoc(answerDoc);
+        if (answerDocSnap.exists()) {
+            const answerData = answerDocSnap.data();
+            return answerData.answers;
+        }
+        return [];
+    } catch (err) {
+        throw err;
+    }
+}
 
 //IMAGE
 export const uploadImageBlob = async (blob: Blob, id: string, type: string, onProgress: (progress: number) => void) => {

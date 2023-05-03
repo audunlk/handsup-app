@@ -1,51 +1,97 @@
 import React, {useEffect, useState} from 'react'
-import {View, Text, Dimensions, StyleSheet, SafeAreaView} from 'react-native'
-import { PieChart } from 'react-native-chart-kit'
+import {View, Text, Dimensions, StyleSheet} from 'react-native'
 import Modal from 'react-native-modal'
+import { getAnswersByPollId, getUserObject } from '../services/firebaseRequests'
+import Loading from '../screens/Loading'
 
 
 
 
-export default function PollResults({poll, isVisible, setIsVisible}) {
-    const [answers, setAnswers] = useState(poll.answer_choices.map((answer: any) => answer) as any)
-    const [votes, setVotes] = useState([])
-    const [totalVotes, setTotalVotes] = useState(poll.answer_choices.map((answer: any) => answer.votes).reduce((a, b) => a + b, 0))
+export default function PollResults({poll, team, isVisible, setIsVisible}) {
+  const [answers, setAnswers] = useState([])
+  const [answerOptions, setAnswerOptions] = useState(poll.answers)
+  const [users, setUsers] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [countMap, setCountMap] = useState({})
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [totalVotes, setTotalVotes] = useState(0)
 
-    useEffect(() => {
-        handleVotesPerAnswerOption()
-        console.log(votes)
-        
-    }, [ poll.membersAnswered])
+  useEffect(() => {
+    setIsLoading(true)
+    getAnswers()
+    setIsLoading(false)
+  }, [poll, team])
 
-    const handleVotesPerAnswerOption = () => {
-        const votesPerAnswer = poll.membersAnswered.reduce((acc: any, curr: any) => {
-            const user = curr.user.firstName
-            const answer = curr.answer
-            if (acc[answer]) {
-                acc[answer].votes += 1
-                acc[answer].voters.push(user)
-            } else {
-                acc[answer] = {
-                    votes: 1,
-                    voters: [user]
-                }
-            }
-            return acc
-        }
-        , {})
-        setVotes(votesPerAnswer)
-
+  useEffect(() => {
+    async function fetchUsers() {
+      setIsLoading(true)
+      try{
+        const userPromises = answers.map((answer) => getUserObject(answer.userId));
+        const users = await Promise.all(userPromises);
+      setUsers(users);
+      }catch(err){
+        setError(err.message)
+      }finally{
+        handleCountVotes()
+        setIsLoading(false)
+      }
     }
+    fetchUsers();
+  }, [answers]);
 
+  const getAnswers = async () => {
+    try{
+      const answers = await getAnswersByPollId(poll.id)
+      setAnswers(answers)
+      console.log(answers)
+      setTotalVotes(answers.length)
+    }
+    catch(err){
+      setError(err.message)
+    }finally{
+      setIsLoading(false)
+    }
+  }
 
+  const handleCountVotes = () =>{
+    const count = Array(answerOptions.length).fill(0);
+    answers.forEach((answer) => {
+      const answerIndex = answer.answerIndex;
+      count[answerIndex]++;
+    });
+    console.log(count)
+    const countMap = count.reduce((acc, curr, idx) => {
+      acc[answerOptions[idx]] = curr;
+      return acc;
+    }, {});
+    console.log(countMap)
+    setCountMap(countMap);
+  }
 
-    
+  const Chart = () => {
+    return (
+      <View style={styles.container}>
+      <Text style={styles.header}>{poll.question}</Text>
+      {Object.entries(countMap).map(([key, value]) => (
+        <View key={key} style={styles.item}>
+          <View style={[styles.bar, { width: (+value / totalVotes) * 100 + '%' }]} />
+          <View style={styles.labels}>
+            <Text style={styles.label}>{key}</Text>
+            <Text style={[styles.percentLabel]}>{((+value / totalVotes) * 100).toFixed(1)}%</Text>
+          </View>
+        </View>
+      ))}
+      <Text style={styles.footer}>{totalVotes} votes</Text>
+    </View>
+    );
+  };
 
+  isLoading && <Loading />
 
   return (
     <Modal
     isVisible={isVisible}
-            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
             animationIn={'zoomIn'}
             backdropOpacity={0.9}
             animationInTiming={500}
@@ -53,55 +99,71 @@ export default function PollResults({poll, isVisible, setIsVisible}) {
             hideModalContentWhileAnimating={true}
             onBackdropPress={() => setIsVisible(null)}
     >
-
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Polling Results</Text>
-      </View>
-      {/* <PieChart
-        data={answers}
-        width={Dimensions.get('window').width / 2}
-        height={220}
-        chartConfig={{
-            backgroundColor: '#fff',
-            backgroundGradientFrom: '#fff',
-            backgroundGradientTo: '#fff',
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-        }}
-        accessor="votes"
-        backgroundColor="transparent"
-        paddingLeft="15"
-        absolute
-        style={styles.chart}
-      /> */}
+      {<Chart />}
+       
     </Modal>
   );
 }
 
-
-
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    header: {
-      backgroundColor: '#fff',
-      height: 60,
-      width: '100%',
-      borderBottomWidth: 0.5,
-      borderBottomColor: '#ccc',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    headerText: {
-      fontSize: 20,
-      fontWeight: 'bold',
-    },
-    chart: {
-      marginTop: 20,
-      borderRadius: 16,
-    },
-  });
+  container: {
+    backgroundColor: '#f5f8fa',
+    padding: 16,
+    borderRadius: 16,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    height: 40,
+  },
+  bar: {
+    height: 30,
+    borderRadius: 10,
+    backgroundColor: '#1da1f2',
+    marginRight: 8,
+  },
+  labels: {
+    position: 'absolute',
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    width: '100%',
+  },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingHorizontal: 8,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    elevation: 2,
+    shadowColor: '#000000',
+    shadowOpacity: 0.1,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#14171a',
+    marginRight: 8,
+  },
+  percentLabel: {
+    fontSize: 16,
+    color: '#657786',
+    alignSelf: 'flex-end',
+  },
+  footer: {
+    fontSize: 16,
+    color: '#657786',
+    textAlign: 'center',
+    marginTop: 16,
+  },
+});
+

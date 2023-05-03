@@ -21,6 +21,7 @@ export default function Teams({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(null);
 
+  
   useEffect(() => {
     setIsLoading(true);
     if(user.id){

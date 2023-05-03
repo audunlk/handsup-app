@@ -25,10 +25,11 @@ export default function Chat({ navigation, route }) {
     const [chatName, setChatName] = useState(route.params.name)
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(true);
-    const [keyboard, setKeyboard] = useState(false);
+    const [keyboard, setKeyboard] = useState(true);
     const [avatar, setAvatar] = useState(null);
 
     useEffect(() => {
+        
         getAvatar();
     }, [user]);
 
@@ -109,7 +110,8 @@ export default function Chat({ navigation, route }) {
 
 
     const handleKeyboard = () => {
-        setKeyboard(true);
+        setKeyboard(!keyboard);
+        console.log(keyboard)
     };
 
     const sortedMessages = messages.sort((a, b) => {
@@ -117,17 +119,17 @@ export default function Chat({ navigation, route }) {
     });
 
     return (
-        <View style={styles.container}>
+        <View style={styles.fullContainer}>
             <Header title={chatName} navigation={navigation} showExit={true} />
-            <View style={[styles.body]}>
+            <View style={[styles.body, keyboard ? {paddingBottom: 40} : {paddingBottom: 0}]}>
                 <GiftedChat
                     messages={sortedMessages}
-                    onInputTextChanged={handleKeyboard}
                     user={{
                         _id: user.id,
                         name: user.username,
                     }}
                     keyboardShouldPersistTaps='handled'
+                    
                     renderUsernameOnMessage={true}
                     alwaysShowSend={true}
                     showUserAvatar={true}
@@ -176,8 +178,13 @@ export default function Chat({ navigation, route }) {
                                 placeholderTextColor={
                                     keyboard ? 'black' : 'grey'
                                 }
+                                onFocus={handleKeyboard}
+                                onBlur={handleKeyboard}
+                                returnKeyType='send'
+                                returnKeyLabel='Send'
                                 value={text}
                                 onChangeText={setText}
+                                onSubmitEditing={sendMessage}
                             />
                             <View style={styles.messageInputButton}>
                                 <TouchableOpacity onPress={sendMessage}>
@@ -187,8 +194,8 @@ export default function Chat({ navigation, route }) {
                         </View>
                     )}
                 />
+                
             </View>
-            <BottomNav navigation={navigation} />
         </View>
     );
 }
