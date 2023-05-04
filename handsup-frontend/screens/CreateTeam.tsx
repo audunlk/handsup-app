@@ -53,15 +53,7 @@ export default function CreateTeam({ isVisible, setIsVisible }) {
       hideModalContentWhileAnimating={true}
       onBackdropPress={() => setIsVisible(null)}
     >
-      <LottieView
-        source={require('../assets/animations/createteam.json')}
-        autoPlay
-        style={{
-          width: 200,
-          height: 200,
-          marginBottom: 20,
-        }}
-      />
+      <Text style={styles.title}>Create Team</Text>
       <TextInput
         placeholder="Enter Team Name"
         value={teamName}

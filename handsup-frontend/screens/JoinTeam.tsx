@@ -8,9 +8,13 @@ import Modal from 'react-native-modal'
 import { RootState, User } from '../redux/types/types'
 import { useSelector } from 'react-redux'
 import LottieView from 'lottie-react-native'
+import { triggerReRender } from '../redux/slices/reRenderSlice'
+import { useDispatch } from 'react-redux'
 
 export default function JoinTeam({ isVisible, setIsVisible }) {
+    const dispatch = useDispatch()
     const user: User = useSelector((state: RootState) => state.user)
+    const reRender = useSelector((state: RootState) => state.reRender)
     const [serialkey, setSerialkey] = useState('')
     const [successful, setSuccessful] = useState(false)
     const [error, setError] = useState('')
@@ -26,18 +30,18 @@ export default function JoinTeam({ isVisible, setIsVisible }) {
 
     const handleJoinTeam = async (serialkey: string) => {
         setIsLoading(true)
-        if(serialkey.trim() === '') {
+        if (serialkey.trim() === '') {
             setError('Please enter a serial key')
             return
-            }
+        }
         try {
             const alreadyMember = await checkUserInTeam(user.id, serialkey)
             console.log(alreadyMember)
             if (!alreadyMember) {
-                    const insertUser = await insertUserIntoTeam(user.id, serialkey, false)
-                    console.log(insertUser)
-                    Alert.alert('Team Joined', 'You have successfully joined the team')
-                    setIsVisible(null)
+                const insertUser = await insertUserIntoTeam(user.id, serialkey, false)
+                console.log(insertUser)
+                Alert.alert('Team Joined', 'You have successfully joined the team')
+                setIsVisible(null)
             } else {
                 setError('Already a member of this team')
                 return
@@ -46,6 +50,7 @@ export default function JoinTeam({ isVisible, setIsVisible }) {
             console.log("pepe")
             setError(error.message)
         } finally {
+            dispatch(triggerReRender(!reRender))
             setLoading(false)
         }
     }
@@ -64,16 +69,7 @@ export default function JoinTeam({ isVisible, setIsVisible }) {
             hideModalContentWhileAnimating={true}
             onBackdropPress={() => setIsVisible(null)}
         >
-            <LottieView
-                source={require('../assets/animations/jointeam.json')}
-                autoPlay
-                style={{
-                    width: 200,
-                    height: 200,
-                    marginBottom: 20
-
-                }}
-            />
+            <Text style={styles.title}>Join Team</Text>
             <TextInput
                 id='serialkey'
                 placeholder='Enter Team Serial Key'

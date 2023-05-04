@@ -1,10 +1,10 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView } from "react-native";
+import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Keyboard } from "react-native";
 import DateSelector from "../components/DateSelector";
 import { User, RootState, Poll } from "../redux/types/types";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
-import { createPoll, createPollChat } from "../services/firebaseRequests";
+import { createPoll, createPollChat, getAllPushTokens } from "../services/firebaseRequests";
 import 'react-native-get-random-values';
 import styles from "../styles/styles";
 import { v4 as uuidv4 } from "uuid";
@@ -13,6 +13,8 @@ import IonIcons from "react-native-vector-icons/Ionicons";
 import { ISOtoReadable } from "../utils/dateConversion";
 import { Picker } from "react-native-wheel-pick";
 import { triggerReRender } from "../redux/slices/reRenderSlice";
+import { schedulePushNotification } from "../services/pushNotifications";
+import Loading from "./Loading";
 
 export default function CreatePoll({ navigation, route }) {
   const dispatch = useDispatch();
@@ -35,7 +37,7 @@ export default function CreatePoll({ navigation, route }) {
   useEffect(() => {
     console.log(team);
   }, [team]);
-  const hasEmptyAnswers =  answers.some(answer => answer.trim() === "");
+  const hasEmptyAnswers = answers.some(answer => answer.trim() === "");
   const canCreatePoll = poll.question.trim() !== "" && !hasEmptyAnswers;
 
   const handleCreatePoll = async () => {
@@ -55,15 +57,16 @@ export default function CreatePoll({ navigation, route }) {
       const pollResponse = await createPoll(pollData)
       await createPollChat(poll.id, user.id);
       console.log(pollResponse);
-      if(pollResponse) {
-      dispatch(triggerReRender(!reRender))
-      navigation.navigate("Home");
+      if (pollResponse) {
+        await handleSendPushNotification();
+        dispatch(triggerReRender(!reRender))
+        navigation.navigate("Home");
       } else {
         setError("Error creating poll");
       }
     } catch (error) {
       setError(error.message);
-    } 
+    }
   };
 
   const handleAddAnswer = () => {
@@ -78,28 +81,54 @@ export default function CreatePoll({ navigation, route }) {
     console.log(answers);
   };
 
+  const handleSendPushNotification = async () => {
+    setIsLoading(true);
+    try {
+      const tokens = await getAllPushTokens(team.serialKey)
+      tokens.forEach(async (token) => {
+        if (!token) {
+          return;
+        }
+        await schedulePushNotification(token, "New Question", poll.question, { seconds: 5 });
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const hideKeyboard = () => {
+    Keyboard.dismiss();
+  }
+
+  isLoading && <Loading />;
+
+
   //make a swiper for each input
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={styles.container}>
       <Header navigation={navigation} title={team.name} showExit={true} />
-      <Swiper style={styles.wrapper} 
-      showsButtons={true} 
-      loop={false} 
-      showsPagination={false} 
-      buttonWrapperStyle={styles.buttonWrapper}
-      nextButton={
-        <IonIcons name="arrow-forward-outline" size={30} color="white" />
-      }
-      prevButton={
-        <IonIcons name="arrow-back-outline" size={30} color="white" />
-      }
+      <Swiper style={[styles.wrapper]}
+        showsButtons={true}
+        loop={false}
+        showsPagination={false}
+        buttonWrapperStyle={styles.buttonWrapper}
+        nextButton={
+          <IonIcons name="arrow-forward-outline" size={30} color="white" style={{ paddingBottom: 50 }} />
+        }
+        prevButton={
+          <IonIcons name="arrow-back-outline" size={30} color="white" style={{ paddingBottom: 50 }} />
+        }
       >
         <View style={styles.slide1}>
           <Text style={styles.mediumText}>Question</Text>
           <TextInput
             placeholder="Question"
             style={styles.input}
-            autoFocus={true}
+
             onChangeText={(text) => setPoll({ ...poll, question: text })}
             value={poll.question}
           />
@@ -124,33 +153,36 @@ export default function CreatePoll({ navigation, route }) {
               Please provide an answer for each choice
             </Text>
           )}
-          <TouchableOpacity style={styles.btn} onPress={handleAddAnswer}>
-            <Text style={styles.mediumText}>Add Answer</Text>
-          </TouchableOpacity>
+          {answers.length < 5 && (
+            <TouchableOpacity style={styles.btn} onPress={handleAddAnswer}>
+              <Text style={styles.mediumText}>Add Answer</Text>
+            </TouchableOpacity>
+          )}
         </View>
         <View style={styles.slide4}>
           <Text style={styles.mediumText}>Question</Text>
-          <Text style={[styles.largeText, {textAlign: "center"}]}>{poll.question}</Text>
-            <Text style={styles.mediumText}>Respond By</Text>
-            <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[0]}</Text>
-            <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[1]}</Text>
-            <Text style={styles.mediumText}>Answers</Text>
-            <Picker
-              style={{ backgroundColor: 'black', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black',}}
-              pickerData={answers}
-              onValueChange={(value) => {
-                console.log(value);
-              }}
-              itemSpace={20}
-              backgroundColor={'#FFFFFF'}
-              itemStyle={{ color: 'white', fontSize: 20 }}
-            >
-            </Picker>
+          <Text style={[styles.largeText, { textAlign: "center" }]}>{poll.question}</Text>
+          <Text style={styles.mediumText}>Respond By</Text>
+          <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[0]}</Text>
+          <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[1]}</Text>
+          <Text style={styles.mediumText}>Answers</Text>
+          <Picker
+            style={{ backgroundColor: 'black', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black', }}
+            pickerData={answers}
+            onValueChange={(value) => {
+              console.log(value);
+            }}
+            itemSpace={20}
+            backgroundColor={'#FFFFFF'}
+            itemStyle={{ color: 'white', fontSize: 20 }}
+          >
+          </Picker>
           <TouchableOpacity
             style={styles.btn}
             onPress={() => handleCreatePoll()}
             disabled={!canCreatePoll}
           >
+            {error && <Text style={{ color: "red" }}>{error}</Text>}
             <Text style={styles.mediumText}>Create Poll</Text>
           </TouchableOpacity>
         </View>
@@ -160,50 +192,3 @@ export default function CreatePoll({ navigation, route }) {
 }
 
 
-
-
-// return (
-//   <View style={styles.container}>
-//     <Header navigation={navigation} title={team.name} showExit={true} />
-//     <ScrollView contentContainerStyle={[styles.scrollBody]}>
-//       <Text style={styles.mediumText}>Question</Text>
-//       <TextInput
-//         placeholder="Question"
-//         style={styles.input}
-//         autoFocus={true}
-//         onChangeText={(text) => setPoll({ ...poll, question: text })}
-//         value={poll.question}
-//       />
-//       <View>
-//         <Text style={styles.mediumText}>Respond By</Text>
-//         <DateSelector setPoll={setPoll} poll={poll} />
-//       </View>
-//       {answers.map((answer, index) => (
-//         <TextInput
-//           key={index}
-//           style={styles.input}
-//           placeholder={`Answer ${index + 1}`}
-//           onChangeText={(text) => handleAnswerTextChange(index, text)}
-//           value={answer}
-//         />
-//       ))}
-//       {hasEmptyAnswers && (
-//         <Text style={{ color: "red", marginBottom: 10 }}>
-//           Please provide an answer for each choice
-//         </Text>
-//       )}
-//       <TouchableOpacity style={styles.btn} onPress={handleAddAnswer}>
-//         <Text style={styles.mediumText}>Add Answer</Text>
-//       </TouchableOpacity>
-//       <TouchableOpacity
-//         style={styles.btn}
-//         onPress={
-//           () => handleCreatePoll()
-//         }
-//         disabled={!canCreatePoll}
-//       >
-//         <Text style={styles.mediumText}>Create Poll</Text>
-//       </TouchableOpacity>
-//     </ScrollView>
-//   </View>
-// );

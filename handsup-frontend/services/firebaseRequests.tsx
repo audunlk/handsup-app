@@ -91,6 +91,31 @@ export const updateUser = async (userId: string, user: User): Promise<User> => {
     }
 };
 
+export const getAllPushTokens = async (teamId: string) => {
+    try {
+        const teamDoc = doc(db, 'teams', teamId);
+        const teamDocSnap = await getDoc(teamDoc);
+        if (teamDocSnap.exists()) {
+            //get all user IDs from members in team
+            const teamData = teamDocSnap.data();
+            const members = teamData.members;
+            //get all users by members ID array
+            const usersCollection = collection(db, 'users');
+            const q = query(usersCollection, where('id', 'in', members.map(member => member.id)));
+            const querySnapshot = await getDocs(q);
+            const users = querySnapshot.docs.map(doc => doc.data());
+            //get all push tokens
+            const pushTokens = users.map(user => user.expoPushToken);
+            return pushTokens;
+        } else {
+            throw new Error('Error getting push tokens');
+        }
+    } catch (err) {
+        throw err;
+    }
+}
+
+
 
 //TEAMS
 export const createTeam = async (teamName: string, serialKey: string) => {
@@ -359,6 +384,7 @@ export const getUserPollStatus = async (pollId: string, userId: string, teamSeri
                 if(pollAnswer){
                     return { isAdmin: isAdmin, answer: pollAnswer };
                 }
+                
             } else {
                 throw new Error('This poll does not exist');
             }

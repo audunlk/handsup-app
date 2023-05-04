@@ -6,6 +6,7 @@ export type User = {
     firstName: string;
     lastName: string;
     username: string;
+    expoPushToken: string;
   };
 
   export type Poll = {

@@ -4,9 +4,6 @@ import Modal from 'react-native-modal'
 import { getAnswersByPollId, getUserObject } from '../services/firebaseRequests'
 import Loading from '../screens/Loading'
 
-
-
-
 export default function PollResults({poll, team, isVisible, setIsVisible}) {
   const [answers, setAnswers] = useState([])
   const [answerOptions, setAnswerOptions] = useState(poll.answers)
@@ -61,8 +58,8 @@ export default function PollResults({poll, team, isVisible, setIsVisible}) {
       count[answerIndex]++;
     });
     console.log(count)
-    const countMap = count.reduce((acc, curr, idx) => {
-      acc[answerOptions[idx]] = curr;
+    const countMap = count.reduce((acc, curr, i) => {
+      acc[answerOptions[i]] = curr;
       return acc;
     }, {});
     console.log(countMap)
@@ -100,7 +97,6 @@ export default function PollResults({poll, team, isVisible, setIsVisible}) {
             onBackdropPress={() => setIsVisible(null)}
     >
       {<Chart />}
-       
     </Modal>
   );
 }

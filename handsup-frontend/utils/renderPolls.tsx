@@ -1,19 +1,21 @@
-import React from "react";
+import React, {useState} from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import styles from "../styles/styles";
 import { ISOtoReadable } from "./dateConversion";
+import date from 'date-and-time';
+
+
 
 export const renderPolls = (polls: any, navigation: any, teams: any) => {
-  const today = new Date().setHours(0, 0, 0, 0);
-
+  const today = new Date()
   return polls.map((poll, i) => {
+    const pollDate = new Date(poll.respond_by);
+
+    const pattern = date.compile('ddd, MMM DD YYYY, HH:mm');
     
+    const respondByDate = date.format(pollDate, pattern);
+    const expiredOrNot = pollDate > today ? true : false
 
-    const [readableDate, readableTime] = ISOtoReadable(poll.respond_by);
-    const respondByDate = new Date(poll.respond_by).setHours(0, 0, 0, 0);
-
-    const respondByText = respondByDate === today ? readableTime : readableDate;
-    const isExpired = respondByDate < today ? "Expired" : "Expires";
     return (
       <View style={styles.listItem} key={poll.id}>
         <TouchableOpacity
@@ -23,7 +25,7 @@ export const renderPolls = (polls: any, navigation: any, teams: any) => {
           <Text style={[styles.listDescription, {color: "#FFA500"}]}>{poll.teamName}</Text>
           <Text style={styles.listTitle}>{poll.question}</Text>
           <Text style={styles.listDescription}>
-            {isExpired}: {respondByText}
+            {expiredOrNot ? `Respond by: ${respondByDate}` : `Expired: ${respondByDate}`}
           </Text>
         </TouchableOpacity>
       </View>
