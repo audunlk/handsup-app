@@ -12,7 +12,7 @@ import Header from "../components/Header";
 import { Ionicons as IonIcons } from "@expo/vector-icons";
 import MainBtn from "../components/MainBtn";
 import styles from "../styles/styles";
-import { getMembersById } from "../services/firebaseRequests";
+import { getAllPushTokens, getMembersById } from "../services/firebaseRequests";
 import ProfilePicture from "../components/ProfilePicture";
 import { User, RootState } from "../redux/types/types";
 import { useSelector } from "react-redux";

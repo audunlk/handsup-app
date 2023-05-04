@@ -52,22 +52,13 @@ export default function ScreenNav() {
         console.log(response);
       }
       );
-  
       return () => {
         Notifications.removeNotificationSubscription(notificationListener.current);
         Notifications.removeNotificationSubscription(responseListener.current);
       }
     }
-    
   }, [user.firstName]);
 
-  useEffect(() => {
-    //test notification with 5 second delay
-    console.log("Sending test notification")
-    
-      const token = AsyncStorage.getItem('pushToken');
-      schedulePushNotification(token, "Test notification", "This is a test notification", {seconds: 3});
-  }, []);
   
   
 

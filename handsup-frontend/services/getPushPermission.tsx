@@ -7,26 +7,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { updateUser } from './firebaseRequests';
 import { User } from '../redux/types/types';
 
-
-// export const updateUser = async (userId: string, user: User): Promise<User> => {
-//   try {
-//       const userDocRef = doc(db, 'users', userId);
-//       await setDoc(userDocRef, user, { merge: true });
-//       const updatedUser = { ...user, id: userId };
-//       console.log({ updatedUser })
-//       return updatedUser;
-//   } catch (error: unknown) {
-//       if (error instanceof FirestoreError) {
-//           console.error('Firestore Error:', error.code, error.message);
-//           throw error;
-//       }
-//       console.error('Unexpected error:', error);
-//       throw new Error('An unexpected error occurred while updating user data.');
-//   }
-// };
-
-
-
 export const getPermission = async (user: User) => {
     if(Device.isDevice){
       const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);

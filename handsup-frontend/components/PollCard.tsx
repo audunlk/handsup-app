@@ -55,6 +55,7 @@ export default function PollCard({ route, navigation }) {
     try {
       await addAnswer(poll.id, answerIndex, user.id);
       setHasAnswered(answers[answerIndex]);
+      dispatch(triggerReRender(!reRender))
     } catch (error) {
       console.log(error)
       setError(error.message);

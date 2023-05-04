@@ -30,18 +30,18 @@ export default function JoinTeam({ isVisible, setIsVisible }) {
 
     const handleJoinTeam = async (serialkey: string) => {
         setIsLoading(true)
-        if(serialkey.trim() === '') {
+        if (serialkey.trim() === '') {
             setError('Please enter a serial key')
             return
-            }
+        }
         try {
             const alreadyMember = await checkUserInTeam(user.id, serialkey)
             console.log(alreadyMember)
             if (!alreadyMember) {
-                    const insertUser = await insertUserIntoTeam(user.id, serialkey, false)
-                    console.log(insertUser)
-                    Alert.alert('Team Joined', 'You have successfully joined the team')
-                    setIsVisible(null)
+                const insertUser = await insertUserIntoTeam(user.id, serialkey, false)
+                console.log(insertUser)
+                Alert.alert('Team Joined', 'You have successfully joined the team')
+                setIsVisible(null)
             } else {
                 setError('Already a member of this team')
                 return
@@ -69,16 +69,7 @@ export default function JoinTeam({ isVisible, setIsVisible }) {
             hideModalContentWhileAnimating={true}
             onBackdropPress={() => setIsVisible(null)}
         >
-            <LottieView
-                source={require('../assets/animations/jointeam.json')}
-                autoPlay
-                style={{
-                    width: 200,
-                    height: 200,
-                    marginBottom: 20
-
-                }}
-            />
+            <Text style={styles.title}>Join Team</Text>
             <TextInput
                 id='serialkey'
                 placeholder='Enter Team Serial Key'
