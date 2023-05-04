@@ -8,9 +8,13 @@ import Modal from 'react-native-modal'
 import { RootState, User } from '../redux/types/types'
 import { useSelector } from 'react-redux'
 import LottieView from 'lottie-react-native'
+import { triggerReRender } from '../redux/slices/reRenderSlice'
+import { useDispatch } from 'react-redux'
 
 export default function JoinTeam({ isVisible, setIsVisible }) {
+    const dispatch = useDispatch()
     const user: User = useSelector((state: RootState) => state.user)
+    const reRender = useSelector((state: RootState) => state.reRender)
     const [serialkey, setSerialkey] = useState('')
     const [successful, setSuccessful] = useState(false)
     const [error, setError] = useState('')
@@ -46,6 +50,7 @@ export default function JoinTeam({ isVisible, setIsVisible }) {
             console.log("pepe")
             setError(error.message)
         } finally {
+            dispatch(triggerReRender(!reRender))
             setLoading(false)
         }
     }

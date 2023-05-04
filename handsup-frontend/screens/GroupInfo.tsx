@@ -74,9 +74,8 @@ export default function GroupInfo({ navigation, route }) {
           <ProfilePicture id={team.serialKey} size={200} type={"team"} allowPress={isAdmin}
           />
           {isAdmin && (
-            <View>
+            <View style={{justifyContent: "center", alignItems: "center"}}>
               <Text style={styles.listTitle}>Invitation Key</Text>
-              <IonIcons name="key-outline" size={24} color="white" />
               <TouchableOpacity
                 style={styles.serialBox}
                 onPress={copyToClipboard}
@@ -97,7 +96,9 @@ export default function GroupInfo({ navigation, route }) {
               </View>
             </View>
           )}
-          <MainBtn title="Chat" onPress={redirectToChat} />
+          <View style={{marginTop: 20}}>
+            <IonIcons name="ios-chatbox-ellipses" size={40} color="white" onPress={redirectToChat}/>
+          </View>
         </View>
       </View>
 

@@ -9,6 +9,7 @@ const initialState: User = {
   firstName: null,
   lastName: null,
   username: null,
+  expoPushToken: null,
 };
 
 const userSlice = createSlice({
@@ -21,6 +22,7 @@ const userSlice = createSlice({
       state.firstName = action.payload.firstName;
       state.lastName = action.payload.lastName;
       state.username = action.payload.username;
+      state.expoPushToken = action.payload.expoPushToken;
     },
     clearUser: (state) => {
       state.id = null;
@@ -28,6 +30,7 @@ const userSlice = createSlice({
       state.firstName = null;
       state.lastName = null;
       state.username = null;
+      state.expoPushToken = null;
     },
   },
 });

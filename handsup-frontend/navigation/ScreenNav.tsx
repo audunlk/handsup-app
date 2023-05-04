@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, User } from "../redux/types/types";
 import { setIsLoading } from "../redux/slices/loadingSlice";
 import { setUser } from "../redux/slices/userSlice";
 import { Alert } from "react-native";
 import * as Notifications from "expo-notifications";
 import jwtDecode from "jwt-decode";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setIsLoggedIn } from "../redux/slices/loggedInSlice";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
+import { getPermission } from '../services/getPushPermission';
+import { schedulePushNotification } from '../services/pushNotifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { User, RootState } from '../redux/types/types';
 
 //Screens
 import Loading from "../screens/Loading";
@@ -27,22 +29,47 @@ export default function ScreenNav() {
   const [token, setToken] = useState<string | null>(null);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
 
-  const getPushNotificationToken = async () => {
-    try{
-      const pushToken = await Notifications.getExpoPushTokenAsync({
-        projectId: "5576dac2-b47c-43fd-aa1e-f72bc44f4d27"
-      });
-      await AsyncStorage.setItem("handsup-push-token", pushToken.data);
-      console.log({ pushToken })
-    }catch(err){
-      console.log("Error getting push token:", err.message);
-    }
-  }
+  const [notifications, setNotifications] = useState(false);
+  const notificationListener: any = useRef();
+  const responseListener: any = useRef();
 
   useEffect(() => {
-    getPushNotificationToken();
-  }, [])
+    if(user.firstName){
+      const getPushPermission = async () => {
+        try {
+            await getPermission(user);
+        } catch (err) {
+          console.log("Error getting push permission:", err.message);
+        }
+      };
+      getPushPermission();
+  
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        setNotifications(!notification);
+      });
+      
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        console.log(response);
+      }
+      );
+  
+      return () => {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
+    }
+    
+  }, [user.firstName]);
 
+  useEffect(() => {
+    //test notification with 5 second delay
+    console.log("Sending test notification")
+    
+      const token = AsyncStorage.getItem('pushToken');
+      schedulePushNotification(token, "Test notification", "This is a test notification", {seconds: 3});
+  }, []);
+  
+  
 
   useEffect(() => {
     dispatch(setIsLoading(true));
