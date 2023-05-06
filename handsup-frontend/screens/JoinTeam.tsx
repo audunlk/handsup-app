@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, Pressable, Alert } from 'react-native'
 import styles from '../styles/styles'
-import { checkUserInTeam, insertUserIntoTeam } from '../services/firebaseRequests'
+import { checkUserInTeam, insertUserIntoTeam } from '../services/teamRequests'
 import Loading from './Loading'
 import { setIsLoading } from '../redux/slices/loadingSlice'
 import Modal from 'react-native-modal'

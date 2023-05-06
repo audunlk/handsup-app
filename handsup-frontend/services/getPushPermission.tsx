@@ -4,7 +4,7 @@ import * as Permissions from 'expo-permissions';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { updateUser } from './firebaseRequests';
+import { updateUser } from './userRequests';
 import { User } from '../redux/types/types';
 
 export const getPermission = async (user: User) => {
@@ -28,15 +28,9 @@ export const getPermission = async (user: User) => {
       await updateUser(user.id, { ...user, expoPushToken: token})
       console.log('token stored in firebase')
       await AsyncStorage.setItem('pushToken', token);
+      return token;
     }
 
-    if(Platform.OS === 'android'){
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
-    }
+    
   }
 

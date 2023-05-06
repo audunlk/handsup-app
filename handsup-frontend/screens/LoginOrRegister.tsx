@@ -12,7 +12,7 @@ import {
     createUser, 
     loginUser, 
     // googleSignInUser 
-} from '../services/firebaseRequests'
+} from '../services/userRequests'
 
 
 export default function LoginOrRegister({ navigation }) {

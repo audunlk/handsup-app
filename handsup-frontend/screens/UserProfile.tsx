@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert, KeyboardAvoidingView } from "react-native";
+import { View, Text, TextInput, Alert, KeyboardAvoidingView } from "react-native";
 import { clearUser } from "../redux/slices/userSlice";
 import { setUser } from "../redux/slices/userSlice";
 import { RootState, User } from "../redux/types/types";
@@ -7,11 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsLoading } from "../redux/slices/loadingSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header";
-import { updateUser } from "../services/firebaseRequests";
+import { updateUser } from "../services/userRequests";
 import ProfilePicture from "../components/ProfilePicture";
 import { checkValidity } from "../utils/regex";
 import styles from "../styles/styles";
 import MainBtn from "../components/MainBtn";
+import { getPermission } from "../services/getPushPermission";
 
 export default function UserProfile({ navigation }) {
   const user: User = useSelector((state: RootState) => state.user);

@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import {View, Text, Dimensions, StyleSheet} from 'react-native'
 import Modal from 'react-native-modal'
-import { getAnswersByPollId, getUserObject } from '../services/firebaseRequests'
+import { getAnswersByPollId } from '../services/answerRequests'
+import { getUserObject } from '../services/userRequests'
 import Loading from '../screens/Loading'
 
 export default function PollResults({poll, team, isVisible, setIsVisible}) {

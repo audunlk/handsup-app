@@ -1,10 +1,12 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
-import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Keyboard } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from "react-native";
 import DateSelector from "../components/DateSelector";
-import { User, RootState, Poll } from "../redux/types/types";
+import { User, RootState } from "../redux/types/types";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
-import { createPoll, createPollChat, getAllPushTokens } from "../services/firebaseRequests";
+import { createPoll } from "../services/pollRequests";
+import { createPollChat } from "../services/chatRequests";
+import { getAllPushTokens } from "../services/userRequests";
 import 'react-native-get-random-values';
 import styles from "../styles/styles";
 import { v4 as uuidv4 } from "uuid";
@@ -23,7 +25,9 @@ export default function CreatePoll({ navigation, route }) {
   const [team, setTeam] = useState(route.params.team);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [canSlide, setCanSlide] = useState(false);
   const [answers, setAnswers] = useState(["", ""]);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [poll, setPoll] = useState({
     id: uuidv4(),
     description: "",
@@ -34,11 +38,31 @@ export default function CreatePoll({ navigation, route }) {
     answer_choices: answers,
   });
 
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   useEffect(() => {
     console.log(team);
   }, [team]);
+
   const hasEmptyAnswers = answers.some(answer => answer.trim() === "");
   const canCreatePoll = poll.question.trim() !== "" && !hasEmptyAnswers;
+  const hasDuplicateAnswers = answers.length !== new Set(answers).size;
+  console.log(hasDuplicateAnswers + "duplicate naswer");
 
   const handleCreatePoll = async () => {
     console.log("creating poll")
@@ -100,6 +124,7 @@ export default function CreatePoll({ navigation, route }) {
 
   const hideKeyboard = () => {
     Keyboard.dismiss();
+
   }
 
   isLoading && <Loading />;
@@ -111,82 +136,102 @@ export default function CreatePoll({ navigation, route }) {
       behavior="padding"
       style={styles.container}>
       <Header navigation={navigation} title={team.name} showExit={true} />
-      <Swiper style={[styles.wrapper]}
-        showsButtons={true}
-        loop={false}
-        showsPagination={false}
-        buttonWrapperStyle={styles.buttonWrapper}
-        nextButton={
-          <IonIcons name="arrow-forward-outline" size={30} color="white" style={{ paddingBottom: 50 }} />
-        }
-        prevButton={
-          <IonIcons name="arrow-back-outline" size={30} color="white" style={{ paddingBottom: 50 }} />
-        }
-      >
-        <View style={styles.slide1}>
-          <Text style={styles.mediumText}>Question</Text>
-          <TextInput
-            placeholder="Question"
-            style={styles.input}
-
-            onChangeText={(text) => setPoll({ ...poll, question: text })}
-            value={poll.question}
-          />
-        </View>
-        <View style={styles.slide2}>
-          <Text style={styles.mediumText}>Respond By</Text>
-          <DateSelector setPoll={setPoll} poll={poll} />
-        </View>
-        <View style={styles.slide3}>
-          <Text style={styles.mediumText}>Answers</Text>
-          {answers.map((answer, index) => (
-            <TextInput
-              key={index}
-              style={styles.input}
-              placeholder={`Answer ${index + 1}`}
-              onChangeText={(text) => handleAnswerTextChange(index, text)}
-              value={answer}
-            />
-          ))}
-          {hasEmptyAnswers && (
-            <Text style={{ color: "red", marginBottom: 10 }}>
-              Please provide an answer for each choice
-            </Text>
-          )}
-          {answers.length < 5 && (
-            <TouchableOpacity style={styles.btn} onPress={handleAddAnswer}>
-              <Text style={styles.mediumText}>Add Answer</Text>
+      <View style={[styles.body, {paddingBottom: 40}]}>
+        <Swiper style={[styles.wrapper]}
+          showsButtons={canSlide}
+          loop={false}
+          showsPagination={false}          
+          onIndexChanged={() => {hideKeyboard()}}
+        >
+          <TouchableWithoutFeedback onPress={hideKeyboard}>
+            <View style={styles.slide1}>
+              <Text style={styles.title}>Question</Text>
+              <Text style={[styles.smallText, {paddingBottom: 20}]}>What would you like to ask?</Text>
+              <TextInput
+                placeholder="Question"
+                style={styles.input}
+                onChangeText={(text) => setPoll({ ...poll, question: text })}
+                value={poll.question}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+          <View style={styles.slide2}>
+            <Text style={styles.title}>When?</Text>
+            <Text style={[styles.smallText, {paddingBottom: 20}]}>When do you need a response?</Text>
+            <DateSelector setPoll={setPoll} poll={poll} />
+          </View>
+          <View style={styles.slide3}>
+            <ScrollView style={{flex: 1}}>
+              <Text style={styles.title}>Answers</Text>
+              <Text style={[styles.smallText, {paddingBottom: 20}]}>What are the possible answers?</Text>
+              {answers.map((answer, index) => (
+                <TextInput
+                  key={index}
+                  style={styles.input}
+                  placeholder={`Answer ${index + 1}`}
+                  onChangeText={(text) => handleAnswerTextChange(index, text)}
+                  value={answer}
+                />
+              ))}
+              {hasEmptyAnswers || hasDuplicateAnswers && (
+                <Text style={{ color: "red", marginBottom: 10 }}>
+                  Please provide an unique answer for each choice
+                </Text>
+              )}
+              {answers.length < 5 && (
+                <TouchableOpacity style={styles.btn} onPress={handleAddAnswer}>
+                  <Text style={styles.mediumText}>Add Answer</Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+          </View>
+          {canCreatePoll ? (
+            <View style={styles.slide4}>
+            <Text style={styles.smallText}>Question</Text>
+            <Text style={[styles.largeText, { textAlign: "center" }]}>{poll.question}</Text>
+            
+            <Picker
+              style={{ backgroundColor: 'black', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black', paddingHorizontal: 20}}
+              pickerData={answers}
+              onValueChange={(value) => {
+                console.log(value);
+              }}
+              itemSpace={20}
+              backgroundColor={'#FFFFFF'}
+              itemStyle={{ color: 'white', fontSize: 20 }}
+            >
+            </Picker>
+            <Text style={styles.smallText}>Answer within</Text>
+            <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[0]}</Text>
+            <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[1]}</Text>
+            
+            <TouchableOpacity
+              style={styles.btn}
+              onPress={() => handleCreatePoll()}
+              disabled={!canCreatePoll}
+            >
+              <Text style={styles.mediumText}>Create Poll</Text>
             </TouchableOpacity>
-          )}
-        </View>
-        <View style={styles.slide4}>
-          <Text style={styles.mediumText}>Question</Text>
-          <Text style={[styles.largeText, { textAlign: "center" }]}>{poll.question}</Text>
-          <Text style={styles.mediumText}>Respond By</Text>
-          <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[0]}</Text>
-          <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[1]}</Text>
-          <Text style={styles.mediumText}>Answers</Text>
-          <Picker
-            style={{ backgroundColor: 'black', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black', }}
-            pickerData={answers}
-            onValueChange={(value) => {
-              console.log(value);
-            }}
-            itemSpace={20}
-            backgroundColor={'#FFFFFF'}
-            itemStyle={{ color: 'white', fontSize: 20 }}
-          >
-          </Picker>
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={() => handleCreatePoll()}
-            disabled={!canCreatePoll}
-          >
-            {error && <Text style={{ color: "red" }}>{error}</Text>}
-            <Text style={styles.mediumText}>Create Poll</Text>
-          </TouchableOpacity>
-        </View>
-      </Swiper>
+          </View>
+            ): (
+              <View style={styles.slide4}>
+                <Text style={styles.mediumText}>Go back and fill out all the fields</Text>
+                <TouchableOpacity
+              style={[styles.btn, {backgroundColor: "grey"}]}
+              onPress={() => handleCreatePoll()}
+              disabled={!canCreatePoll}
+            >
+              <Text style={styles.mediumText}>Create Poll</Text>
+            </TouchableOpacity>
+                </View>
+            )}
+
+          
+        </Swiper>
+        <Text 
+        style={[styles.smallText, {position: "relative", bottom: 0, alignSelf: "center", paddingBottom: 20, color: "white", opacity: 0.5, zIndex: 1}]}
+        >Swipe to continue</Text>
+      </View>
     </KeyboardAvoidingView>
   );
 }

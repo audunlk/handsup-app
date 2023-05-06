@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import Header from "../components/Header";
 import { RootState } from "../redux/types/types";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/styles";
-import { getTeamsByUserId } from "../services/firebaseRequests";
+import { getTeamsByUserId } from "../services/teamRequests";
 import BottomNav from "../navigation/BottomNav";
 import Loading from "./Loading";
 import JoinTeam from "./JoinTeam";
 import CreateTeam from "./CreateTeam";
 import { handleRenderTeams } from "../utils/renderTeams";
+import { RefreshControl } from "react-native-gesture-handler";
+
 
 
 export default function Teams({ navigation }) {
@@ -17,6 +19,7 @@ export default function Teams({ navigation }) {
   const reRender = useSelector((state: RootState) => state.reRender);
   const user = useSelector((state: RootState) => state.user);
   const [renderView, setRenderView] = useState(null); 
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(null);
@@ -30,8 +33,14 @@ export default function Teams({ navigation }) {
     setIsLoading(false);
   }, [user, reRender]);
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    defineTeams();
+    setRefreshing(false);
+  }, [refreshing]);
+
+
   const defineTeams = async () => {
-    setIsLoading(true);
     try {
       const teams = await getTeamsByUserId(user.id);
       const renderView = handleRenderTeams(teams, navigation);
@@ -40,7 +49,6 @@ export default function Teams({ navigation }) {
       console.log(error);
       setError(error);
     }
-    setIsLoading(false);
   };
   
 
@@ -57,7 +65,11 @@ export default function Teams({ navigation }) {
           <Text style={{ color: "white" }}>Create Team</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView>
+      <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          contentContainerStyle={styles.body}>
       <View style={styles.listContainer}>{renderView}</View>
       </ScrollView>
       <BottomNav navigation={navigation} />

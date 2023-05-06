@@ -6,7 +6,8 @@ import { View, TouchableOpacity, TextInput, Text, Alert, Image } from 'react-nat
 import { Bubble, GiftedChat } from 'react-native-gifted-chat';
 import { Ionicons } from '@expo/vector-icons';
 import { db, auth, storage } from '../firebase/firebase';
-import { getChatById, getImage, insertChat } from '../services/firebaseRequests';
+import { getChatById, insertChat } from '../services/chatRequests';
+import { getImage } from '../services/imageRequests';
 import { User } from '../redux/types/types';
 import { useSelector } from 'react-redux';
 import Header from './Header';

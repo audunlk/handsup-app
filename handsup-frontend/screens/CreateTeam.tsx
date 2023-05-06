@@ -7,7 +7,8 @@ import styles from "../styles/styles";
 import Modal from "react-native-modal";
 import LottieView from "lottie-react-native";
 import { triggerReRender } from "../redux/slices/reRenderSlice";
-import { createGroupChat, createTeam, insertUserIntoTeam } from "../services/firebaseRequests";
+import { createTeam, insertUserIntoTeam } from "../services/teamRequests";
+import { createGroupChat } from "../services/chatRequests";
 import Loading from "./Loading";
 
 export default function CreateTeam({ isVisible, setIsVisible }) {

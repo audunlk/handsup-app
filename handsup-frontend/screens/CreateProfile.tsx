@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../redux/types/types';
 import { useDispatch } from 'react-redux';
 import { setIsLoading } from '../redux/slices/loadingSlice';
-import { updateUser } from '../services/firebaseRequests';
+import { updateUser } from '../services/userRequests';
 import { setUser } from '../redux/slices/userSlice';
 import { isValidFirstName, isValidLastName, isValidUsername } from '../utils/regex';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -51,6 +51,7 @@ export default function CreateProfile({ navigation }) {
             firstName,
             lastName,
             username,
+            expoPushToken: null
           }
           try {
             await updateUser(user.id, updatedUser);

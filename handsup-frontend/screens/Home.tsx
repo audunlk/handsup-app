@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   FlatList,
   ScrollView,
   RefreshControl,
@@ -14,9 +13,10 @@ import { Poll, User } from "../redux/types/types";
 import BottomNav from "../navigation/BottomNav";
 import { RootState } from "../redux/types/types";
 import styles from "../styles/styles";
-import { setPolls } from "../redux/slices/pollSlice";
 import { renderPolls } from "../utils/renderPolls";
-import { getPollsByTeamSerials, getTeamsByUserId, getUserObject, getUserPollStatus } from "../services/firebaseRequests";
+import { getPollsByTeamSerials} from "../services/pollRequests";
+import { getUserPollStatus } from "../services/answerRequests";
+import { getTeamsByUserId } from "../services/teamRequests";
 import ProfilePicture from "../components/ProfilePicture";
 import LottieView from "lottie-react-native";
 
@@ -30,7 +30,6 @@ export default function Home({ navigation }) {
   const [teams, setTeams] = useState([]);
   const [polls, setPolls] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-
   const [selectedTab, setSelectedTab] = useState("active");
   const [isContentLoaded, setIsContentLoaded] = useState(false);
 
