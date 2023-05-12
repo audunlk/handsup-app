@@ -56,9 +56,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 10,
     borderWidth: 2,
-    alignItems: "center",
-    width: "100%",
-    justifyContent: "center",
+    width: 200,
   },
   inputError:{
     backgroundColor: "white",

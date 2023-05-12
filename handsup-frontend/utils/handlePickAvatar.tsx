@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { uploadImageBlob } from '../services/firebaseRequests';
+import { uploadImageBlob } from '../services/imageRequests';
 
 export const handlePickAvatar = async (id: string, type: string, onProgress: (progress: number) => void): Promise<void> => {
     try {

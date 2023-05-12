@@ -1,22 +1,15 @@
-//chat screen for the application using FCM and realtime database
-//gifted chat
-
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, TextInput, Text, Alert, Image } from 'react-native';
 import { Bubble, GiftedChat } from 'react-native-gifted-chat';
-import { Ionicons } from '@expo/vector-icons';
-import { db, auth, storage } from '../firebase/firebase';
 import { getChatById, insertChat } from '../services/chatRequests';
 import { getImage } from '../services/imageRequests';
 import { User } from '../redux/types/types';
 import { useSelector } from 'react-redux';
 import Header from './Header';
 import styles from '../styles/styles';
-import BottomNav from '../navigation/BottomNav';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from "uuid";
 import ProfilePicture from './ProfilePicture';
-import { ref, getDownloadURL } from 'firebase/storage';
 
 
 export default function Chat({ navigation, route }) {
@@ -30,7 +23,6 @@ export default function Chat({ navigation, route }) {
     const [avatar, setAvatar] = useState(null);
 
     useEffect(() => {
-        
         getAvatar();
     }, [user]);
 

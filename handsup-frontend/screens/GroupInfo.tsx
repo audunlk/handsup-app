@@ -76,7 +76,7 @@ export default function GroupInfo({ navigation, route }) {
           />
           {isAdmin && (
             <View style={{justifyContent: "center", alignItems: "center"}}>
-              <Text style={styles.listTitle}>Invitation Key</Text>
+              <Text style={[styles.listTitle, {paddingTop: 20}]}>Invitation Key</Text>
               <TouchableOpacity
                 style={styles.serialBox}
                 onPress={copyToClipboard}

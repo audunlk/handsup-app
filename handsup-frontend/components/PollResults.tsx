@@ -5,7 +5,7 @@ import { getAnswersByPollId } from '../services/answerRequests'
 import { getUserObject } from '../services/userRequests'
 import Loading from '../screens/Loading'
 
-export default function PollResults({poll, team, isVisible, setIsVisible}) {
+export default function PollResults({poll, team, isVisible, setIsVisible, hasAnswered}) {
   const [answers, setAnswers] = useState([])
   const [answerOptions, setAnswerOptions] = useState(poll.answers)
   const [users, setUsers] = useState([])
@@ -71,6 +71,7 @@ export default function PollResults({poll, team, isVisible, setIsVisible}) {
     return (
       <View style={styles.container}>
       <Text style={styles.header}>{poll.question}</Text>
+      <Text>You answered: {hasAnswered}</Text>
       {Object.entries(countMap).map(([key, value]) => (
         <View key={key} style={styles.item}>
           <View style={[styles.bar, { width: (+value / totalVotes) * 100 + '%' }]} />

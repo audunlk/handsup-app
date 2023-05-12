@@ -1,11 +1,12 @@
-import {
-    doc, getDoc, setDoc, getDocs, collection, query, where
-} from 'firebase/firestore';
+
+import { setDoc, doc, collection, getDocs, getDoc, deleteDoc, query, where } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../firebase/firebase';
 import { FirestoreError } from 'firebase/firestore';
 import { User } from '../redux/types/types';
+import { getDatabase, ref, set, get } from "firebase/database";
+
 
 
 
@@ -108,8 +109,96 @@ export const getAllPushTokens = async (teamId: string) => {
             throw new Error('Error getting push tokens');
         }
     } catch (err) {
-
-
         throw err;
     }
 }
+
+
+// export const createUser = async (email: string, password: string) => {
+//     const db = getDatabase();
+//     try {
+//       await createUserWithEmailAndPassword(auth, email, password);
+//       console.log('User registered successfully');
+//       console.log(auth.currentUser)
+//       const { uid } = auth.currentUser;
+//       const userRef = ref(db, 'users/' + uid);
+//       await set(userRef, {
+//           id: uid,
+//           email: email,
+//           firstName: null,
+//           lastName: null,
+//           username: null,
+//           expoPushToken: null,
+//       });
+//       console.log('User doc created successfully');
+//       const accessToken = await auth.currentUser.getIdToken();
+//       await AsyncStorage.setItem('handsup-token', accessToken);
+//     } catch (error) {
+//       throw error;
+//     }
+//   };
+
+
+//   export const loginUser = async (email: string, password) => {
+//     try {
+//       await signInWithEmailAndPassword(auth, email, password);
+//       const accessToken = await auth.currentUser.getIdToken();
+//       await AsyncStorage.setItem('handsup-token', accessToken);
+//     } catch (err) {
+//       throw err;
+//     }
+//   };
+
+
+//   export const getUserObject = async (uid: string) => {
+//     const db = getDatabase();
+//     try {
+//       const userRef = ref(db, 'users/' + uid);
+//       const userSnapshot = await get(userRef);
+//       if (userSnapshot.exists()) {
+//         return userSnapshot.val();
+//       }
+//       return null
+//     } catch (err) {
+//       throw err;
+//     }
+//   };
+
+
+//   export const updateUser = async (userId: string, user: User): Promise<User> => {
+//     const db = getDatabase();
+//     try {
+//       const userRef = ref(db, 'users/' + userId);
+//       await set(userRef, user);
+//       const updatedUser = { ...user, id: userId };
+//       console.log({ updatedUser })
+//       return updatedUser;
+//     } catch (error) {
+//       console.error('Unexpected error:', error);
+//       throw new Error('An unexpected error occurred while updating user data.');
+//     }
+//   };
+
+//   export const getAllPushTokens = async (teamId: string) => {
+//     const db = getDatabase();
+//     try {
+//       const teamRef = ref(db, 'teams/' + teamId);
+//       const teamSnapshot = await get(teamRef);
+//       if (teamSnapshot.exists()) {
+//         //get all user IDs from members in team
+//         const teamData = teamSnapshot.val();
+//         const members = teamData.members;
+//         //get all users by members ID array
+//         const usersRef = ref(db, 'users/');
+//         const usersSnapshot = await get(usersRef);
+//         const users = Object.values(usersSnapshot.val()) as User[];
+//         //get all push tokens
+//         const pushTokens = users.map(user => user.expoPushToken);
+//         return pushTokens;
+//         } else {
+//             throw new Error('Error getting push tokens');
+//             }
+//         } catch (err) {
+//             throw err;
+//         }
+//     }

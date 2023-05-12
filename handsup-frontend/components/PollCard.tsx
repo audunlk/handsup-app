@@ -33,7 +33,7 @@ export default function PollCard({ route, navigation }) {
   const user: User = useSelector((state: RootState) => state.user);
   const reRender = useSelector((state: RootState) => state.reRender);
 
-  
+
   useEffect(() => {
     console.log(team)
     setIsLoading(true);
@@ -100,7 +100,7 @@ export default function PollCard({ route, navigation }) {
     );
   };
 
-  if(isLoading) return <Loading />
+  if (isLoading) return <Loading />
 
   return (
     <View style={styles.container}>
@@ -115,10 +115,13 @@ export default function PollCard({ route, navigation }) {
         <Text style={styles.smallText}>{respondBy[1]}</Text>
         <Text style={styles.smallText}>{poll.group_id}</Text>
         {hasAnswered ? (
-          <Text style={styles.smallText}>Your answer: {hasAnswered}</Text>
+          <View>
+            <TouchableOpacity style={styles.btn}>
+              <Text style={styles.smallText} onPress={() => setIsVisible(true)}>See Results</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
-          <View
-          >
+          <View>
             <Picker
               style={{ backgroundColor: 'black', width: 300, height: 215, borderRadius: 10, borderWidth: 1, borderColor: 'black', }}
               selectedValue={selectedAnswer}
@@ -128,15 +131,11 @@ export default function PollCard({ route, navigation }) {
               itemStyle={{ color: "white", fontSize: 20, fontWeight: "bold", textAlign: "center", }}
             >
             </Picker>
-            <TouchableOpacity style={styles.btn}>
-              <Text style={styles.smallText} onPress={() => handleSubmitAnswer(selectedAnswer)}>Submit</Text>
+            <TouchableOpacity style={styles.btn} onPress={() => handleSubmitAnswer(selectedAnswer)}>
+              <Text style={styles.smallText}>Submit</Text>
             </TouchableOpacity>
           </View>
-
         )}
-        <TouchableOpacity style={styles.btn}>
-          <Text style={styles.smallText} onPress={() => setIsVisible(true)}>See Results</Text>
-        </TouchableOpacity>
         <MainBtn title="Chat" onPress={redirectToChat} />
         {isAdmin && (
           <IonIcons
@@ -147,7 +146,7 @@ export default function PollCard({ route, navigation }) {
           />
         )}
         {isVisible === true && (
-          <PollResults poll={poll} team={team} isVisible={isVisible} setIsVisible={setIsVisible} />
+          <PollResults poll={poll} team={team} isVisible={isVisible} setIsVisible={setIsVisible} hasAnswered={hasAnswered}/>
         )
         }
       </View>
