@@ -4,7 +4,7 @@ import styles from "../styles/styles";
 const MainBtn = ({ title = "Button", onPress = () => null }) => {
   return (
     <TouchableOpacity style={styles.btn} onPress={onPress}>
-      <Text style={{ color: "white" }}>{title}</Text>
+      <Text style={{ color: "#141d26" }}>{title}</Text>
     </TouchableOpacity>
   );
 };

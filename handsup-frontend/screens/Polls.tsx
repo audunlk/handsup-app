@@ -11,14 +11,11 @@ import { getPollsByTeamSerials } from '../services/pollRequests';
 import { getTeamsByUserId } from '../services/teamRequests';
 import { setPolls } from '../redux/slices/pollSlice';
 import { User } from '../redux/types/types';
-import { Ionicons } from '@expo/vector-icons';
 import Header from '../components/Header';
-
-
 
 export default function Polls({ navigation }) {
     const user: User = useSelector((state: RootState) => state.user);
-    const polls = useSelector((state: RootState) => state.polls);
+    const polls: Poll[] = useSelector((state: RootState) => state.polls);
     const reRender = useSelector((state: RootState) => state.reRender);
     const dispatch = useDispatch();
     const [error, setError] = useState("");
@@ -26,16 +23,7 @@ export default function Polls({ navigation }) {
     const [selectedTab, setSelectedTab] = useState("active");
     const [isContentLoaded, setIsContentLoaded] = useState(false);
 
-    const getPolls = async () => {
-        try {
-            const polls = await getPollsByTeamSerials(teams.map(team => team.serialKey));
-            dispatch(setPolls(polls));
-            setIsContentLoaded(true);
-        } catch (error) {
-            console.log(error);
-            setError(error);
-        }
-    };
+    
 
     const getTeams = async () => {
         try {
@@ -49,7 +37,6 @@ export default function Polls({ navigation }) {
 
     useEffect(() => {
         getTeams();
-        getPolls();
         console.log(reRender)
     }, [dispatch, user, navigation, isContentLoaded, reRender]);
 

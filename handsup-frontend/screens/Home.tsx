@@ -19,33 +19,44 @@ import { getUserPollStatus } from "../services/answerRequests";
 import { getTeamsByUserId } from "../services/teamRequests";
 import ProfilePicture from "../components/ProfilePicture";
 import LottieView from "lottie-react-native";
+import { setPolls } from "../redux/slices/pollSlice";
 
 
 export default function Home({ navigation }) {
   const user: User = useSelector((state: RootState) => state.user);
-  //const polls = useSelector((state: RootState) => state.polls);
+  const polls: Poll[] = useSelector((state: RootState) => state.polls);
   const reRender = useSelector((state: RootState) => state.reRender);
   const dispatch = useDispatch();
   const [error, setError] = useState("");
   const [teams, setTeams] = useState([]);
-  const [polls, setPolls] = useState([]);
+  const [unansweredPolls, setUnansweredPolls] = useState([]); // polls that have not been answered by the user
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTab, setSelectedTab] = useState("active");
   const [isContentLoaded, setIsContentLoaded] = useState(false);
 
+  const getPolls = async () => {
+    try {
+      const newPolls = await getPollsByTeamSerials(teams.map(team => team.serialKey));
+      dispatch(setPolls(newPolls));
+    } catch (error) {
+      console.log(error);
+      setError(error);
+    }
+  };
+
   const getUnansweredPolls = async () => {
     try {
-      const polls = await getPollsByTeamSerials(teams.map(team => team.serialKey));
       const pollStatusPromises = polls.map(poll => getUserPollStatus(poll.id, user.id, poll.teamSerial));
       const pollStatuses = await Promise.all(pollStatusPromises);
       const unansweredPolls = polls.filter((poll, index) => !pollStatuses[index].answer);
-      setPolls(unansweredPolls);
+      setUnansweredPolls(unansweredPolls);
       setIsContentLoaded(true);
     } catch (error) {
       console.log(error);
       setError(error);
     }
   };
+
 
   const getTeams = async () => {
     try {
@@ -60,9 +71,19 @@ export default function Home({ navigation }) {
   useEffect(() => {
     console.log("use effect ran");
     getTeams();
-    getUnansweredPolls();
-    console.log(reRender)
-  }, [dispatch, user, navigation, isContentLoaded, reRender]);
+  }, [user, reRender]);
+  
+  useEffect(() => {
+    if (teams.length > 0) {
+      getPolls();
+    }
+  }, [teams]);
+
+  useEffect(() => {
+    if (polls.length > 0) {
+      getUnansweredPolls();
+    }
+  }, [polls]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -73,7 +94,7 @@ export default function Home({ navigation }) {
 
 
   const now = new Date();
-  const activePolls = polls
+  const activePolls = unansweredPolls
     .filter((poll) => new Date(poll.respond_by) > now)
     .sort((a, b) => new Date(a.respond_by).getTime() - new Date(b.respond_by).getTime());
 
@@ -84,7 +105,9 @@ export default function Home({ navigation }) {
         <View style={{ flexDirection: "row" }}>
           <ProfilePicture id={user.id} size={50} type={"user"} allowPress={false} />
           <View style={{ paddingLeft: 10 }}>
-            <Text style={styles.title}>{user.firstName}</Text>
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+            {user.firstName}
+          </Text>
             <Text style={styles.smallText}>@{user.username}</Text>
           </View>
         </View>

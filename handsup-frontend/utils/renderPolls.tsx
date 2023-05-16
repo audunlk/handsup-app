@@ -23,7 +23,7 @@ export const renderPolls = (polls: any, navigation: any, teams: any) => {
           onPress={() => navigation.navigate("PollCard", { poll: poll, team: teams.find((team:any) =>team.serialKey === poll.teamSerial)})}
         >
           <Text style={[styles.listDescription, {color: "#FFA500"}]}>{poll.teamName}</Text>
-          <Text style={styles.listTitle}>{poll.question}</Text>
+          <Text style={[styles.mediumText, {marginLeft: 10}]}>{poll.question}</Text>
           <Text style={styles.listDescription}>
             {expiredOrNot ? `Respond by: ${respondByDate}` : `Expired: ${respondByDate}`}
           </Text>

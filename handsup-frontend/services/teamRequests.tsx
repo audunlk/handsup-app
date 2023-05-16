@@ -56,16 +56,20 @@ export const checkUserAdmin = async (userId: string, teamSerial: string) => {
     }
 }
 
+
+
 export const getTeamsByUserId = async (userId: string) => {
     try {
         const teams = [];
         const querySnapshot = await getDocs(collection(db, 'teams'));
         querySnapshot.forEach((doc) => {
             const members = doc.data().members;
-            const user = members.find(member => member.id === userId);
-            if (user) {
-                teams.push(doc.data());
-            }
+            if (Array.isArray(members)) {
+                const user = members.find(member => member.id === userId);
+                if (user) {
+                  teams.push(doc.data());
+                }
+              }
         });
         return teams;
     } catch (err) {
@@ -138,10 +142,18 @@ export const leaveGroup = async (userId: string, serialKey: string) => {
 }
 
 export const deleteTeam = async (serialKey: string) => {
+    console.log(serialKey)
     try {
-        await deleteDoc(doc(db, 'teams', serialKey));
         await deleteDoc(doc(db, 'chat', serialKey))
         await deleteImage(serialKey, 'teams')
+        const pollRef = collection(db, 'polls');
+        const pollQuery = query(pollRef, where('teamSerial', '==', serialKey));
+        const pollQuerySnapshot = await getDocs(pollQuery);
+        pollQuerySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+            await deleteImage(doc.id, 'polls')
+        });
+        await deleteDoc(doc(db, 'teams', serialKey));
     } catch (err) {
         throw err;
     }

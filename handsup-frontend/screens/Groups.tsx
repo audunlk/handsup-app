@@ -26,11 +26,9 @@ export default function Teams({ navigation }) {
 
   
   useEffect(() => {
-    setIsLoading(true);
     if(user.id){
       defineTeams();
     }
-    setIsLoading(false);
   }, [user, reRender]);
 
   const onRefresh = useCallback(() => {
@@ -41,6 +39,7 @@ export default function Teams({ navigation }) {
 
 
   const defineTeams = async () => {
+    setIsLoading(true);
     try {
       const teams = await getTeamsByUserId(user.id);
       const renderView = handleRenderTeams(teams, navigation);
@@ -48,6 +47,8 @@ export default function Teams({ navigation }) {
     } catch (error) {
       console.log(error);
       setError(error);
+    }finally{
+      setIsLoading(false);
     }
   };
   
@@ -58,10 +59,10 @@ export default function Teams({ navigation }) {
     <View style={styles.container}>
       <Header navigation={navigation} title={"Your teams"} showExit={true} />
       <View style={styles.tabs}>
-        <TouchableOpacity onPress={() => setIsVisible("join")}>
+        <TouchableOpacity onPress={() => setIsVisible("join")} >
           <Text style={{ color: "white" }}>Join Team</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setIsVisible("create")}>
+        <TouchableOpacity onPress={() => setIsVisible("create")} >
           <Text style={{ color: "white" }}>Create Team</Text>
         </TouchableOpacity>
       </View>

@@ -9,12 +9,26 @@ export type User = {
     expoPushToken: string;
   };
 
+  export type Member = {
+    id: string;
+    admin: boolean;
+  }
+
+  export type Team = {
+    name: string;
+    members: Member[];
+    serialKey: string;    
+  }
+
   export type Poll = {
     question: string;
-    teamId: string;
+    teamSerial: string;
     created_at: string;
     respond_by: string;
-    multiple_choice: boolean;
+    teamName: string;
+    id: string;
+    answers: string[];
+    anonymous: boolean;
   };
 
   export interface Message {

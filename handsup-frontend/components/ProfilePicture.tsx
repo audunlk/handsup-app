@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { triggerReRender } from "../redux/slices/reRenderSlice";
 import { RootState } from "../redux/types/types";
 import { LogBox } from 'react-native'
-import CachedImage from 'expo-cached-image'
+import CachedImage from 'react-native-expo-cached-image'
 import Loading from '../screens/Loading'
 
 
@@ -102,8 +102,6 @@ export default function ProfilePicture({ id, size, type, allowPress }) {
           <CachedImage
             style={{ width: size, height: size, borderRadius: size / 2 }}
             source={{ uri: imageURL }}
-            cacheKey={`${id}-${type}`}
-            resizeMode="cover"
             
           />
         </TouchableOpacity>

@@ -17,6 +17,9 @@ import { triggerReRender } from "../redux/slices/reRenderSlice";
 
 
 export default function PollCard({ route, navigation }) {
+  const user: User = useSelector((state: RootState) => state.user);
+  const reRender = useSelector((state: RootState) => state.reRender);
+
   const { poll } = route.params;
   const { team } = route.params;
   const dispatch = useDispatch();
@@ -30,18 +33,16 @@ export default function PollCard({ route, navigation }) {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(0);
 
-  const user: User = useSelector((state: RootState) => state.user);
-  const reRender = useSelector((state: RootState) => state.reRender);
 
 
   useEffect(() => {
     console.log(team)
-    setIsLoading(true);
     handleCheckAnswer();
-    setIsLoading(false);
   }, [poll, user, hasAnswered, reRender, team]);
 
   const handleCheckAnswer = async () => {
+    setIsLoading(true);
+
     try {
       const status = await getUserPollStatus(poll.id, user.id, poll.teamSerial);
       console.log({ status })
@@ -49,6 +50,8 @@ export default function PollCard({ route, navigation }) {
       setIsAdmin(status.isAdmin)
     } catch (err) {
       setError(err.message);
+    }finally{
+      setIsLoading(false);
     }
   }
 
@@ -138,14 +141,12 @@ export default function PollCard({ route, navigation }) {
         )}
         <MainBtn title="Chat" onPress={redirectToChat} />
         {isAdmin && (
-          <IonIcons
-            name="trash"
-            size={30}
-            color="red"
-            onPress={deleteAlert}
+          <MainBtn 
+          title="Delete Poll"
+          onPress={deleteAlert}
           />
         )}
-        {isVisible === true && (
+        {isVisible && (
           <PollResults poll={poll} team={team} isVisible={isVisible} setIsVisible={setIsVisible} hasAnswered={hasAnswered}/>
         )
         }

@@ -1,10 +1,9 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#141d26",
-    //to account for 120 height bottom bar
     paddingBottom: 120,
   },
   fullContainer: {
@@ -22,6 +21,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 30,
     fontWeight: "bold",
+    maxWidth: Dimensions.get("screen").width -150,
   },
   tabs: {
     justifyContent: "space-between",
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 20,
     color: "white",
-    alignItems: "center",
+    alignItems: "flex-start",
     flexDirection: "column",
   },
   input: {
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   listItem: {
     width: "100%",
     height: 100,
-    
+    maxWidth: Dimensions.get("screen").width - 100,
     padding: 10,
     flexDirection: "row",
     alignItems: "center",
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginLeft: 10,
+    alignSelf: "center",
   },
   listDescription: {
     color: "white",

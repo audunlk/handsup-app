@@ -13,7 +13,7 @@ import { Ionicons as IonIcons } from "@expo/vector-icons";
 import MainBtn from "../components/MainBtn";
 import styles from "../styles/styles";
 import { getAllPushTokens } from "../services/userRequests";
-import { getMembersById } from "../services/teamRequests";
+import { deleteTeam, getMembersById } from "../services/teamRequests";
 import ProfilePicture from "../components/ProfilePicture";
 import { User, RootState } from "../redux/types/types";
 import { useSelector } from "react-redux";
@@ -58,6 +58,31 @@ export default function GroupInfo({ navigation, route }) {
     return isAdmin
   };
 
+  const handleDeleteTeam = async () => {
+    Alert.alert(
+      "Delete team",
+      "Are you sure you want to delete this team?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Delete", onPress: async () => 
+          {
+            try {
+              const response = await deleteTeam(team.serialKey);
+              navigation.navigate("Groups");
+            } catch (error) {
+              console.log(error);
+            }
+          }
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   const copyToClipboard = async () => {
     Clipboard.setStringAsync(team.serialKey);
     Alert.alert(`Copied to clipboard`);
@@ -94,6 +119,10 @@ export default function GroupInfo({ navigation, route }) {
                   title="Create poll"
                   onPress={() => navigation.navigate("CreatePoll", { team })}
                 />
+                <MainBtn
+                  title="Delete team"
+                  onPress={() => handleDeleteTeam()}
+                />
               </View>
             </View>
           )}
@@ -108,8 +137,8 @@ export default function GroupInfo({ navigation, route }) {
           <Text style={styles.listTitle}>{members.length} Members</Text>
           {members.map((member) => (
             <View key={member.id} style={styles.listItem}>
-              <ProfilePicture id={member.id} size={50} type={"user"} allowPress={false} />
-              <Text style={[styles.mediumText, { padding: 10 }]}>{member.firstName}</Text>
+              <ProfilePicture id={member.id} size={50} type={"user"} allowPress={false}  />
+              <Text style={[styles.mediumText, { padding: 10 }]} numberOfLines={1} ellipsizeMode="tail">{member.firstName}</Text>
             </View>
           ))}
         </View>

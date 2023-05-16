@@ -32,7 +32,6 @@ export default function CreatePoll({ navigation, route }) {
   const [hasDuplicateAnswers, setHasDuplicateAnswers] = useState(false);
   const [poll, setPoll] = useState({
     id: uuidv4(),
-    description: "",
     created_at: new Date(),
     respond_by: new Date(new Date().toUTCString()),
     question: "",

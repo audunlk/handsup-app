@@ -2,13 +2,14 @@ import {
     doc, getDoc, setDoc, getDocs, collection, deleteDoc
 } from 'firebase/firestore';
 import {  db } from '../firebase/firebase';
+import { Member, Poll } from '../redux/types/types';
 
 
 
 //POLLS
-export const createPoll = async (poll: any) => {
+export const createPoll = async (poll: Poll) => {
     try {
-        const pollDoc = await setDoc(doc(db, 'polls', poll.id), poll);
+        await setDoc(doc(db, 'polls', poll.id), poll);
         await setDoc(doc(db, 'answers', poll.id), {
             pollId: poll.id,
             answers: []
@@ -51,13 +52,13 @@ export const getPollsByTeamSerial = async (serial: string) => {
 
 export const getPollsByUserId = async (userId: string) => {
     try {
-        const polls = [];
+        const polls: Poll[] = [];
         const querySnapshot = await getDocs(collection(db, 'polls'));
         querySnapshot.forEach((doc) => {
-            const members = doc.data().members;
+            const members = doc.data().members as Member[];
             const user = members.find(member => member.id === userId);
             if (user) {
-                polls.push(doc.data());
+                polls.push(doc.data() as Poll);
             }
         });
         return polls;
@@ -82,11 +83,11 @@ export const getPollById = async (pollId: string) => {
 
 export const getPollsByTeamSerials = async (serials: string[]) => {
     try {
-        const polls = [];
+        const polls: Poll[] = [];
         const querySnapshot = await getDocs(collection(db, 'polls'));
         querySnapshot.forEach((doc) => {
             if (serials.includes(doc.data().teamSerial)) {
-                polls.push(doc.data());
+                polls.push(doc.data() as Poll);
             }
         });
         return polls;
