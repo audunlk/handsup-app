@@ -158,3 +158,25 @@ export const deleteTeam = async (serialKey: string) => {
         throw err;
     }
 }
+
+export const makeAdmin = async (userId: string, serialKey: string) => {
+    try {
+        const teamDoc = doc(db, 'teams', serialKey);
+        const teamDocSnap = await getDoc(teamDoc);
+        if (teamDocSnap.exists()) {
+            const teamData = teamDocSnap.data();
+            const members = teamData.members;
+            const newMembers = members.map(member => {
+                if (member.id === userId) {
+                    return { ...member, admin: true };
+                }
+                return member;
+            });
+            await setDoc(teamDoc, { members: newMembers }, { merge: true });
+        } else {
+            throw new Error('This team does not exist');
+        }
+    } catch (err) {
+        throw err;
+    }
+}

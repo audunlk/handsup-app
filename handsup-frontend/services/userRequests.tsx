@@ -104,6 +104,7 @@ export const getAllPushTokens = async (teamId: string) => {
             const users = querySnapshot.docs.map(doc => doc.data());
             //get all push tokens
             const pushTokens = users.map(user => user.expoPushToken);
+            console.log({ pushTokens })
             return pushTokens;
         } else {
             throw new Error('Error getting push tokens');

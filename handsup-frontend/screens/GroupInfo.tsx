@@ -12,8 +12,7 @@ import Header from "../components/Header";
 import { Ionicons as IonIcons } from "@expo/vector-icons";
 import MainBtn from "../components/MainBtn";
 import styles from "../styles/styles";
-import { getAllPushTokens } from "../services/userRequests";
-import { deleteTeam, getMembersById } from "../services/teamRequests";
+import { deleteTeam, getMembersById, leaveGroup, makeAdmin } from "../services/teamRequests";
 import ProfilePicture from "../components/ProfilePicture";
 import { User, RootState } from "../redux/types/types";
 import { useSelector } from "react-redux";
@@ -32,14 +31,10 @@ export default function GroupInfo({ navigation, route }) {
 
 
   useEffect(() => {
-    console.log({ team });
-    console.log("teams in teams info");
     setIsAdmin(checkAdmin());
-    console.log(typeof (team.members))
     if (team.members) {
       getMembers();
     }
-    console.log(members)
   }, [team]);
 
 
@@ -62,6 +57,11 @@ export default function GroupInfo({ navigation, route }) {
     return isAdmin
   };
 
+  const checkMemberAuth = (memberId: string) => {
+    const isAdmin = team.members.find((member) => memberId === member.id).admin;
+    return isAdmin 
+  };
+
   const handleDeleteTeam = async () => {
     Alert.alert(
       "Delete team",
@@ -72,8 +72,8 @@ export default function GroupInfo({ navigation, route }) {
           onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
-        { text: "Delete", onPress: async () => 
-          {
+        {
+          text: "Delete", onPress: async () => {
             try {
               const response = await deleteTeam(team.serialKey);
               dispatch(triggerReRender(!reRender))
@@ -97,6 +97,54 @@ export default function GroupInfo({ navigation, route }) {
     navigation.navigate("Chat", { team, teamSerial: team.serialKey, name: team.name });
   };
 
+  const handleLeaveTeam = async () => {
+    Alert.alert(
+      "Leave team",
+      "Are you sure you want to leave this team?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Leave",
+          onPress: async () => {
+            try {
+              await handleRemoveUser(user.id, team.serialKey);
+              navigation.navigate("Groups");
+            } catch (error) {
+              console.log(error)
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const handleRemoveUser = async (userId, serialKey) => {
+    try {
+      const response = await leaveGroup(userId, serialKey);
+      dispatch(triggerReRender(!reRender))
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleMakeAdmin = async (userId, serialKey) => {
+    try {
+      const response = await makeAdmin(userId, serialKey);
+      dispatch(triggerReRender(!reRender))
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
+
+
   return (
     <ScrollView style={styles.container}>
       <Header navigation={navigation} title={team.name} showExit={true} />
@@ -105,8 +153,8 @@ export default function GroupInfo({ navigation, route }) {
           <ProfilePicture id={team.serialKey} size={200} type={"team"} allowPress={isAdmin}
           />
           {isAdmin && (
-            <View style={{justifyContent: "center", alignItems: "center"}}>
-              <Text style={[styles.listTitle, {paddingTop: 20}]}>Invitation Key</Text>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <Text style={[styles.listTitle, { paddingTop: 20 }]}>Invitation Key</Text>
               <TouchableOpacity
                 style={styles.serialBox}
                 onPress={copyToClipboard}
@@ -129,10 +177,12 @@ export default function GroupInfo({ navigation, route }) {
                   onPress={() => handleDeleteTeam()}
                 />
               </View>
+              <MainBtn title="Leave team" onPress={() => handleLeaveTeam()} />
+
             </View>
           )}
-          <View style={{marginTop: 20}}>
-            <IonIcons name="ios-chatbox-ellipses" size={40} color="white" onPress={redirectToChat}/>
+          <View style={{ marginTop: 20 }}>
+            <IonIcons name="ios-chatbox-ellipses" size={40} color="white" onPress={redirectToChat} />
           </View>
         </View>
       </View>
@@ -141,10 +191,28 @@ export default function GroupInfo({ navigation, route }) {
         <View style={styles.listContainer}>
           <Text style={styles.listTitle}>{members.length} Members</Text>
           {members.map((member) => (
-            <View key={member.id} style={styles.listItem}>
-              <ProfilePicture id={member.id} size={50} type={"user"} allowPress={false}  />
-              <Text style={[styles.mediumText, { padding: 10 }]} numberOfLines={1} ellipsizeMode="tail">{member.firstName}</Text>
-            </View>
+            <>
+              {member.id !== user.id && (
+                <View key={member.id} style={[styles.listItem]}>
+                  <ProfilePicture id={member.id} size={50} type={"user"} allowPress={false} />
+                  <Text style={[styles.mediumText, { padding: 10 }]} numberOfLines={1} ellipsizeMode="tail">{member.firstName}</Text>
+                  {isAdmin && !checkMemberAuth(member.id) && 
+                  <TouchableOpacity
+                    onPress={() => handleMakeAdmin(member.id, team.serialKey)}
+                  >
+                    <Text style={styles.smallText}>Make Owner</Text>
+                  </TouchableOpacity>
+                  }
+                  {/* {isAdmin && !member.admin && 
+                  <TouchableOpacity
+                    onPress={() => handleRemoveUser(member.id, team.serialKey)}
+                  >
+                    <Text style={styles.smallText}>Remove Member</Text>
+                  </TouchableOpacity>
+                  } */}
+                </View>
+              )}
+            </>
           ))}
         </View>
       )}

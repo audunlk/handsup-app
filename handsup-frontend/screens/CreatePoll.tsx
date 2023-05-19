@@ -122,6 +122,7 @@ export default function CreatePoll({ navigation, route }) {
     setIsLoading(true);
     try {
       const tokens = await getAllPushTokens(team.serialKey)
+      console.log(tokens)
       tokens.forEach(async (token) => {
         if (!token) {
           return;

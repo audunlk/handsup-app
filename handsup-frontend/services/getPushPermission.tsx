@@ -17,7 +17,7 @@ export const getPermission = async (user: User) => {
       }
       if (finalStatus !== 'granted') {
         alert('Failed to get push token for push notification!');
-        await AsyncStorage.setItem('pushToken', '');
+        await AsyncStorage.removeItem('pushToken');
         return;
       }
       const token = (await Notifications.getExpoPushTokenAsync(
@@ -30,7 +30,5 @@ export const getPermission = async (user: User) => {
       await AsyncStorage.setItem('pushToken', token);
       return token;
     }
-
-    
   }
 

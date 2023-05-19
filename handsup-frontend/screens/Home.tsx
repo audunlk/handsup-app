@@ -20,6 +20,7 @@ import { getTeamsByUserId } from "../services/teamRequests";
 import ProfilePicture from "../components/ProfilePicture";
 import LottieView from "lottie-react-native";
 import { setPolls } from "../redux/slices/pollSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export default function Home({ navigation }) {
