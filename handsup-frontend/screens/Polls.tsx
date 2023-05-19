@@ -7,9 +7,7 @@ import { RootState } from '../redux/types/types';
 import { renderPolls } from '../utils/renderPolls';
 import { FlatList } from 'react-native-gesture-handler';
 import BottomNav from '../navigation/BottomNav';
-import { getPollsByTeamSerials } from '../services/pollRequests';
 import { getTeamsByUserId } from '../services/teamRequests';
-import { setPolls } from '../redux/slices/pollSlice';
 import { User } from '../redux/types/types';
 import Header from '../components/Header';
 
@@ -22,8 +20,6 @@ export default function Polls({ navigation }) {
     const [teams, setTeams] = useState([]);
     const [selectedTab, setSelectedTab] = useState("active");
     const [isContentLoaded, setIsContentLoaded] = useState(false);
-
-    
 
     const getTeams = async () => {
         try {
@@ -54,7 +50,7 @@ export default function Polls({ navigation }) {
     return (
         <View style={styles.container}>
             <Header navigation={navigation} title={"Polls"} showExit={false} />
-                <View style={styles.tabs}>
+                <View style={[styles.tabs, {marginBottom: 20}]}>
                     <TouchableOpacity onPress={() => setSelectedTab("active")}>
                         <Text style={{ color: "white" }}>Active</Text>
                     </TouchableOpacity>

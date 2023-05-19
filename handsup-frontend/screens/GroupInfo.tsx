@@ -18,10 +18,14 @@ import ProfilePicture from "../components/ProfilePicture";
 import { User, RootState } from "../redux/types/types";
 import { useSelector } from "react-redux";
 import Loading from "./Loading";
+import { triggerReRender } from "../redux/slices/reRenderSlice";
+import { useDispatch } from "react-redux";
 
 export default function GroupInfo({ navigation, route }) {
   const { team } = route.params;
   const user: User = useSelector((state: RootState) => state.user);
+  const reRender = useSelector((state: RootState) => state.reRender);
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [members, setMembers] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -72,6 +76,7 @@ export default function GroupInfo({ navigation, route }) {
           {
             try {
               const response = await deleteTeam(team.serialKey);
+              dispatch(triggerReRender(!reRender))
               navigation.navigate("Groups");
             } catch (error) {
               console.log(error);

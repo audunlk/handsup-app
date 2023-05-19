@@ -19,11 +19,10 @@ import { triggerReRender } from "../redux/slices/reRenderSlice";
 export default function PollCard({ route, navigation }) {
   const user: User = useSelector((state: RootState) => state.user);
   const reRender = useSelector((state: RootState) => state.reRender);
-
   const { poll } = route.params;
   const { team } = route.params;
   const dispatch = useDispatch();
-  const [answers, setAnswers] = useState(poll.answers.map((answer: any) => answer));
+  const [answers, setAnswers] = useState(poll.answers.map((answer: string[]) => answer));
   const [creationDate, setCreationDate] = useState(ISOtoReadable(poll.created_at))
   const [respondBy, setRespondBy] = useState(ISOtoReadable(poll.respond_by));
   const [error, setError] = useState("");
@@ -107,21 +106,15 @@ export default function PollCard({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} title={poll.question} showExit={true} />
+      <Header navigation={navigation} title={team.name} showExit={true} />
       <View style={styles.body}>
-        <Text style={styles.mediumText}>{team.name}</Text>
-        <Text style={styles.smallText}>Created At:</Text>
-        <Text style={styles.smallText}>{creationDate[0]}</Text>
-        <Text style={styles.smallText}>{creationDate[1]}</Text>
-        <Text style={styles.smallText}>Respond By:</Text>
-        <Text style={styles.smallText}>{respondBy[0]}</Text>
-        <Text style={styles.smallText}>{respondBy[1]}</Text>
-        <Text style={styles.smallText}>{poll.group_id}</Text>
+        <Text style={[styles.title, {fontWeight: "bold"}]}>{poll.question}</Text>
+        <Text style={styles.smallText}>Made on:</Text>
+        <Text style={[styles.smallText, {marginBottom: 10}]}>{creationDate[0]} at {creationDate[1]}</Text>
         {hasAnswered ? (
           <View>
-            <TouchableOpacity style={styles.btn}>
-              <Text style={styles.smallText} onPress={() => setIsVisible(true)}>See Results</Text>
-            </TouchableOpacity>
+           
+            <MainBtn title='See Results' onPress={() => setIsVisible(true)} />
           </View>
         ) : (
           <View>
@@ -134,9 +127,7 @@ export default function PollCard({ route, navigation }) {
               itemStyle={{ color: "white", fontSize: 20, fontWeight: "bold", textAlign: "center", }}
             >
             </Picker>
-            <TouchableOpacity style={styles.btn} onPress={() => handleSubmitAnswer(selectedAnswer)}>
-              <Text style={styles.smallText}>Submit</Text>
-            </TouchableOpacity>
+            <MainBtn title="Submit" onPress={() => handleSubmitAnswer(selectedAnswer)} />
           </View>
         )}
         <MainBtn title="Chat" onPress={redirectToChat} />
@@ -148,8 +139,7 @@ export default function PollCard({ route, navigation }) {
         )}
         {isVisible && (
           <PollResults poll={poll} team={team} isVisible={isVisible} setIsVisible={setIsVisible} hasAnswered={hasAnswered}/>
-        )
-        }
+        )}
       </View>
     </View>
   );

@@ -71,7 +71,7 @@ export default function Teams({ navigation }) {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           contentContainerStyle={styles.body}>
-      <View style={styles.listContainer}>{renderView}</View>
+        {renderView}
       </ScrollView>
       <BottomNav navigation={navigation} />
       {isVisible === "join" && <JoinTeam isVisible={true} setIsVisible={setIsVisible} /> }

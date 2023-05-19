@@ -101,7 +101,7 @@ export default function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, {marginBottom: 20}]}>
         <View style={{ flexDirection: "row" }}>
           <ProfilePicture id={user.id} size={50} type={"user"} allowPress={false} />
           <View style={{ paddingLeft: 10 }}>
@@ -123,7 +123,7 @@ export default function Home({ navigation }) {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          contentContainerStyle={styles.body}>
+          contentContainerStyle={[styles.body]}>
           <LottieView
             source={require("../assets/animations/relax.json")}
             autoPlay
@@ -135,7 +135,7 @@ export default function Home({ navigation }) {
               marginBottom: 20,
             }}
           />
-          <Text style={styles.mediumText}>No polls in need of your attention</Text>
+          <Text style={[styles.mediumText, {color: "#FFA500", marginBottom: 5}]}>No polls in need of your attention</Text>
           <Text style={styles.smallText}>Pull down to refresh</Text>
         </ScrollView>
       ) : (

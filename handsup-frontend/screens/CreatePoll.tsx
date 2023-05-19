@@ -219,7 +219,7 @@ export default function CreatePoll({ navigation, route }) {
             <View style={styles.slide4}>
               <Text style={styles.smallText}>Question</Text>
               <Text style={[styles.largeText, { textAlign: "center" }]}>{poll.question}</Text>
-              <View style={styles.listContainer}>
+              <View style={styles.body}>
                 {answers.map((answer, index) => (
                   <View key={index} style={{ padding: 5, alignItems: "center", justifyContent: "center" }}>
                     <Text style={[styles.smallText, {paddingBottom: 5}]}>Answer {index + 1}</Text>
@@ -228,9 +228,9 @@ export default function CreatePoll({ navigation, route }) {
                     </View>
                   </View>
                 ))}
-                <Text style={[styles.smallText, {paddingBottom: 5}]}>Answer within</Text>
-                <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[0]}</Text>
+                <Text style={[styles.smallText, {paddingBottom: 5}]}>Reply By:</Text>
                 <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[1]}</Text>
+                <Text style={styles.mediumText}>{ISOtoReadable(poll.respond_by.toISOString())[0]}</Text>
               </View>
               
 

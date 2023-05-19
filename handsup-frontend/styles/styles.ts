@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 10,
     borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: 10,
     marginTop: 10,
     borderWidth: 2,
     width: 200,
@@ -213,6 +213,7 @@ buttonWrapper: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    
     backgroundColor: "#141d26",
     padding: 20,
   },

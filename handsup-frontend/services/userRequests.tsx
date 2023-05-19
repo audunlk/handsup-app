@@ -113,6 +113,21 @@ export const getAllPushTokens = async (teamId: string) => {
     }
 }
 
+export const deleteUser = async (userId: string) => {
+    try {
+        const userDocRef = doc(db, 'users', userId);
+        await deleteDoc(userDocRef);
+    } catch (error: unknown) {
+        if (error instanceof FirestoreError) {
+            console.error('Firestore Error:', error.code, error.message);
+            throw error;
+        }
+        console.error('Unexpected error:', error);
+        throw new Error('An unexpected error occurred while deleting user data.');
+    }
+};
+
+
 
 // export const createUser = async (email: string, password: string) => {
 //     const db = getDatabase();

@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TextInput, Alert, KeyboardAvoidingView } from "react-native";
-import { clearUser } from "../redux/slices/userSlice";
-import { setUser } from "../redux/slices/userSlice";
+import { setUser, clearUser } from "../redux/slices/userSlice";
 import { RootState, User } from "../redux/types/types";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoading } from "../redux/slices/loadingSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header";
-import { updateUser } from "../services/userRequests";
+import { deleteUser, updateUser } from "../services/userRequests";
 import ProfilePicture from "../components/ProfilePicture";
 import { checkValidity } from "../utils/regex";
 import styles from "../styles/styles";
 import MainBtn from "../components/MainBtn";
-import { getPermission } from "../services/getPushPermission";
+import { clearPolls } from "../redux/slices/pollSlice";
 
 export default function UserProfile({ navigation }) {
   const user: User = useSelector((state: RootState) => state.user);
@@ -95,13 +94,42 @@ export default function UserProfile({ navigation }) {
         {
           text: "Log out",
           onPress: async () => {
-            AsyncStorage.clear();
             dispatch(clearUser());
+            dispatch(clearPolls());
+            AsyncStorage.clear();
           },
         },
       ]
     );
   };
+
+  const handleDeleteUser = async () => {
+    Alert.alert(
+      "Are you sure?",
+      "Deleting your account is permanent and cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => setIsLoggingOut(false),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            try{
+              await deleteUser(user.id);
+            } catch (error) {
+              console.log(error)
+            }finally{
+              AsyncStorage.clear();
+              dispatch(clearUser());
+            }
+          },
+        },
+      ]
+    );
+  };
+
 
   return (
     <KeyboardAvoidingView
@@ -110,7 +138,7 @@ export default function UserProfile({ navigation }) {
       <Header navigation={navigation} title="Your Profile" showExit={true} />
       <View style={styles.body}>
         <ProfilePicture id={user.id} size={180} type={"user"} allowPress={true} />
-        <Text style={[styles.smallText, { marginBottom: 10 }]}>Tap to upload</Text>
+        <Text style={[styles.smallText, { marginVertical: 10, fontWeight: "bold" }]}>Tap to upload</Text>
         <Text style={[styles.smallText]}>
           Username
         </Text>
@@ -144,6 +172,7 @@ export default function UserProfile({ navigation }) {
         <Text style={[styles.smallText, { textAlign: "center" }]}>{error}</Text>
         <MainBtn title={isEditable ? "Save" : "Edit"} onPress={handleEdit} />
         <MainBtn title="Log out" onPress={handleLogout} />
+        <MainBtn title="Delete account" onPress={handleDeleteUser} />
       </View>
     </KeyboardAvoidingView>
   );

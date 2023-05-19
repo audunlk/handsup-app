@@ -10,9 +10,7 @@ export const renderPolls = (polls: any, navigation: any, teams: any) => {
   const today = new Date()
   return polls.map((poll, i) => {
     const pollDate = new Date(poll.respond_by);
-
     const pattern = date.compile('ddd, MMM DD YYYY, HH:mm');
-    
     const respondByDate = date.format(pollDate, pattern);
     const expiredOrNot = pollDate > today ? true : false
 

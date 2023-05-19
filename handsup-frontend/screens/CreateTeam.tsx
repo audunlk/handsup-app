@@ -23,7 +23,6 @@ export default function CreateTeam({ isVisible, setIsVisible }) {
   
 
   const handleCreateTeam = async (name: string) => {
-    setisLoading(true);
     setError("");
     try {
       const serialkey = new ShortUniqueId().randomUUID(6);
@@ -38,11 +37,9 @@ export default function CreateTeam({ isVisible, setIsVisible }) {
     } finally {
       setSuccessful(true);
       dispatch(triggerReRender(!reRender));
-      setisLoading(false);
     }
   };
 
-  if (isLoading) return <Loading />;
 
   return (
     <Modal
